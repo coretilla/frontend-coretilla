@@ -9,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Bitcoin, TrendingUp, Info, Zap } from "lucide-react";
+import { ArrowLeft, TrendingUp, Info, Zap } from "lucide-react";
+import Image from "next/image";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -111,7 +112,7 @@ export default function StakePage() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-sans flex items-center gap-2">
-                <Bitcoin className="h-5 w-5 text-orange-500" />
+                <Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />
                 BTC Balance
               </CardTitle>
             </CardHeader>

@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Calendar, Bitcoin, TrendingUp, Clock, DollarSign, Repeat } from "lucide-react";
+import { ArrowLeft, Calendar, TrendingUp, Clock, DollarSign, Repeat } from "lucide-react";
+import Image from "next/image";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -292,7 +293,7 @@ export default function DCAPage() {
           <Card>
             <CardHeader>
               <CardTitle className="font-sans flex items-center gap-2">
-                <Bitcoin className="h-5 w-5 text-orange-500" />
+                <Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />
                 Investment Projection
               </CardTitle>
               <CardDescription className="font-sans">

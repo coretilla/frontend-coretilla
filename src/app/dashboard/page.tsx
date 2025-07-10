@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import BalanceCard from "@/components/balance-card";
-import { ArrowLeft, Bitcoin, DollarSign, TrendingUp, Zap, BarChart3, Calendar } from "lucide-react";
+import { ArrowLeft, DollarSign, TrendingUp, Zap, BarChart3, Calendar } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -169,7 +170,7 @@ export default function DashboardPage() {
                 amount={balances.crypto.BTC.amount}
                 symbol=""
                 change={balances.crypto.BTC.change}
-                icon={<Bitcoin className="h-5 w-5 text-orange-500" />}
+                icon={<Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />}
               />
               <BalanceCard
                 title="Liquid Staking BTC"
@@ -224,7 +225,7 @@ export default function DashboardPage() {
                 <div className="text-sm text-muted-foreground font-sans">Add funds</div>
               </Link>
               <Link href="/swap" className="p-4 border rounded-lg hover:border-primary transition-colors text-center">
-                <Bitcoin className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+                <Image src="/image/btcLogo.png" alt="Bitcoin" width={32} height={32} className="object-contain mx-auto mb-2" />
                 <div className="font-medium font-sans">Swap</div>
                 <div className="text-sm text-muted-foreground font-sans">Trade assets</div>
               </Link>

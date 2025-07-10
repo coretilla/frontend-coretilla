@@ -5,7 +5,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { mobileNavSections } from "@/config/navItems";
-import { Menu, X, Bitcoin } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import BTCPriceViewer from "./btc-price-viewer";
 
@@ -37,7 +38,7 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
           <SheetHeader className="p-6 pb-4">
             <div className="flex items-center justify-between">
               <SheetTitle className="flex items-center gap-2 text-xl font-bold font-sans">
-                <Bitcoin className="h-6 w-6 text-primary" />
+                <Image src="/image/btcLogo.png" alt="Bitcoin" width={24} height={24} className="object-contain" />
                 Bitcoin Neobank
               </SheetTitle>
             </div>

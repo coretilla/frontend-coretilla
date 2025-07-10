@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Bitcoin, TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
+import { TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
+import Image from "next/image";
 
 interface BTCPriceData {
   price: number;
@@ -66,7 +67,7 @@ export default function BTCPriceViewer() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-auto p-2 font-sans">
           <div className="flex items-center gap-2">
-            <Bitcoin className="h-4 w-4 text-orange-500" />
+            <Image src="/image/btcLogo.png" alt="Bitcoin" width={16} height={16} className="object-contain" />
             <div className="text-right">
               <div className="text-sm font-mono font-semibold">
                 ${priceData.price.toLocaleString()}
@@ -85,7 +86,7 @@ export default function BTCPriceViewer() {
               {/* Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Bitcoin className="h-5 w-5 text-orange-500" />
+                  <Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />
                   <span className="font-semibold font-sans">Bitcoin Price</span>
                 </div>
                 <Button

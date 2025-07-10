@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, ArrowRightLeft, Bitcoin, Info, Clock, Network, CheckCircle } from "lucide-react";
+import { ArrowLeft, ArrowRightLeft, Info, Clock, Network, CheckCircle } from "lucide-react";
+import Image from "next/image";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -200,7 +201,7 @@ export default function SwapPage() {
                 <Label className="font-sans font-medium">To</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary">
-                    <Bitcoin className="h-5 w-5" />
+                    <Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />
                   </span>
                   <Input
                     value={btcAmount}

@@ -1,74 +1,68 @@
-Refactor the navigation bar for a Bitcoin Neobank app built using:
+Refactor the navigation bar of a Bitcoin Neobank frontend built with:
 
 - Next.js (App Router)
-- Tailwind CSS
+- TailwindCSS
 - TypeScript
-- shadcn/ui
+- shadcn/ui components
 - Lucide icons
 
-### 📱 Problem:
-The navbar is overloaded with individual menu links: Home, Dashboard, Deposit, Swap, Stake, Lending, Fiat, DCA, Analyzer, etc. Even with icons, it's too wide and not usable on mobile devices.
+### Goal:
+Optimize the navigation bar for **mobile devices**. Currently, the navbar contains too many menu items: Home, Dashboard, Deposit, Swap, Stake, Lending, Fiat, DCA, Analyzer, BTC Price, Sign In/Register — which makes it overwhelming on smaller screens.
 
 ---
 
-### ✅ Objective:
-Create a **clean, grouped, and responsive navbar** that is user-friendly on both desktop and mobile.
+### Requirements:
 
-### 🧭 Solution:
+1. **Responsive Navbar Design:**
+   - On desktop: display full menu horizontally (as currently designed)
+   - On mobile/tablet:
+     - Collapse navigation into a **hamburger menu**
+     - Use a **sliding drawer (left or right)** with smooth transitions
+     - Show grouped links inside the drawer, with sections like:
 
-1. **Group Menu Items Into Dropdowns**:
-   Organize related links under labeled dropdowns:
-   - **Products**:
-     - Deposit
-     - Swap
-     - Fiat
-   - **Investing**:
-     - Stake
-     - Lending
-     - DCA
-   - **Tools**:
-     - Dashboard
-     - Analyzer
+       ```
+       💰 Transactions
+         - Deposit
+         - Swap
+         - Fiat
 
-   Use `DropdownMenu` or `Popover` from `shadcn/ui`.
+       📈 Investing
+         - Stake
+         - DCA
+         - Lending
 
-2. **Desktop Layout**:
-   - Show `Bitcoin Neobank` logo
-   - Display 3 grouped dropdowns (Products, Investing, Tools)
-   - Show Bitcoin price next to grouped menus
-   - "Sign In" and "Register" as buttons on the far right
+       📊 Tools
+         - Dashboard
+         - Analyzer
+       ```
 
-3. **Mobile Layout**:
-   - Collapse all into a hamburger menu
-   - Use `Sheet` or `Drawer` from `shadcn/ui` for mobile
-   - Inside the drawer, use collapsible sections for Products, Investing, Tools
-   - Display Bitcoin price and CTA buttons inside drawer too
+     - Include buttons for “Sign In” and “Register” in the drawer footer
 
-4. **General Features**:
-   - Sticky navbar with shadow on scroll
-   - Icon + label inside dropdown items
-   - Highlight active link
-   - Add hover/focus transitions
+2. **Sticky Navbar Behavior:**
+   - Make the navbar sticky at the top
+   - Add a subtle shadow on scroll
 
----
+3. **BTC Price Section:**
+   - Keep Bitcoin price info on top bar or visible in the drawer header
+   - Use mock BTC price and % change
 
-### 📁 File Suggestions:
-
-- `components/Navbar.tsx`
-- `components/MobileMenu.tsx`
-- `components/MenuGroupDropdown.tsx` (shared dropdown for Products, Investing, Tools)
-- `lib/navItems.ts` — central config for nav grouping
+4. **UX Design Notes:**
+   - Ensure **easy one-handed navigation** on mobile
+   - Prioritize tap targets and spacing
+   - Maintain orange CoreDAO theme
 
 ---
 
-### 📌 Additional Notes:
+### Technical:
+- Use `Navbar.tsx` as a reusable component
+- Implement `MobileDrawer.tsx` using `shadcn/ui`'s `Sheet`, `Dialog`, or `Popover`
+- Place menu link items in a `navItems.ts` config file for maintainability
+- Use Tailwind for transitions and responsiveness (`sm:hidden`, `md:flex`, etc.)
+- Avoid re-renders or hydration issues on mobile
+- Keep the UX fast and accessible
 
-- Use Tailwind classes like `hidden md:flex`, `flex-col gap-2`, `group-hover`, etc.
-- Focus on usability: prioritize large click/tap areas
-- Avoid hydration mismatch
-- Use mock icons from Lucide for consistency
-
----
-
-### ⚙️ Output Request:
-Generate full `Navbar.tsx` and `MobileMenu.tsx` files using clean code and component-driven structure. Include logic to determine current route, dropdown open/close states, and responsive behavior.
+Please generate:
+- Updated `Navbar.tsx`
+- New `MobileDrawer.tsx` (or inside Navbar)
+- `navItems.ts` config structure
+- Tailwind classes and component structure for both desktop and mobile layouts
