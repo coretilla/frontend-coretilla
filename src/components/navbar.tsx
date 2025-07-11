@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import RouteLoader from "./ui/RouteLoader";
 import Image from "next/image";
 import BTCPrice from "./navbar/BTCPrice";
 import MobileDrawer from "./MobileDrawer";
@@ -15,11 +16,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { navGroups } from "@/lib/navItems";
-import { useNavigation, useScroll } from "@/hooks";
+import { useNavigation, useScroll, useRouteLoader } from "@/hooks";
 
 export default function Navbar() {
   const { mobileMenuOpen, activeRoute, toggleMobileMenu } = useNavigation();
   const { isScrolled } = useScroll(10);
+  const { navigateWithLoader, isNavigating } = useRouteLoader();
 
   return (
     <motion.nav
@@ -93,15 +95,15 @@ export default function Navbar() {
                         
                         return (
                           <DropdownMenuItem key={item.name} asChild>
-                            <Link
-                              href={item.href}
-                              className={`flex items-center gap-3 px-3 py-2 cursor-pointer ${
+                            <button
+                              onClick={() => navigateWithLoader(item.href)}
+                              className={`flex items-center gap-3 px-3 py-2 cursor-pointer w-full text-left ${
                                 isActive ? "bg-primary/10 text-primary" : ""
                               }`}
                             >
                               <IconComponent className="h-4 w-4" />
                               {item.name}
-                            </Link>
+                            </button>
                           </DropdownMenuItem>
                         );
                       })}
@@ -138,6 +140,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      <RouteLoader show={isNavigating} />
     </motion.nav>
   );
 }

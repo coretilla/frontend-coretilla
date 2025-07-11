@@ -17,51 +17,51 @@ export default function DashboardPage() {
   // Mock balance data
   const balances = {
     fiat: {
-      USD: { amount: "1,250.00", change: { value: 125.50, percentage: 11.2, period: "7D" } },
-      IDR: { amount: "18,750,000", change: { value: -250000, percentage: -1.3, period: "7D" } },
-      EUR: { amount: "1,100.50", change: { value: 55.25, percentage: 5.3, period: "7D" } },
+      USD: { amount: "0.00", change: { value: 0, percentage: 0, period: "7D" } },
+      IDR: { amount: "0", change: { value: 0, percentage: 0, period: "7D" } },
+      EUR: { amount: "0.00", change: { value: 0, percentage: 0, period: "7D" } },
     },
     crypto: {
-      BTC: { amount: "0.15000000", change: { value: 0.0125, percentage: 9.1, period: "7D" } },
-      lstBTC: { amount: "0.08000000", change: { value: 0.0045, percentage: 5.9, period: "7D" } },
-      istBTC: { amount: "0.00200000", change: { value: 0.0008, percentage: 66.7, period: "7D" } },
+      BTC: { amount: "0.00000000", change: { value: 0, percentage: 0, period: "7D" } },
+      lstBTC: { amount: "0.00000000", change: { value: 0, percentage: 0, period: "7D" } },
+      istBTC: { amount: "0.00000000", change: { value: 0, percentage: 0, period: "7D" } },
     },
     mockAssets: {
-      mockUSDT: { amount: "2,500.00", change: { value: 0, percentage: 0, period: "7D" } },
-      mockETH: { amount: "2.50000000", change: { value: 0.15, percentage: 6.4, period: "7D" } },
+      mockUSDT: { amount: "0.00", change: { value: 0, percentage: 0, period: "7D" } },
+      mockETH: { amount: "0.00000000", change: { value: 0, percentage: 0, period: "7D" } },
     }
   };
 
   // Mock chart data
   const chartData = {
     "7D": [
-      { day: "Mon", value: 8250 },
-      { day: "Tue", value: 8580 },
-      { day: "Wed", value: 8920 },
-      { day: "Thu", value: 8750 },
-      { day: "Fri", value: 9100 },
-      { day: "Sat", value: 9350 },
-      { day: "Sun", value: 9600 },
+      { day: "Mon", value: 0 },
+      { day: "Tue", value: 0 },
+      { day: "Wed", value: 0 },
+      { day: "Thu", value: 0 },
+      { day: "Fri", value: 0 },
+      { day: "Sat", value: 0 },
+      { day: "Sun", value: 0 },
     ],
     "1M": [
-      { day: "Week 1", value: 7800 },
-      { day: "Week 2", value: 8200 },
-      { day: "Week 3", value: 8900 },
-      { day: "Week 4", value: 9600 },
+      { day: "Week 1", value: 0 },
+      { day: "Week 2", value: 0 },
+      { day: "Week 3", value: 0 },
+      { day: "Week 4", value: 0 },
     ],
     "All": [
-      { day: "Jan", value: 5000 },
-      { day: "Feb", value: 5500 },
-      { day: "Mar", value: 6200 },
-      { day: "Apr", value: 7100 },
-      { day: "May", value: 7800 },
-      { day: "Jun", value: 8400 },
-      { day: "Jul", value: 9600 },
+      { day: "Jan", value: 0 },
+      { day: "Feb", value: 0 },
+      { day: "Mar", value: 0 },
+      { day: "Apr", value: 0 },
+      { day: "May", value: 0 },
+      { day: "Jun", value: 0 },
+      { day: "Jul", value: 0 },
     ],
   };
 
-  const totalPortfolioValue = 9600; // USD
-  const totalChange = { value: 847.50, percentage: 9.7 };
+  const totalPortfolioValue = 0; // USD
+  const totalChange = { value: 0, percentage: 0 };
 
   return (
     <PageWrapper 
@@ -85,10 +85,10 @@ export default function DashboardPage() {
                 <div className="text-4xl font-bold font-mono text-foreground">
                   ${totalPortfolioValue.toLocaleString()}
                 </div>
-                <div className="flex items-center gap-2 text-sm font-sans text-green-600">
+                <div className="flex items-center gap-2 text-sm font-sans text-muted-foreground">
                   <TrendingUp className="h-4 w-4" />
-                  <span className="font-mono">+${totalChange.value.toFixed(2)}</span>
-                  <span>(+{totalChange.percentage}%)</span>
+                  <span className="font-mono">${totalChange.value.toFixed(2)}</span>
+                  <span>({totalChange.percentage}%)</span>
                   <span className="text-muted-foreground">7D</span>
                 </div>
               </div>

@@ -32,15 +32,15 @@ export default function StakePage() {
 
   // Mock balances
   const balances = {
-    BTC: 0.15,
-    lstBTC: 0.08,
-    istBTC: 0.002,
+    BTC: 0.00000000,
+    lstBTC: 0.00000000,
+    istBTC: 0.00000000,
   };
 
   const stakingData = {
     apr: 12.5,
-    totalStaked: 1.25,
-    totalRewards: 0.156,
+    totalStaked: 0.00000000,
+    totalRewards: 0.00000000,
     stakingPeriod: "Flexible",
     minStake: 0.001,
   };

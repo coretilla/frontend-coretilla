@@ -45,9 +45,9 @@ export default function LendingPage() {
 
   // Mock data
   const assets = [
-    { symbol: "mockBTC", name: "Mock Bitcoin", balance: 0.15, apy: 8.5 },
-    { symbol: "mockUSDT", name: "Mock Tether", balance: 1250.0, apy: 12.0 },
-    { symbol: "mockETH", name: "Mock Ethereum", balance: 2.5, apy: 6.8 },
+    { symbol: "mockBTC", name: "Mock Bitcoin", balance: 0.00000000, apy: 8.5 },
+    { symbol: "mockUSDT", name: "Mock Tether", balance: 0.00, apy: 12.0 },
+    { symbol: "mockETH", name: "Mock Ethereum", balance: 0.00000000, apy: 6.8 },
   ];
 
   const lendingRates = {

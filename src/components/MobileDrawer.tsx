@@ -12,7 +12,7 @@ import { motion } from "framer-motion";
 import BTCPrice from "./navbar/BTCPrice";
 import { ConnectWallet } from "./wallet/ConnectWallet";
 import { navGroups } from "@/lib/navItems";
-import { useNavigation } from "@/hooks";
+import { useNavigation, useRouteLoader } from "@/hooks";
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -21,14 +21,16 @@ interface MobileDrawerProps {
 
 export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps) {
   const { activeRoute, closeMobileMenu } = useNavigation();
+  const { navigateWithLoader } = useRouteLoader();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "Transactions": true,
     "Investing": true,
     "Tools": true,
   });
 
-  const handleLinkClick = () => {
+  const handleLinkClick = (href: string) => {
     closeMobileMenu();
+    navigateWithLoader(href);
   };
 
   const toggleGroup = (groupName: string) => {
@@ -115,10 +117,9 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                             >
-                              <Link
-                                href={item.href}
-                                onClick={handleLinkClick}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                              <button
+                                onClick={() => handleLinkClick(item.href)}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 w-full text-left ${
                                   isActive 
                                     ? "bg-primary text-primary-foreground" 
                                     : "hover:bg-muted text-foreground"
@@ -132,7 +133,7 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
                                 }`}>
                                   {item.name}
                                 </span>
-                              </Link>
+                              </button>
                             </motion.div>
                           );
                         })}
@@ -157,13 +158,13 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
               <Button 
                 variant="outline" 
                 className="font-sans font-medium"
-                onClick={handleLinkClick}
+                onClick={() => closeMobileMenu()}
               >
                 Sign In
               </Button>
               <Button 
                 className="font-sans font-medium"
-                onClick={handleLinkClick}
+                onClick={() => closeMobileMenu()}
               >
                 Register
               </Button>

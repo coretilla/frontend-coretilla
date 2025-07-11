@@ -1,22 +1,52 @@
-Enhance the frontend of the Bitcoin Neobank application by adding the following:
-
----
-
 🎯 GOAL:
-1. Animate route/page transitions between menu pages: Deposit, Swap, Stake, Lending, Fiat, DCA, Analyzer.
-2. Ensure the navigation (`Navbar`) and `Footer` are persistent across all pages.
-3. Use smooth entrance/exit animations for page content using Framer Motion.
-4. Maintain responsiveness and performance.
+Implement a loading animation or skeleton screen when users navigate to key pages:
+- /deposit
+- /swap
+- /stake
+- /lending
+- /dca
+- /analyzer
+- /faucet
+
+This is to enhance UX during route changes and prevent users from seeing white flashes or layout jumps.
 
 ---
 
-🧩 TECH STACK TO USE:
+🧩 TECH TO USE:
 - **Next.js (App Router)**
 - **Tailwind CSS**
-- **Framer Motion**
-- React functional components
-- Reusable layout system
+- **Framer Motion** (for fade-in/out or spinner)
+- Optional: **nprogress** or custom loader component
 
 ---
 
-📁 FILE STRUCTURE REQUIREMENTS:
+📁 FILES TO INCLUDE:
+/components/ui/RouteLoader.tsx
+/app/layout.tsx or /app/(pages)/layout.tsx
+
+
+---
+
+💡 BEHAVIOR:
+- Show spinner or skeleton while new page is loading
+- Only show loader on first navigation or during network delay
+- Animate entrance/exit of the page content
+- Use `useTransition()` or `router.events` from `next/navigation`
+
+---
+
+🔧 IMPLEMENTATION STRATEGY (Option 1 - with `useTransition()`):
+
+1. Wrap page links or buttons (e.g., in Navbar) with logic:
+
+```tsx
+'use client';
+import { useTransition } from 'react';
+
+const [isPending, startTransition] = useTransition();
+
+const handleClick = () => {
+  startTransition(() => {
+    router.push('/deposit');
+  });
+};

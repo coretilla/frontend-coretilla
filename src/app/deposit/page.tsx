@@ -42,9 +42,9 @@ export default function DepositPage() {
   ];
 
   const currentBalances = {
-    USD: 1250.00,
-    IDR: 18750000,
-    EUR: 1100.50,
+    USD: 0.00,
+    IDR: 0,
+    EUR: 0.00,
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

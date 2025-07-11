@@ -21,7 +21,7 @@ export const activeRouteAtom = atom<string>('');
 // Wallet State
 export const walletConnectedAtom = atom<boolean>(false);
 export const walletAddressAtom = atom<string | null>(null);
-export const walletBalanceAtom = atom<string>('0');
+export const walletBalanceAtom = atom<string>('0.00000000');
 
 // Theme State
 export const themeAtom = atom<'light' | 'dark'>('light');

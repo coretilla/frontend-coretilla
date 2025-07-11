@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Zap, Globe, TrendingUp } from "lucide-react";
+import { ArrowRight, Shield, Zap, Globe, TrendingUp, Fuel, Eye, Key, Lock } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useBTCPrice } from "@/hooks";
@@ -119,7 +119,7 @@ export default function Hero() {
               </motion.div>
             </motion.div>
 
-            {/* Feature Pills */}
+            {/* Feature Pills - Web3 Native */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -130,28 +130,31 @@ export default function Hero() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.2, duration: 0.4 }}
-                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center gap-2 bg-orange-100 text-orange-800 text-sm px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
               >
-                <Shield className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-foreground font-medium font-sans">Bank-Grade Security</span>
+                <Fuel className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium font-sans">Gasless Transactions</span>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.4, duration: 0.4 }}
-                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center gap-2 bg-purple-100 text-purple-800 text-sm px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
               >
-                <Zap className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-foreground font-medium font-sans">Instant Transactions</span>
+                <Eye className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium font-sans">No KYC Required</span>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.6, duration: 0.4 }}
-                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center gap-2 bg-green-100 text-green-800 text-sm px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
               >
-                <Globe className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-foreground font-medium font-sans">Global Access</span>
+                <Key className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium font-sans">100% Self-Custody</span>
               </motion.div>
             </motion.div>
           </div>
@@ -242,7 +245,7 @@ export default function Hero() {
                       transition={{ delay: 1.6, duration: 0.4 }}
                       className="text-center"
                     >
-                      <div className="text-xl font-bold text-foreground mb-1 font-mono">0.025</div>
+                      <div className="text-xl font-bold text-foreground mb-1 font-mono">0.00000000</div>
                       <div className="text-xs text-muted-foreground font-sans">Your Balance</div>
                     </motion.div>
                   </div>
@@ -280,9 +283,9 @@ export default function Hero() {
                 className="absolute -top-4 -left-4 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-4 border border-orange-200/50 hidden lg:block"
               >
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  <TrendingUp className="w-5 h-5 text-muted-foreground" />
                   <div>
-                    <div className="text-sm font-semibold text-green-600">+15.2%</div>
+                    <div className="text-sm font-semibold text-muted-foreground">0.0%</div>
                     <div className="text-xs text-muted-foreground">Portfolio</div>
                   </div>
                 </div>
@@ -295,10 +298,10 @@ export default function Hero() {
                 className="absolute -bottom-4 -right-4 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-4 border border-orange-200/50 hidden lg:block"
               >
                 <div className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-primary" />
+                  <Lock className="w-5 h-5 text-primary" />
                   <div>
-                    <div className="text-sm font-semibold text-primary">Gassless</div>
-                    <div className="text-xs text-muted-foreground">Transactions</div>
+                    <div className="text-sm font-semibold text-primary">Not Your Keys</div>
+                    <div className="text-xs text-muted-foreground">Not Your Coins</div>
                   </div>
                 </div>
               </motion.div>

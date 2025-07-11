@@ -32,9 +32,9 @@ export default function DCAPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const currencies = [
-    { code: "USD", name: "US Dollar", symbol: "$", balance: 1250.00 },
-    { code: "IDR", name: "Indonesian Rupiah", symbol: "Rp", balance: 18750000 },
-    { code: "EUR", name: "Euro", symbol: "€", balance: 1100.50 },
+    { code: "USD", name: "US Dollar", symbol: "$", balance: 0.00 },
+    { code: "IDR", name: "Indonesian Rupiah", symbol: "Rp", balance: 0 },
+    { code: "EUR", name: "Euro", symbol: "€", balance: 0.00 },
   ];
 
   const frequencies = [

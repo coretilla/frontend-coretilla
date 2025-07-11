@@ -7,7 +7,8 @@ import {
   DollarSign, 
   CalendarDays, 
   BarChart3,
-  TrendingUp 
+  TrendingUp,
+  Droplets
 } from "lucide-react";
 
 export interface NavItem {
@@ -47,6 +48,7 @@ export const navGroups: NavGroup[] = [
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { name: "Analyzer", href: "/analyzer", icon: BarChart3 },
+      { name: "Faucet", href: "/faucet", icon: Droplets },
     ]
   }
 ];

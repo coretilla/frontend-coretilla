@@ -35,9 +35,9 @@ export default function SwapPage() {
   ];
 
   const currentBalances = {
-    USD: 1250.00,
-    IDR: 18750000,
-    BTC: 0.025,
+    USD: 0.00,
+    IDR: 0,
+    BTC: 0.00000000,
   };
 
   const networkFee = 0.0001; // BTC
