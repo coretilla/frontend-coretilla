@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { TrendingUp, TrendingDown, RefreshCw, AlertCircle } from "lucide-react";
 import Image from "next/image";
-import { useBTCPrice } from "@/contexts/BTCPriceContext";
+import { useBTCPrice } from "@/hooks";
 
 interface BTCPriceProps {
   className?: string;
@@ -130,9 +130,6 @@ export default function BTCPrice({ className = "", showDropdown = true }: BTCPri
                     <TrendingDown className="h-4 w-4" />
                   )}
                   <span>
-                    {isPositive ? '+' : '-'}{formatChange(priceData.change24h)}
-                  </span>
-                  <span>
                     ({isPositive ? '+' : ''}{priceData.changePercent.toFixed(2)}%)
                   </span>
                 </div>
@@ -144,7 +141,7 @@ export default function BTCPrice({ className = "", showDropdown = true }: BTCPri
                   Data from CoinGecko • Updates every 60s
                 </div>
                 <div className="text-xs text-muted-foreground font-mono">
-                  Last updated: {priceData.lastUpdate}
+                  Last updated: {new Date(priceData.lastUpdated).toLocaleTimeString()}
                 </div>
               </div>
 
@@ -153,7 +150,7 @@ export default function BTCPrice({ className = "", showDropdown = true }: BTCPri
                 <div className="text-center p-3 bg-muted rounded-lg">
                   <div className="text-sm text-muted-foreground font-sans">24h Change</div>
                   <div className={`font-mono font-semibold text-lg ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                    {isPositive ? '+' : '-'}{formatChange(priceData.change24h)}
+                    {isPositive ? '+' : ''}{priceData.changePercent.toFixed(2)}%
                   </div>
                 </div>
               </div>

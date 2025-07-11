@@ -5,9 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import BalanceCard from "@/components/balance-card";
-import { ArrowLeft, DollarSign, TrendingUp, Zap, BarChart3, Calendar } from "lucide-react";
+import PageWrapper from "@/components/layout/PageWrapper";
+import { DollarSign, TrendingUp, Zap, BarChart3, Calendar } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function DashboardPage() {
   const [selectedPeriod, setSelectedPeriod] = useState("7D");
@@ -62,22 +64,12 @@ export default function DashboardPage() {
   const totalChange = { value: 847.50, percentage: 9.7 };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+    <PageWrapper 
+      title="Portfolio Dashboard"
+      subtitle="Track your fiat and crypto balances with detailed analytics"
+      className="bg-gradient-to-br from-orange-50 to-orange-100"
+    >
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors mb-6">
-            <ArrowLeft className="h-4 w-4" />
-            <span className="font-sans font-medium">Back to Home</span>
-          </Link>
-          
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-2 font-sans">Portfolio Dashboard</h1>
-            <p className="text-muted-foreground font-sans">
-              Track your fiat and crypto balances with detailed analytics
-            </p>
-          </div>
-        </div>
 
         {/* Total Portfolio Value */}
         <Card className="mb-8">
@@ -243,6 +235,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

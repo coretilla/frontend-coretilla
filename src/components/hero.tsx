@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Zap, Globe, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useBTCPrice } from "@/contexts/BTCPriceContext";
+import { useBTCPrice } from "@/hooks";
 
 export default function Hero() {
   const { priceData, isLoading, error } = useBTCPrice();
@@ -297,8 +297,8 @@ export default function Hero() {
                 <div className="flex items-center gap-2">
                   <Shield className="w-5 h-5 text-primary" />
                   <div>
-                    <div className="text-sm font-semibold text-primary">Secured</div>
-                    <div className="text-xs text-muted-foreground">Bank Level</div>
+                    <div className="text-sm font-semibold text-primary">Gassless</div>
+                    <div className="text-xs text-muted-foreground">Transactions</div>
                   </div>
                 </div>
               </motion.div>

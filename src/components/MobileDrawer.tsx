@@ -8,11 +8,11 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Menu, ChevronDown, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import BTCPrice from "./navbar/BTCPrice";
 import { ConnectWallet } from "./wallet/ConnectWallet";
 import { navGroups } from "@/lib/navItems";
+import { useNavigation } from "@/hooks";
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -20,7 +20,7 @@ interface MobileDrawerProps {
 }
 
 export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps) {
-  const pathname = usePathname();
+  const { activeRoute, closeMobileMenu } = useNavigation();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "Transactions": true,
     "Investing": true,
@@ -28,7 +28,7 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
   });
 
   const handleLinkClick = () => {
-    onOpenChange(false);
+    closeMobileMenu();
   };
 
   const toggleGroup = (groupName: string) => {
@@ -75,7 +75,7 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
             >
               {navGroups.map((group, groupIndex) => {
                 const isGroupOpen = openGroups[group.name];
-                const hasActiveItem = group.items.some(item => pathname === item.href);
+                const hasActiveItem = group.items.some(item => activeRoute === item.href);
                 
                 return (
                   <motion.div
@@ -104,7 +104,7 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
                       <CollapsibleContent className="space-y-1 pl-6">
                         {group.items.map((item, itemIndex) => {
                           const IconComponent = item.icon;
-                          const isActive = pathname === item.href;
+                          const isActive = activeRoute === item.href;
                           
                           return (
                             <motion.div

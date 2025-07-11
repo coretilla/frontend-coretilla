@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, CreditCard, Building2, Smartphone, QrCode, Info, CheckCircle } from "lucide-react";
+import { CreditCard, Building2, Smartphone, QrCode, Info, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-import Link from "next/link";
+import PageWrapper from "@/components/layout/PageWrapper";
+import { motion } from "framer-motion";
 
 interface DepositFormData {
   currency: string;
@@ -78,20 +79,12 @@ export default function DepositPage() {
   const selectedPaymentMethod = paymentMethods.find(p => p.id === formData.paymentMethod);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+    <PageWrapper 
+      title="Deposit Fiat"
+      subtitle="Easily top up your balance to buy Bitcoin anytime."
+      className="bg-gradient-to-br from-orange-50 to-orange-100"
+    >
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors mb-6">
-            <ArrowLeft className="h-4 w-4" />
-            <span className="font-sans font-medium">Back to Home</span>
-          </Link>
-          
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-2 font-sans">Deposit Fiat</h1>
-            <p className="text-muted-foreground font-sans">Easily top up your balance to buy Bitcoin anytime.</p>
-          </div>
-        </div>
 
         {/* Current Balances */}
         <Card className="mb-6">
@@ -271,6 +264,6 @@ export default function DepositPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import BTCPrice from "./navbar/BTCPrice";
 import MobileDrawer from "./MobileDrawer";
 import { ConnectWallet } from "./wallet/ConnectWallet";
@@ -16,20 +14,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { navGroups, allNavItems } from "@/lib/navItems";
+import { navGroups } from "@/lib/navItems";
+import { useNavigation, useScroll } from "@/hooks";
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const { mobileMenuOpen, activeRoute, toggleMobileMenu } = useNavigation();
+  const { isScrolled } = useScroll(10);
 
   return (
     <motion.nav
@@ -58,7 +48,7 @@ export default function Navbar() {
                 <Image src="/image/btcLogo.png" alt="Bitcoin" width={32} height={32} className="object-contain" />
               </motion.div>
               <span className="text-xl font-bold text-foreground font-sans">
-                Bitcoin Neobank
+            Coretilla
               </span>
             </Link>
           </motion.div>
@@ -71,7 +61,7 @@ export default function Navbar() {
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             {navGroups.map((group, groupIndex) => {
-              const hasActiveItem = group.items.some(item => pathname === item.href);
+              const hasActiveItem = group.items.some(item => activeRoute === item.href);
               
               return (
                 <motion.div
@@ -99,7 +89,7 @@ export default function Navbar() {
                     <DropdownMenuContent align="start" className="w-48">
                       {group.items.map((item) => {
                         const IconComponent = item.icon;
-                        const isActive = pathname === item.href;
+                        const isActive = activeRoute === item.href;
                         
                         return (
                           <DropdownMenuItem key={item.name} asChild>
@@ -142,8 +132,8 @@ export default function Navbar() {
               <BTCPrice showDropdown={false} />
             </div>
             <MobileDrawer 
-              isOpen={isMobileMenuOpen} 
-              onOpenChange={setIsMobileMenuOpen}
+              isOpen={mobileMenuOpen} 
+              onOpenChange={toggleMobileMenu}
             />
           </div>
         </div>

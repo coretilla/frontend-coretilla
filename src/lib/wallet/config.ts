@@ -1,16 +1,39 @@
 import { createAppKit } from '@reown/appkit/react'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { QueryClient } from '@tanstack/react-query'
-import { mainnet } from 'viem/chains'
+import { defineChain } from 'viem'
+
+// Define CoreDAO Testnet
+const coreDAOTestnet = defineChain({
+  id: 1115,
+  name: 'Core Blockchain Testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'tCORE',
+    symbol: 'tCORE',
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.test.btcs.network'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'CoreScan Testnet',
+      url: 'https://scan.test.btcs.network',
+    },
+  },
+  testnet: true,
+})
 
 // Get projectId from WalletConnect Cloud
 export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'demo-project-id'
 
 // Create a metadata object
 const metadata = {
-  name: 'Bitcoin Neobank',
-  description: 'Your digital bank for the Bitcoin economy',
-  url: typeof window !== 'undefined' ? window.location.origin : 'https://bitcoinneobank.com',
+  name: 'Coretilla',
+  description: 'Your digital bank for the CoreDAO economy',
+  url: typeof window !== 'undefined' ? window.location.origin : 'https://coretilla.com',
   icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 
@@ -18,15 +41,15 @@ const metadata = {
 export const wagmiAdapter = new WagmiAdapter({
   ssr: true,
   projectId,
-  networks: [mainnet]
+  networks: [coreDAOTestnet]
 })
 
 // Configure the modal
 export const modal = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
-  networks: [mainnet],
-  defaultNetwork: mainnet,
+  networks: [coreDAOTestnet],
+  defaultNetwork: coreDAOTestnet,
   metadata: metadata,
   features: {
     analytics: true,

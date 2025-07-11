@@ -1,23 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { WalletProvider } from "@/components/wallet/WalletProvider";
-import { BTCPriceProvider } from "@/contexts/BTCPriceContext";
+import JotaiProvider from "@/components/providers/JotaiProvider";
+import MainLayout from "@/components/layout/MainLayout";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
-  title: "Bitcoin Neobank - Your Digital Bank for Bitcoin",
-  description: "Simple, secure, and designed for everyone - from crypto beginners to Bitcoin veterans.",
+  title: "Coretilla - Your Digital Bank for CoreDAO",
+  description: "Simple, secure, and designed for everyone - from crypto beginners to CoreDAO veterans.",
 };
 
 export default function RootLayout({
@@ -28,14 +25,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${poppins.variable} antialiased`}
       >
-        <WalletProvider>
-          <BTCPriceProvider>
-            {children}
+        <JotaiProvider>
+          <WalletProvider>
+            <MainLayout>
+              {children}
+            </MainLayout>
             <Toaster />
-          </BTCPriceProvider>
-        </WalletProvider>
+          </WalletProvider>
+        </JotaiProvider>
       </body>
     </html>
   );

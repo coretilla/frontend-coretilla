@@ -8,10 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, ArrowRightLeft, Info, Clock, Network, CheckCircle } from "lucide-react";
+import { ArrowRightLeft, Info, Clock, Network, CheckCircle } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
-import Link from "next/link";
+import PageWrapper from "@/components/layout/PageWrapper";
+import { motion } from "framer-motion";
 
 interface SwapFormData {
   fromCurrency: string;
@@ -94,20 +95,12 @@ export default function SwapPage() {
   const selectedCurrency = currencies.find(c => c.code === formData.fromCurrency);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+    <PageWrapper 
+      title="Swap to Bitcoin"
+      subtitle="Convert your fiat currency to Bitcoin on Core Network"
+      className="bg-gradient-to-br from-orange-50 to-orange-100"
+    >
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors mb-6">
-            <ArrowLeft className="h-4 w-4" />
-            <span className="font-sans font-medium">Back to Home</span>
-          </Link>
-          
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-2 font-sans">Swap to Bitcoin</h1>
-            <p className="text-muted-foreground font-sans">Convert your fiat currency to Bitcoin on Core Network</p>
-          </div>
-        </div>
 
         {/* Current Balances */}
         <Card className="mb-6">
@@ -321,6 +314,6 @@ export default function SwapPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

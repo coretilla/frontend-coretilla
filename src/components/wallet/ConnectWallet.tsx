@@ -161,7 +161,7 @@ export function ConnectWallet({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.open(`https://etherscan.io/address/${address}`, '_blank')}
+                onClick={() => window.open(`https://scan.test2.btcs.network/address/${address}`, '_blank')}
                 className="flex-1"
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
@@ -253,7 +253,7 @@ export function ConnectWallet({
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Chrome className="w-4 h-4 text-blue-500" />
-              <span>Works with Google, Apple, and social logins</span>
+              <span>Works with Google account login</span>
             </div>
           </div>
 

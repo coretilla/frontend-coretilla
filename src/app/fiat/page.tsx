@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, QrCode, Scan, Building2, CreditCard, Send, Download } from "lucide-react";
+import { QrCode, Scan, Building2, CreditCard, Send, Download } from "lucide-react";
 import { toast } from "sonner";
-import Link from "next/link";
+import PageWrapper from "@/components/layout/PageWrapper";
+import { motion } from "framer-motion";
 
 interface FiatTransactionData {
   type: "deposit" | "transfer" | "withdraw";
@@ -100,22 +101,12 @@ export default function FiatPage() {
   const selectedCurrency = currencies.find(c => c.code === transactionData.currency);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+    <PageWrapper 
+      title="Fiat Transactions"
+      subtitle="Deposit, transfer, and withdraw fiat currency with QR support"
+      className="bg-gradient-to-br from-orange-50 to-orange-100"
+    >
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors mb-6">
-            <ArrowLeft className="h-4 w-4" />
-            <span className="font-sans font-medium">Back to Home</span>
-          </Link>
-          
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-2 font-sans">Fiat Transactions</h1>
-            <p className="text-muted-foreground font-sans">
-              Deposit, transfer, and withdraw fiat currency with QR support
-            </p>
-          </div>
-        </div>
 
         {/* Balance Overview */}
         <Card className="mb-8">
@@ -490,6 +481,6 @@ export default function FiatPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
