@@ -92,22 +92,6 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
 
           <Separator />
 
-          {/* Footer - Auth Buttons */}
-          <div className="p-6 pt-4 space-y-3">
-            <Button
-              variant="outline"
-              className="w-full justify-start font-sans font-medium"
-              onClick={handleLinkClick}
-            >
-              Sign In
-            </Button>
-            <Button
-              className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
-              onClick={handleLinkClick}
-            >
-              Register
-            </Button>
-          </div>
         </div>
       </SheetContent>
     </Sheet>

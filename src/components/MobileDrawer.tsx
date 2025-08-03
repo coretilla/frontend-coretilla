@@ -154,21 +154,7 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <div className="grid grid-cols-2 gap-3">
-              <Button 
-                variant="outline" 
-                className="font-sans font-medium"
-                onClick={() => closeMobileMenu()}
-              >
-                Sign In
-              </Button>
-              <Button 
-                className="font-sans font-medium"
-                onClick={() => closeMobileMenu()}
-              >
-                Register
-              </Button>
-            </div>
+
             <ConnectWallet 
               className="w-full justify-center font-sans font-medium"
             />
