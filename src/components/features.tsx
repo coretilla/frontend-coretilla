@@ -3,14 +3,11 @@ import { Button } from "@/components/ui/button";
 import { 
   Wallet, 
   ArrowUpDown, 
-  Coins, 
   TrendingUp, 
   CreditCard, 
-  QrCode,
   BarChart3,
   DollarSign,
   Percent,
-  Bot,
   Activity,
   UserCheck,
   Zap
@@ -20,7 +17,7 @@ const features = [
   {
     icon: CreditCard,
     title: "Deposit Fiat",
-    description: "Easily deposit USD, EUR, and other fiat currencies directly to your account",
+    description: "Easily deposit USD directly to your account",
     color: "bg-blue-100 text-blue-600",
     comingSoon: false
   },
@@ -29,13 +26,6 @@ const features = [
     title: "Swap Fiat to BTC",
     description: "Convert your fiat currency to Bitcoin on the Core network with competitive rates",
     color: "bg-orange-100 text-orange-600",
-    comingSoon: false
-  },
-  {
-    icon: Coins,
-    title: "Mock BTC & USDT",
-    description: "Trade with mock Bitcoin and USDT on the Core chain for testing purposes",
-    color: "bg-yellow-100 text-yellow-600",
     comingSoon: false
   },
   {
@@ -51,13 +41,6 @@ const features = [
     description: "Lend your Bitcoin to earn interest or borrow against your crypto holdings",
     color: "bg-purple-100 text-purple-600",
     comingSoon: true
-  },
-  {
-    icon: QrCode,
-    title: "QR & Barcode Payments",
-    description: "Deposit, transfer, and withdraw using QR codes and barcode scanning",
-    color: "bg-indigo-100 text-indigo-600",
-    comingSoon: false
   },
   {
     icon: BarChart3,
@@ -79,20 +62,6 @@ const features = [
     description: "Flexible APY with adjustable interest rates based on market conditions",
     color: "bg-pink-100 text-pink-600",
     comingSoon: true
-  },
-  {
-    icon: Bot,
-    title: "AI Spending Analyzer",
-    description: "Smart AI assistant that analyzes your spending patterns and provides insights",
-    color: "bg-cyan-100 text-cyan-600",
-    comingSoon: true
-  },
-  {
-    icon: Activity,
-    title: "Real-time BTC Price",
-    description: "Live Bitcoin price updates with advanced charting and market data",
-    color: "bg-orange-100 text-orange-600",
-    comingSoon: false
   },
   {
     icon: UserCheck,

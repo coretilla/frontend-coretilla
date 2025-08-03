@@ -141,7 +141,7 @@ export default function SwapPage() {
 
   return (
     <PageWrapper 
-      title="Swap to Bitcoin"
+      title="Swap USD to Bitcoin"
       subtitle="Convert your fiat currency to Bitcoin on Core Network"
       className="bg-gradient-to-br from-orange-50 to-orange-100"
     >
