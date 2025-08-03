@@ -26,6 +26,24 @@ interface ConfirmDepositResponse {
   transaction_id: number;
 }
 
+export interface UserBalance {
+  USD?: number;
+  IDR?: number;
+  EUR?: number;
+  [key: string]: number | undefined;
+}
+
+export interface UserMeResponse {
+  id: number;
+  wallet_address: string;
+  balance?: UserBalance | number; // Support both object and number format
+  balances?: UserBalance;
+  // Support different field names
+  usd_balance?: number;
+  idr_balance?: number;
+  eur_balance?: number;
+}
+
 import { getStoredAuth } from './auth';
 
 function getAuthToken(): string | null {
@@ -112,4 +130,83 @@ export async function confirmDeposit(data: ConfirmDepositRequest): Promise<Confi
   }
 
   return response.json();
+}
+
+export async function getUserData(): Promise<UserMeResponse> {
+  console.log('👤 Fetching user data from /users/me...');
+  
+  const token = getAuthToken();
+  if (!token) {
+    console.error('❌ No access_token found in localStorage');
+    throw new Error('Authentication required. Please login first.');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  console.log('👤 /users/me response status:', response.status);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ /users/me API Error response:', errorText);
+    throw new Error(`Failed to fetch user data (${response.status}): ${errorText}`);
+  }
+
+  const result = await response.json();
+  console.log('✅ User data response:', result);
+  return result;
+}
+
+export function parseUserBalance(userData: UserMeResponse): UserBalance {
+  console.log('💰 Parsing user balance from userData:', userData);
+  console.log('💰 userData.balance type:', typeof userData.balance);
+  console.log('💰 userData.balance value:', userData.balance);
+  
+  // Try different possible balance formats
+  let balances: UserBalance = {};
+  
+  if (userData.balance && typeof userData.balance === 'object' && !Array.isArray(userData.balance)) {
+    // Format 1: { balance: { USD: 100, IDR: 150000, EUR: 85 } }
+    balances = userData.balance as UserBalance;
+    console.log('💰 ✅ Using balance object field:', balances);
+  } else if (userData.balance && typeof userData.balance === 'number') {
+    // Format 2: { balance: 1000 } - single number, assume USD
+    balances = {
+      USD: userData.balance,
+      IDR: 0,
+      EUR: 0,
+    };
+    console.log('💰 ✅ Using balance number field as USD:', balances);
+    console.log('💰 ✅ Converted balance:', userData.balance, '→ USD:', balances.USD);
+  } else if (userData.balances) {
+    // Format 3: { balances: { USD: 100, IDR: 150000, EUR: 85 } }
+    balances = userData.balances;
+    console.log('💰 ✅ Using balances field:', balances);
+  } else if (userData.usd_balance !== undefined || userData.idr_balance !== undefined || userData.eur_balance !== undefined) {
+    // Format 4: { usd_balance: 100, idr_balance: 150000, eur_balance: 85 }
+    balances = {
+      USD: userData.usd_balance || 0,
+      IDR: userData.idr_balance || 0,
+      EUR: userData.eur_balance || 0,
+    };
+    console.log('💰 ✅ Using individual balance fields:', balances);
+  } else {
+    console.warn('⚠️ No balance found in userData, using defaults');
+    balances = { USD: 0, IDR: 0, EUR: 0 };
+  }
+  
+  // Ensure all currencies have default values
+  const finalBalances: UserBalance = {
+    USD: Number(balances.USD) || 0,
+    IDR: Number(balances.IDR) || 0,
+    EUR: Number(balances.EUR) || 0,
+  };
+  
+  console.log('💰 ✅ Final parsed balances:', finalBalances);
+  return finalBalances;
 }

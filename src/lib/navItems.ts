@@ -26,7 +26,7 @@ export interface NavGroup {
 export const navGroups: NavGroup[] = [
   {
     name: "Transactions",
-    emoji: "",
+    emoji: "💳",
     items: [
       { name: "Deposit", href: "/deposit", icon: CreditCard },
       { name: "Swap", href: "/swap", icon: ArrowRightLeft },
@@ -35,7 +35,7 @@ export const navGroups: NavGroup[] = [
   },
   {
     name: "Investing", 
-    emoji: "",
+    emoji: "📈",
     items: [
       { name: "Stake", href: "/stake", icon: Percent },
       { name: "DCA", href: "/dca", icon: CalendarDays },
@@ -44,7 +44,7 @@ export const navGroups: NavGroup[] = [
   },
   {
     name: "Tools",
-    emoji: "", 
+    emoji: "🔧", 
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { name: "Analyzer", href: "/analyzer", icon: BarChart3 },

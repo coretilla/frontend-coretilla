@@ -8,16 +8,18 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CreditCard, Building2, Smartphone, QrCode, Info, CheckCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CreditCard, Info, CheckCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { motion } from "framer-motion";
 import { loadStripe, Stripe, StripeElements, StripeCardElement } from "@stripe/stripe-js";
 import { stripePromise } from "@/lib/stripe";
-import { createDeposit, confirmDeposit } from "@/lib/api";
+import { createDeposit, confirmDeposit, getUserData, parseUserBalance, UserBalance } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useWallet } from "@/hooks/useWallet";
-import { testAccessToken, analyzeAccessToken } from "@/lib/auth";
+import { Badge } from "@/components/ui/badge";
+import { ArrowUpRight, ArrowDownLeft, ChevronLeft, ChevronRight, History } from "lucide-react";
 
 interface DepositFormData {
   currency: string;
@@ -29,6 +31,25 @@ interface StripeCardData {
   cardElement: StripeCardElement | null;
   stripe: Stripe | null;
   elements: StripeElements | null;
+}
+
+interface Transaction {
+  id: number;
+  amount: number;
+  type: "DEPOSIT" | "WITHDRAWAL";
+  description: string;
+  createdAt: string;
+}
+
+interface TransactionResponse {
+  success?: boolean;
+  data?: Transaction[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export default function DepositPage() {
@@ -48,25 +69,130 @@ export default function DepositPage() {
     stripe: null,
     elements: null,
   });
-  const [showCreditCard, setShowCreditCard] = useState(false);
+  const [currentBalances, setCurrentBalances] = useState<UserBalance>({
+    USD: 0,
+  });
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
+  const [activeTab, setActiveTab] = useState("deposit");
+  const [transactionPage, setTransactionPage] = useState(1);
+  const [transactionPagination, setTransactionPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  });
 
   const currencies = [
     { code: "USD", name: "US Dollar", symbol: "$" },
-    { code: "IDR", name: "Indonesian Rupiah", symbol: "Rp" },
-    { code: "EUR", name: "Euro", symbol: "€" },
   ];
 
   const paymentMethods = [
     { id: "credit_card", name: "Credit Card", icon: CreditCard, description: "Pay with credit/debit card via Stripe" },
-    { id: "bank_transfer", name: "Bank Transfer", icon: Building2, description: "Direct bank transfer" },
-    { id: "virtual_account", name: "Virtual Account", icon: CreditCard, description: "Virtual account number" },
-    { id: "qris", name: "QRIS", icon: QrCode, description: "QR code payment" },
   ];
 
-  const currentBalances = {
-    USD: 0.00,
-    IDR: 0,
-    EUR: 0.00,
+  const fetchUserBalance = async () => {
+    if (!isAuthenticated) return;
+    
+    setIsLoadingBalance(true);
+    try {
+      console.log('💰 Fetching user balance...');
+      const userData = await getUserData();
+      const balances = parseUserBalance(userData);
+      setCurrentBalances(balances);
+      console.log('✅ Balance updated:', balances);
+    } catch (error) {
+      console.error('❌ Failed to fetch balance:', error);
+      // Don't show error toast for balance, just keep existing values
+    } finally {
+      setIsLoadingBalance(false);
+    }
+  };
+
+  const fetchTransactions = async (page: number = 1, limit: number = 10) => {
+    if (!isAuthenticated) return;
+    
+    setIsLoadingTransactions(true);
+    try {
+      const token = localStorage.getItem('jwt_token');
+      if (!token) {
+        throw new Error('No access token found');
+      }
+
+      console.log(`📊 Fetching transactions - page: ${page}, limit: ${limit}`);
+      
+      const response = await fetch(`https://core-backend-production-0965.up.railway.app/users/me/transactions?page=${page}&limit=${limit}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          // No transactions or endpoint not available
+          setTransactions([]);
+          setTransactionPagination({
+            page: 1,
+            limit: 10,
+            total: 0,
+            totalPages: 0,
+          });
+          return;
+        }
+        throw new Error(`Failed to fetch transactions: ${response.status}`);
+      }
+
+      const responseText = await response.text();
+      const data: TransactionResponse = JSON.parse(responseText);
+      
+      if (data.success && data.data) {
+        setTransactions(data.data);
+        // Handle pagination if provided, otherwise calculate from data
+        if (data.pagination) {
+          setTransactionPagination(data.pagination);
+        } else {
+          setTransactionPagination({
+            page: page,
+            limit: limit,
+            total: data.data.length,
+            totalPages: Math.ceil(data.data.length / limit),
+          });
+        }
+        console.log('✅ Transactions loaded:', data.data);
+      } else if (Array.isArray(data)) {
+        const transactionsArray = data as Transaction[];
+        setTransactions(transactionsArray);
+        setTransactionPagination({
+          page: page,
+          limit: limit,
+          total: transactionsArray.length,
+          totalPages: Math.ceil(transactionsArray.length / limit),
+        });
+      } else {
+        setTransactions([]);
+        setTransactionPagination({
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 0,
+        });
+      }
+
+    } catch (error) {
+      console.error('❌ Failed to fetch transactions:', error);
+      setTransactions([]);
+      setTransactionPagination({
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+      });
+    } finally {
+      setIsLoadingTransactions(false);
+    }
   };
 
   useEffect(() => {
@@ -88,35 +214,52 @@ export default function DepositPage() {
         
         setStripeData({ stripe, elements, cardElement });
         
-        // Mount card element when credit card is selected
-        if (formData.paymentMethod === 'credit_card' && showCreditCard) {
-          setTimeout(() => {
-            cardElement.mount('#card-element');
-          }, 100);
-        }
+        // Mount card element automatically
+        setTimeout(() => {
+          cardElement.mount('#card-element');
+        }, 100);
       }
     };
 
     initializeStripe();
-  }, [formData.paymentMethod, showCreditCard]);
+  }, []);
+
+  // Fetch balance and transactions when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchUserBalance();
+      fetchTransactions(1, 10);
+    }
+  }, [isAuthenticated]);
+
+  // Auto-select credit card and USD since they're the only options
+  useEffect(() => {
+    if (paymentMethods.length === 1 && !formData.paymentMethod) {
+      setFormData(prev => ({
+        ...prev,
+        paymentMethod: paymentMethods[0].id
+      }));
+    }
+  }, [formData.paymentMethod]);
+
+  // Auto-select USD currency since it's the only option
+  useEffect(() => {
+    if (currencies.length === 1 && !formData.currency) {
+      setFormData(prev => ({
+        ...prev,
+        currency: currencies[0].code
+      }));
+    }
+  }, [formData.currency]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.currency || !formData.amount || !formData.paymentMethod) {
-      toast.error("Please fill in all required fields");
+    if (!formData.amount) {
+      toast.error("Please enter an amount");
       return;
     }
 
-    if (formData.paymentMethod === 'credit_card') {
-      await handleStripePayment();
-    } else {
-      setIsLoading(true);
-      // Simulate API call for other payment methods
-      setTimeout(() => {
-        setIsLoading(false);
-        setShowConfirmation(true);
-      }, 2000);
-    }
+    await handleStripePayment();
   };
 
   const handleStripePayment = async () => {
@@ -211,13 +354,16 @@ export default function DepositPage() {
       setIsLoading(false);
       toast.success(`Deposit successful! New balance: $${result.new_balance}`);
       
+      // Refresh user balance and transactions
+      fetchUserBalance();
+      fetchTransactions(1, 10);
+      
       // Reset form
       setFormData({
-        currency: "",
+        currency: "USD",
         amount: "",
-        paymentMethod: "",
+        paymentMethod: "credit_card",
       });
-      setShowCreditCard(false);
       
     } catch (error) {
       console.error('❌ Deposit failed:', error);
@@ -238,8 +384,39 @@ export default function DepositPage() {
     });
   };
 
-  const selectedCurrency = currencies.find(c => c.code === formData.currency);
-  const selectedPaymentMethod = paymentMethods.find(p => p.id === formData.paymentMethod);
+  const selectedCurrency = currencies[0]; // Always USD since it's the only option
+  const selectedPaymentMethod = paymentMethods[0]; // Always credit card since it's the only option
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const formatAmount = (amount: number, type: string) => {
+    const formatted = Math.abs(amount).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return type === 'DEPOSIT' ? `+$${formatted}` : `-$${formatted}`;
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= transactionPagination.totalPages) {
+      setTransactionPage(newPage);
+      fetchTransactions(newPage, 10);
+    }
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (value === "transactions" && transactions.length === 0) {
+      fetchTransactions(1, 10);
+    }
+  };
 
   // Show authentication prompt if not connected or authenticated
   if (!isConnected) {
@@ -325,79 +502,53 @@ export default function DepositPage() {
     >
       <div className="max-w-2xl mx-auto">
 
-        {/* Authentication Debug Info */}
-        {user && (
-          <Card className="mb-6 bg-green-50 border-green-200">
-            <CardHeader>
-              <CardTitle className="font-sans text-green-800">✅ Authenticated with JWT</CardTitle>
-              <CardDescription className="font-sans text-green-600">
-                Wallet: {user.wallet_address || address}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm text-green-700 font-sans mb-3">
-                🔑 Deposit API calls use access_token as Bearer token in Authorization header
-              </div>
-              <div className="text-xs text-green-600 font-mono mb-3">
-                Access Token: {localStorage.getItem('jwt_token') ? `${localStorage.getItem('jwt_token')!.substring(0, 40)}...` : 'None'}
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                <Button 
-                  onClick={() => {
-                    const token = localStorage.getItem('jwt_token');
-                    console.log('🔍 Manual access_token check:');
-                    console.log('- Access token (stored as jwt_token):', token ? `${token.substring(0, 50)}...` : 'None');
-                    console.log('- isAuthenticated state:', isAuthenticated);
-                    console.log('- user state:', user);
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="font-sans"
-                >
-                  🔍 Check
-                </Button>
-                <Button 
-                  onClick={testAccessToken}
-                  variant="outline"
-                  size="sm"
-                  className="font-sans"
-                >
-                  🧪 Test
-                </Button>
-                <Button 
-                  onClick={analyzeAccessToken}
-                  variant="outline"
-                  size="sm"
-                  className="font-sans"
-                >
-                  🔬 Analyze
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
-        {/* Current Balances */}
+        {/* Current Balance */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="font-sans">Current Balances</CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="font-sans">Current Balance</CardTitle>
+              <Button
+                onClick={fetchUserBalance}
+                disabled={isLoadingBalance}
+                variant="outline"
+                size="sm"
+                className="font-sans"
+              >
+                <RefreshCw className={`h-4 w-4 mr-1 ${isLoadingBalance ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {currencies.map((currency) => (
-                <div key={currency.code} className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-primary font-mono">
-                    {currency.symbol}{currentBalances[currency.code as keyof typeof currentBalances].toLocaleString()}
-                  </div>
-                  <div className="text-sm text-muted-foreground font-sans">{currency.name}</div>
+            <div className="text-center p-6 bg-muted rounded-lg relative">
+              {isLoadingBalance && (
+                <div className="absolute inset-0 bg-muted/50 rounded-lg flex items-center justify-center">
+                  <RefreshCw className="h-4 w-4 animate-spin text-primary" />
                 </div>
-              ))}
+              )}
+              <div className="text-3xl font-bold text-primary font-mono">
+                ${(currentBalances.USD || 0).toLocaleString()}
+              </div>
+              <div className="text-sm text-muted-foreground font-sans">US Dollar</div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Deposit Form */}
-        <Card>
+        {/* Tabs for Deposit and Transactions */}
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="deposit" className="font-sans">
+              💳 Make Deposit
+            </TabsTrigger>
+            <TabsTrigger value="transactions" className="font-sans">
+              📊 Transaction History
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Deposit Tab */}
+          <TabsContent value="deposit" className="mt-6">
+            <Card>
           <CardHeader>
             <CardTitle className="font-sans">Make a Deposit</CardTitle>
             <CardDescription className="font-sans">
@@ -406,32 +557,25 @@ export default function DepositPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Currency Selection */}
+              {/* Currency - Auto Selected */}
               <div className="space-y-2">
-                <Label htmlFor="currency" className="font-sans font-medium">Currency</Label>
-                <Select 
-                  value={formData.currency} 
-                  onValueChange={(value) => setFormData({...formData, currency: value})}
-                >
-                  <SelectTrigger className="font-sans">
-                    <SelectValue placeholder="Select currency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {currencies.map((currency) => (
-                      <SelectItem key={currency.code} value={currency.code} className="font-sans">
-                        {currency.symbol} {currency.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="font-sans font-medium">Currency</Label>
+                <div className="flex items-center space-x-3 p-3 border border-primary bg-primary/5 rounded-lg">
+                  <div className="text-primary font-mono font-bold">$</div>
+                  <div className="flex-1">
+                    <div className="font-medium font-sans">US Dollar (USD)</div>
+                    <div className="text-sm text-muted-foreground font-sans">Only supported currency</div>
+                  </div>
+                  <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary" />
+                </div>
               </div>
 
               {/* Amount Input */}
               <div className="space-y-2">
-                <Label htmlFor="amount" className="font-sans font-medium">Amount</Label>
+                <Label htmlFor="amount" className="font-sans font-medium">Amount (USD)</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground font-mono">
-                    {selectedCurrency?.symbol || "$"}
+                    $
                   </span>
                   <Input
                     id="amount"
@@ -446,55 +590,31 @@ export default function DepositPage() {
                 </div>
               </div>
 
-              {/* Payment Method Selection */}
+              {/* Payment Method - Auto Selected */}
               <div className="space-y-2">
                 <Label className="font-sans font-medium">Payment Method</Label>
-                <div className="grid grid-cols-1 gap-3">
-                  {paymentMethods.map((method) => {
-                    const IconComponent = method.icon;
-                    return (
-                      <div
-                        key={method.id}
-                        className={`flex items-center space-x-3 p-4 border rounded-lg cursor-pointer transition-colors ${
-                          formData.paymentMethod === method.id
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/50"
-                        }`}
-                        onClick={() => {
-                          setFormData({...formData, paymentMethod: method.id});
-                          setShowCreditCard(method.id === 'credit_card');
-                        }}
-                      >
-                        <IconComponent className="h-5 w-5 text-primary" />
-                        <div className="flex-1">
-                          <div className="font-medium font-sans">{method.name}</div>
-                          <div className="text-sm text-muted-foreground font-sans">{method.description}</div>
-                        </div>
-                        <div className={`w-4 h-4 rounded-full border-2 ${
-                          formData.paymentMethod === method.id
-                            ? "border-primary bg-primary"
-                            : "border-muted-foreground"
-                        }`} />
-                      </div>
-                    );
-                  })}
+                <div className="flex items-center space-x-3 p-4 border border-primary bg-primary/5 rounded-lg">
+                  <CreditCard className="h-5 w-5 text-primary" />
+                  <div className="flex-1">
+                    <div className="font-medium font-sans">Credit Card</div>
+                    <div className="text-sm text-muted-foreground font-sans">Pay with credit/debit card via Stripe</div>
+                  </div>
+                  <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary" />
                 </div>
               </div>
 
               {/* Credit Card Input */}
-              {showCreditCard && formData.paymentMethod === 'credit_card' && (
-                <div className="space-y-2">
-                  <Label className="font-sans font-medium">Card Details</Label>
-                  <div className="border rounded-lg p-4">
-                    <div id="card-element" className="min-h-[40px]">
-                      {/* Stripe Elements will mount here */}
-                    </div>
-                  </div>
-                  <div className="text-sm text-muted-foreground font-sans">
-                    Test card: 4242 4242 4242 4242 (any future date, any CVC)
+              <div className="space-y-2">
+                <Label className="font-sans font-medium">Card Details</Label>
+                <div className="border rounded-lg p-4">
+                  <div id="card-element" className="min-h-[40px]">
+                    {/* Stripe Elements will mount here */}
                   </div>
                 </div>
-              )}
+                <div className="text-sm text-muted-foreground font-sans">
+                  Test card: 4242 4242 4242 4242 (any future date, any CVC)
+                </div>
+              </div>
 
               {/* Info Alert */}
               <Alert>
@@ -572,6 +692,141 @@ export default function DepositPage() {
             </div>
           </DialogContent>
         </Dialog>
+          </TabsContent>
+
+          {/* Transactions Tab */}
+          <TabsContent value="transactions" className="mt-6">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="font-sans flex items-center gap-2">
+                    <History className="h-5 w-5" />
+                    Transaction History
+                  </CardTitle>
+                  <Button
+                    onClick={() => fetchTransactions(transactionPage, 10)}
+                    disabled={isLoadingTransactions}
+                    variant="outline"
+                    size="sm"
+                    className="font-sans"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-1 ${isLoadingTransactions ? 'animate-spin' : ''}`} />
+                    Refresh
+                  </Button>
+                </div>
+                {transactionPagination.total > 0 && (
+                  <CardDescription className="font-sans">
+                    Showing {transactions.length} of {transactionPagination.total} transactions
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                {isLoadingTransactions ? (
+                  <div className="space-y-3">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="flex items-center justify-between p-4 border rounded-lg animate-pulse">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-muted rounded-full"></div>
+                          <div className="space-y-2">
+                            <div className="w-32 h-4 bg-muted rounded"></div>
+                            <div className="w-24 h-3 bg-muted rounded"></div>
+                          </div>
+                        </div>
+                        <div className="w-20 h-6 bg-muted rounded"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : transactions.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">💳</div>
+                    <h3 className="text-lg font-semibold font-sans mb-2">No transactions yet</h3>
+                    <p className="text-muted-foreground font-sans">
+                      Your transaction history will appear here once you make your first deposit or withdrawal.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {transactions.map((transaction, index) => (
+                      <motion.div
+                        key={transaction.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            transaction.type === 'DEPOSIT' 
+                              ? 'bg-green-100 text-green-600' 
+                              : 'bg-red-100 text-red-600'
+                          }`}>
+                            {transaction.type === 'DEPOSIT' ? (
+                              <ArrowDownLeft className="h-5 w-5" />
+                            ) : (
+                              <ArrowUpRight className="h-5 w-5" />
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-medium font-sans">
+                              {transaction.description}
+                            </div>
+                            <div className="text-sm text-muted-foreground font-sans">
+                              {formatDate(transaction.createdAt)} • ID: {transaction.id}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`font-bold font-mono ${
+                            transaction.type === 'DEPOSIT' ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {formatAmount(transaction.amount, transaction.type)}
+                          </div>
+                          <Badge 
+                            variant={transaction.type === 'DEPOSIT' ? 'default' : 'secondary'}
+                            className="font-sans text-xs"
+                          >
+                            {transaction.type}
+                          </Badge>
+                        </div>
+                      </motion.div>
+                    ))}
+
+                    {/* Pagination */}
+                    {transactionPagination.totalPages > 1 && (
+                      <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                        <div className="text-sm text-muted-foreground font-sans">
+                          Page {transactionPagination.page} of {transactionPagination.totalPages}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(transactionPagination.page - 1)}
+                            disabled={transactionPagination.page <= 1 || isLoadingTransactions}
+                            className="font-sans"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            Previous
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(transactionPagination.page + 1)}
+                            disabled={transactionPagination.page >= transactionPagination.totalPages || isLoadingTransactions}
+                            className="font-sans"
+                          >
+                            Next
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </PageWrapper>
   );
