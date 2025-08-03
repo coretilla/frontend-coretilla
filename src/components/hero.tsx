@@ -5,9 +5,34 @@ import { ArrowRight, Shield, Zap, Globe, TrendingUp, Fuel, Eye, Key, Lock } from
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useBTCPrice } from "@/hooks";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { getUserData } from "@/lib/api";
 
 export default function Hero() {
   const { priceData, isLoading, error } = useBTCPrice();
+  const { isAuthenticated } = useAuth();
+  const [wbtcBalance, setWbtcBalance] = useState<number>(0);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+
+  // Fetch WBTC balance from API
+  const fetchWbtcBalance = async () => {
+    if (!isAuthenticated) return;
+    
+    setIsLoadingBalance(true);
+    try {
+      const userData = await getUserData();
+      setWbtcBalance(userData.wbtcBalance || 0);
+    } catch (error) {
+      console.error('Failed to fetch WBTC balance:', error);
+    } finally {
+      setIsLoadingBalance(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWbtcBalance();
+  }, [isAuthenticated]);
 
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('en-US', {
@@ -245,8 +270,18 @@ export default function Hero() {
                       transition={{ delay: 1.6, duration: 0.4 }}
                       className="text-center"
                     >
-                      <div className="text-xl font-bold text-foreground mb-1 font-mono">0.00000000</div>
-                      <div className="text-xs text-muted-foreground font-sans">Your Balance</div>
+                      <div className="text-xl font-bold text-foreground mb-1 font-mono">
+                        {isLoadingBalance ? (
+                          <div className="animate-pulse bg-muted rounded w-20 h-6 mx-auto" />
+                        ) : isAuthenticated ? (
+                          wbtcBalance.toFixed(8)
+                        ) : (
+                          "0.00000000"
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-sans">
+                        {isAuthenticated ? "Your WBTC Balance" : "Your Balance"}
+                      </div>
                     </motion.div>
                   </div>
                 </div>
