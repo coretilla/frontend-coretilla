@@ -8,7 +8,6 @@ import {
   CalendarDays, 
   BarChart3,
   TrendingUp,
-  Droplets,
   Settings
 } from "lucide-react";
 
@@ -47,7 +46,6 @@ export const navGroups: NavGroup[] = [
     icon: Settings, 
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { name: "Faucet", href: "/faucet", icon: Droplets },
     ]
   }
 ];

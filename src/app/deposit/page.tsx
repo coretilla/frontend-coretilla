@@ -516,6 +516,15 @@ export default function DepositPage() {
     return type === 'DEPOSIT' ? `+$${formatted}` : `-$${formatted}`;
   };
 
+  const formatTransactionDescription = (description: string) => {
+    // Remove Stripe payment intent ID from description
+    // Example: "Deposit via Stripe - pi_3Rs2FPRpP4URq09n08Elckqa" -> "Deposit via Stripe"
+    if (description.includes(' - pi_')) {
+      return description.split(' - pi_')[0];
+    }
+    return description;
+  };
+
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= transactionPagination.totalPages) {
       setTransactionPage(newPage);
@@ -939,7 +948,7 @@ export default function DepositPage() {
                           </div>
                           <div>
                             <div className="font-medium font-sans">
-                              {transaction.description}
+                              {formatTransactionDescription(transaction.description)}
                             </div>
                             <div className="text-sm text-muted-foreground font-sans">
                               {formatDate(transaction.createdAt)} • ID: {transaction.id}
