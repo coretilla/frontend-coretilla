@@ -35,6 +35,7 @@ export interface UserBalance {
 
 export interface UserMeResponse {
   id: number;
+  name?: string;
   wallet_address: string;
   balance?: UserBalance | number; // Support both object and number format
   balances?: UserBalance;
@@ -42,6 +43,40 @@ export interface UserMeResponse {
   usd_balance?: number;
   idr_balance?: number;
   eur_balance?: number;
+  // Additional balance fields
+  coreBalance?: number;
+  wbtcBalance?: number;
+  wbtcBalanceInUsd?: number;
+  coreBalanceInUsd?: number;
+  totalAssetInUsd?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface BtcPriceResponse {
+  success: boolean;
+  data: {
+    symbol: string;
+    price: number;
+    currency: string;
+    timestamp: string;
+  };
+}
+
+export interface SwapRequest {
+  amount: number;
+}
+
+export interface SwapResponse {
+  success: boolean;
+  message: string;
+  data: {
+    transactionHash: string;
+    btcAmount: number;
+    btcPrice: number;
+    usdAmount: number;
+    remainingBalance: number;
+  };
 }
 
 import { getStoredAuth } from './auth';
@@ -209,4 +244,79 @@ export function parseUserBalance(userData: UserMeResponse): UserBalance {
   
   console.log('💰 ✅ Final parsed balances:', finalBalances);
   return finalBalances;
+}
+
+export async function getBtcPrice(): Promise<BtcPriceResponse> {
+  console.log('₿ Fetching BTC price from /finance/btc-price...');
+  
+  const token = getAuthToken();
+  if (!token) {
+    console.error('❌ No access_token found in localStorage');
+    throw new Error('Authentication required. Please login first.');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/finance/btc-price`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  console.log('₿ /finance/btc-price response status:', response.status);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ /finance/btc-price API Error response:', errorText);
+    throw new Error(`Failed to fetch BTC price (${response.status}): ${errorText}`);
+  }
+
+  const result = await response.json();
+  console.log('✅ BTC price response:', result);
+  return result;
+}
+
+export async function swapUsdToBtc(data: SwapRequest): Promise<SwapResponse> {
+  console.log('🔄 Swapping USD to BTC with access_token Bearer auth:', data);
+  
+  const token = getAuthToken();
+  if (!token) {
+    console.error('❌ No access_token found in localStorage');
+    throw new Error('Authentication required. Please login first.');
+  }
+  
+  const requestHeaders = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  };
+
+  console.log('🔑 Using access_token for swap:', token.substring(0, 40) + '...');
+  
+  const requestBody = {
+    amount: data.amount,
+  };
+  
+  console.log('📡 Swap API Request (Access Token Bearer Auth):');
+  console.log('- URL:', `${API_BASE_URL}/finance/swap`);
+  console.log('- Headers:', requestHeaders);
+  console.log('- Body:', JSON.stringify(requestBody, null, 2));
+  
+  const response = await fetch(`${API_BASE_URL}/finance/swap`, {
+    method: 'POST',
+    headers: requestHeaders,
+    body: JSON.stringify(requestBody),
+  });
+
+  console.log('📡 Swap API Response status:', response.status);
+  console.log('📡 Swap API Response headers:', Object.fromEntries(response.headers.entries()));
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ Swap API Error response:', errorText);
+    throw new Error(`Failed to swap USD to BTC (${response.status}): ${errorText}`);
+  }
+
+  const result = await response.json();
+  console.log('✅ Swap API Success response:', result);
+  return result;
 }

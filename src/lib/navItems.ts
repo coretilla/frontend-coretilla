@@ -29,8 +29,7 @@ export const navGroups: NavGroup[] = [
     emoji: "💳",
     items: [
       { name: "Deposit", href: "/deposit", icon: CreditCard },
-      { name: "Swap", href: "/swap", icon: ArrowRightLeft },
-      { name: "Fiat", href: "/fiat", icon: DollarSign },
+      { name: "Buy Bitcoin", href: "/swap", icon: ArrowRightLeft },
     ]
   },
   {
@@ -47,7 +46,6 @@ export const navGroups: NavGroup[] = [
     emoji: "🔧", 
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { name: "Analyzer", href: "/analyzer", icon: BarChart3 },
       { name: "Faucet", href: "/faucet", icon: Droplets },
     ]
   }

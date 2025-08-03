@@ -43,16 +43,10 @@ export const navGroups: NavGroup[] = [
         description: "Add funds to your account"
       },
       {
-        name: "Swap",
+        name: "Buy Bitcoin",
         href: "/swap",
         icon: ArrowUpDown,
-        description: "Convert fiat to Bitcoin"
-      },
-      {
-        name: "Fiat",
-        href: "/fiat",
-        icon: Building2,
-        description: "Fiat transactions with QR"
+        description: "Buy Bitcoin with USD"
       }
     ]
   },
@@ -88,12 +82,6 @@ export const navGroups: NavGroup[] = [
         icon: BarChart3,
         description: "Portfolio tracker"
       },
-      {
-        name: "Analyzer",
-        href: "/analyzer",
-        icon: Brain,
-        description: "AI spending insights"
-      }
     ]
   }
 ];
@@ -112,16 +100,10 @@ export const mobileNavSections: MobileNavSection[] = [
         description: "Add funds to your account"
       },
       {
-        name: "Swap",
+        name: "Buy Bitcoin",
         href: "/swap",
         icon: ArrowUpDown,
-        description: "Convert fiat to Bitcoin"
-      },
-      {
-        name: "Fiat",
-        href: "/fiat",
-        icon: Building2,
-        description: "Fiat transactions with QR"
+        description: "Buy Bitcoin with USD"
       }
     ]
   },
@@ -159,12 +141,6 @@ export const mobileNavSections: MobileNavSection[] = [
         icon: BarChart3,
         description: "Portfolio tracker"
       },
-      {
-        name: "Analyzer",
-        href: "/analyzer",
-        icon: Brain,
-        description: "AI spending insights"
-      }
     ]
   }
 ];

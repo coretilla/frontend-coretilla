@@ -13,6 +13,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { motion } from "framer-motion";
+import { getUserData, parseUserBalance, getBtcPrice, swapUsdToBtc } from "@/lib/api";
 
 interface SwapFormData {
   fromCurrency: string;
@@ -21,7 +22,7 @@ interface SwapFormData {
 
 export default function SwapPage() {
   const [formData, setFormData] = useState<SwapFormData>({
-    fromCurrency: "",
+    fromCurrency: "USD",
     amount: "",
   });
   
@@ -29,70 +30,114 @@ export default function SwapPage() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [btcAmount, setBtcAmount] = useState("0.00000000");
 
+  const [btcPrice, setBtcPrice] = useState(47234.56);
+  const [userBalance, setUserBalance] = useState(0);
+  const [userInfo, setUserInfo] = useState<any>(null);
+
   const currencies = [
-    { code: "USD", name: "US Dollar", symbol: "$", rate: 47234.56 },
-    { code: "IDR", name: "Indonesian Rupiah", symbol: "Rp", rate: 751000000 },
+    { code: "USD", name: "US Dollar", symbol: "$", rate: btcPrice },
   ];
 
+  // Fetch user info and BTC price from API
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const data = await getUserData();
+        if (data) {
+          setUserInfo(data);
+          const balances = parseUserBalance(data);
+          setUserBalance(balances.USD || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    };
+
+    const fetchBtcPrice = async () => {
+      try {
+        const data = await getBtcPrice();
+        if (data.success) {
+          setBtcPrice(parseFloat(data.data.price.toString()));
+        }
+      } catch (error) {
+        console.error('Error fetching BTC price:', error);
+      }
+    };
+
+    fetchUserInfo();
+    fetchBtcPrice();
+    // Refresh price every 30 seconds
+    const interval = setInterval(fetchBtcPrice, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const currentBalances = {
-    USD: 0.00,
-    IDR: 0,
-    BTC: 0.00000000,
+    USD: userBalance,
+    CORE: userInfo?.coreBalance || 0,
+    WBTC: userInfo?.wbtcBalance || 0,
+    WBTC_USD: userInfo?.wbtcBalanceInUsd || 0,
   };
 
   const networkFee = 0.0001; // BTC
   const estimatedTime = "2-5 minutes";
 
-  // Calculate BTC amount based on fiat input
+  // Calculate BTC amount based on USD input
   useEffect(() => {
-    if (formData.amount && formData.fromCurrency) {
-      const selectedCurrency = currencies.find(c => c.code === formData.fromCurrency);
-      if (selectedCurrency) {
-        const fiatAmount = parseFloat(formData.amount);
-        const btcReceived = fiatAmount / selectedCurrency.rate;
-        setBtcAmount(btcReceived.toFixed(8));
-      }
+    if (formData.amount) {
+      const fiatAmount = parseFloat(formData.amount);
+      const btcReceived = fiatAmount / btcPrice;
+      setBtcAmount(btcReceived.toFixed(8));
     } else {
       setBtcAmount("0.00000000");
     }
-  }, [formData.amount, formData.fromCurrency]);
+  }, [formData.amount, btcPrice]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.fromCurrency || !formData.amount) {
-      toast.error("Please fill in all required fields");
+    if (!formData.amount) {
+      toast.error("Please enter an amount");
       return;
     }
 
-    const selectedCurrency = currencies.find(c => c.code === formData.fromCurrency);
-    const userBalance = currentBalances[formData.fromCurrency as keyof typeof currentBalances];
-    
     if (parseFloat(formData.amount) > userBalance) {
       toast.error("Insufficient balance");
       return;
     }
 
+    // Show confirmation dialog directly
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmSwap = async () => {
+    setShowConfirmation(false);
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const data = await swapUsdToBtc({
+        amount: parseFloat(formData.amount)
+      });
+      
+      if (data.success) {
+        setUserBalance(data.data.remainingBalance);
+        toast.success("Swap completed successfully! Bitcoin has been added to your wallet.");
+        
+        // Reset form
+        setFormData({
+          fromCurrency: "USD",
+          amount: "",
+        });
+      } else {
+        throw new Error('Swap failed');
+      }
+    } catch (error) {
+      toast.error('Failed to process swap. Please try again.');
+      console.error('Swap error:', error);
+    } finally {
       setIsLoading(false);
-      setShowConfirmation(true);
-    }, 2000);
+    }
   };
 
-  const handleConfirmSwap = () => {
-    setShowConfirmation(false);
-    toast.success("Swap transaction submitted successfully!");
-    
-    // Reset form
-    setFormData({
-      fromCurrency: "",
-      amount: "",
-    });
-  };
-
-  const selectedCurrency = currencies.find(c => c.code === formData.fromCurrency);
+  const selectedCurrency = currencies[0];
 
   return (
     <PageWrapper 
@@ -108,20 +153,30 @@ export default function SwapPage() {
             <CardTitle className="font-sans">Available Balances</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {currencies.map((currency) => (
-                <div key={currency.code} className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-primary font-mono">
-                    {currency.symbol}{currentBalances[currency.code as keyof typeof currentBalances].toLocaleString()}
-                  </div>
-                  <div className="text-sm text-muted-foreground font-sans">{currency.name}</div>
-                </div>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-muted rounded-lg">
                 <div className="text-2xl font-bold text-primary font-mono">
-                  {currentBalances.BTC.toFixed(8)}
+                  ${currentBalances.USD.toLocaleString()}
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">Bitcoin</div>
+                <div className="text-sm text-muted-foreground font-sans">US Dollar</div>
+              </div>
+              <div className="text-center p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-primary font-mono">
+                  {currentBalances.CORE.toLocaleString()}
+                </div>
+                <div className="text-sm text-muted-foreground font-sans">CORE</div>
+              </div>
+              <div className="text-center p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-primary font-mono">
+                  {currentBalances.WBTC.toFixed(6)}
+                </div>
+                <div className="text-sm text-muted-foreground font-sans">wBTC</div>
+              </div>
+              <div className="text-center p-4 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-primary font-mono">
+                  ${Math.round(currentBalances.WBTC_USD).toLocaleString()}
+                </div>
+                <div className="text-sm text-muted-foreground font-sans">wBTC in USD</div>
               </div>
             </div>
           </CardContent>
