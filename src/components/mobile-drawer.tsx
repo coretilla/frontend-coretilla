@@ -55,7 +55,7 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
               {mobileNavSections.map((section) => (
                 <div key={section.title} className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">{section.emoji}</span>
+                    <section.icon className="h-8 w-8" />
                     <h3 className="font-semibold text-foreground font-sans">
                       {section.title}
                     </h3>

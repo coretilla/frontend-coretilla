@@ -8,7 +8,8 @@ import {
   CalendarDays, 
   BarChart3,
   TrendingUp,
-  Droplets
+  Droplets,
+  Settings
 } from "lucide-react";
 
 export interface NavItem {
@@ -19,14 +20,14 @@ export interface NavItem {
 
 export interface NavGroup {
   name: string;
-  emoji: string;
+  icon: any;
   items: NavItem[];
 }
 
 export const navGroups: NavGroup[] = [
   {
     name: "Transactions",
-    emoji: "💳",
+    icon: CreditCard,
     items: [
       { name: "Deposit", href: "/deposit", icon: CreditCard },
       { name: "Buy Bitcoin", href: "/swap", icon: ArrowRightLeft },
@@ -34,7 +35,7 @@ export const navGroups: NavGroup[] = [
   },
   {
     name: "Investing", 
-    emoji: "📈",
+    icon: TrendingUp,
     items: [
       { name: "Stake", href: "/stake", icon: Percent },
       { name: "DCA", href: "/dca", icon: CalendarDays },
@@ -43,7 +44,7 @@ export const navGroups: NavGroup[] = [
   },
   {
     name: "Tools",
-    emoji: "🔧", 
+    icon: Settings, 
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { name: "Faucet", href: "/faucet", icon: Droplets },

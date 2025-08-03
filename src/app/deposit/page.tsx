@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ import { createDeposit, confirmDeposit, getUserData, parseUserBalance, UserBalan
 import { useAuth } from "@/hooks/useAuth";
 import { useWallet } from "@/hooks/useWallet";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpRight, ArrowDownLeft, ChevronLeft, ChevronRight, History } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, ChevronLeft, ChevronRight, History, DollarSign, BarChart3 } from "lucide-react";
 
 interface DepositFormData {
   currency: string;
@@ -69,6 +69,9 @@ export default function DepositPage() {
     stripe: null,
     elements: null,
   });
+  const [stripeInitialized, setStripeInitialized] = useState(false);
+  const [stripeError, setStripeError] = useState<string | null>(null);
+  const cardElementRef = useRef<HTMLDivElement>(null);
   const [currentBalances, setCurrentBalances] = useState<UserBalance>({
     USD: 0,
   });
@@ -120,7 +123,7 @@ export default function DepositPage() {
         throw new Error('No access token found');
       }
 
-      console.log(`📊 Fetching transactions - page: ${page}, limit: ${limit}`);
+      console.log(`Fetching transactions - page: ${page}, limit: ${limit}`);
       
       const response = await fetch(`https://core-backend-production-0965.up.railway.app/users/me/transactions?page=${page}&limit=${limit}`, {
         method: 'GET',
@@ -197,32 +200,147 @@ export default function DepositPage() {
 
   useEffect(() => {
     const initializeStripe = async () => {
-      const stripe = await stripePromise;
-      if (stripe) {
+      try {
+        console.log('🔄 Initializing Stripe...');
+        setStripeError(null);
+        
+        const stripe = await stripePromise;
+        
+        if (!stripe) {
+          const error = 'Stripe failed to load. Please check your internet connection.';
+          console.error('❌', error);
+          setStripeError(error);
+          return;
+        }
+        
+        console.log('✅ Stripe loaded successfully');
         const elements = stripe.elements();
         const cardElement = elements.create('card', {
           style: {
             base: {
               fontSize: '16px',
               color: '#424770',
+              fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+              fontSmoothing: 'antialiased',
               '::placeholder': {
                 color: '#aab7c4',
               },
+            },
+            invalid: {
+              color: '#fa755a',
+              iconColor: '#fa755a',
             },
           },
         });
         
         setStripeData({ stripe, elements, cardElement });
         
-        // Mount card element automatically
-        setTimeout(() => {
-          cardElement.mount('#card-element');
-        }, 100);
+        // Multiple attempts to mount card element
+        let retryCount = 0;
+        const maxRetries = 5;
+        
+        const tryMount = () => {
+          // Try both ref and getElementById
+          const cardElementContainer = cardElementRef.current || document.getElementById('card-element');
+          console.log('🔍 Card element container found:', !!cardElementContainer);
+          console.log('🔍 Container has children:', cardElementContainer?.hasChildNodes());
+          console.log('🔍 Ref current:', !!cardElementRef.current);
+          
+          if (cardElementContainer && !cardElementContainer.hasChildNodes()) {
+            console.log(`🔄 Mounting Stripe card element (attempt ${retryCount + 1})...`);
+            try {
+              cardElement.mount(cardElementContainer);
+              console.log('✅ Stripe card element mounted successfully');
+              setStripeInitialized(true);
+              
+              // Add event listeners to verify mount
+              cardElement.on('ready', () => {
+                console.log('✅ Stripe card element is ready');
+                setStripeInitialized(true);
+              });
+              
+              cardElement.on('change', (event) => {
+                if (event.error) {
+                  console.log('⚠️ Stripe card element error:', event.error.message);
+                } else {
+                  console.log('✅ Stripe card element change event');
+                }
+              });
+              
+            } catch (error: any) {
+              console.error('❌ Error mounting Stripe card element:', error);
+              setStripeError(`Failed to mount payment form: ${error.message}`);
+              
+              // Retry if not max attempts
+              if (retryCount < maxRetries) {
+                retryCount++;
+                setTimeout(tryMount, 500);
+              }
+            }
+          } else if (!cardElementContainer) {
+            console.log(`🔍 Card element container not found (attempt ${retryCount + 1})`);
+            if (retryCount < maxRetries) {
+              retryCount++;
+              setTimeout(tryMount, 200);
+            } else {
+              const error = 'Payment form container not found after multiple attempts';
+              console.error('❌', error);
+              setStripeError(error);
+            }
+          } else if (cardElementContainer?.hasChildNodes()) {
+            console.log('✅ Card element already has children, assuming mounted');
+            setStripeInitialized(true);
+          }
+        };
+        
+        // Check if element is already available
+        if (cardElementRef.current) {
+          console.log('🔍 Card element ref already available');
+          setTimeout(tryMount, 100);
+        } else {
+          // Use MutationObserver to watch for when the element appears
+          const observer = new MutationObserver((mutations) => {
+            if (cardElementRef.current || document.getElementById('card-element')) {
+              console.log('🔍 Card element found via observer');
+              observer.disconnect();
+              setTimeout(tryMount, 100);
+            }
+          });
+          
+          // Start observing
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true
+          });
+          
+          // Fallback: try immediately and then cleanup observer after 10 seconds
+          setTimeout(() => {
+            tryMount();
+            setTimeout(() => {
+              observer.disconnect();
+            }, 10000);
+          }, 300);
+        }
+        
+      } catch (error) {
+        const errorMessage = `Error initializing Stripe: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        console.error('❌', errorMessage);
+        setStripeError(errorMessage);
       }
     };
 
-    initializeStripe();
-  }, []);
+    // Only initialize if on deposit tab and authenticated
+    console.log('🔍 useEffect dependency check:', { activeTab, isAuthenticated });
+    if (activeTab === 'deposit' && isAuthenticated) {
+      console.log('🔄 Starting Stripe initialization...');
+      // Add delay to ensure DOM is fully rendered
+      setTimeout(() => {
+        initializeStripe();
+      }, 500);
+    } else {
+      console.log('⏸️ Skipping Stripe initialization - conditions not met');
+    }
+  }, [activeTab, isAuthenticated]);
 
   // Fetch balance and transactions when authenticated
   useEffect(() => {
@@ -412,9 +530,15 @@ export default function DepositPage() {
   };
 
   const handleTabChange = (value: string) => {
+    console.log('🔄 Tab changed to:', value);
     setActiveTab(value);
     if (value === "transactions" && transactions.length === 0) {
       fetchTransactions(1, 10);
+    }
+    // Reset Stripe state when switching to deposit tab
+    if (value === "deposit" && !stripeInitialized) {
+      setStripeError(null);
+      setStripeInitialized(false);
     }
   };
 
@@ -538,11 +662,13 @@ export default function DepositPage() {
         {/* Tabs for Deposit and Transactions */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="deposit" className="font-sans">
-              💳 Make Deposit
+            <TabsTrigger value="deposit" className="font-sans flex items-center gap-2">
+              <CreditCard className="h-6 w-6" />
+              Make Deposit
             </TabsTrigger>
-            <TabsTrigger value="transactions" className="font-sans">
-              📊 Transaction History
+            <TabsTrigger value="transactions" className="font-sans flex items-center gap-2">
+              <BarChart3 className="h-6 w-6" />
+              Transaction History
             </TabsTrigger>
           </TabsList>
 
@@ -607,13 +733,58 @@ export default function DepositPage() {
               <div className="space-y-2">
                 <Label className="font-sans font-medium">Card Details</Label>
                 <div className="border rounded-lg p-4">
-                  <div id="card-element" className="min-h-[40px]">
+                  <div ref={cardElementRef} id="card-element" className="min-h-[40px]">
                     {/* Stripe Elements will mount here */}
+                    {!stripeInitialized && !stripeError && (
+                      <div className="flex items-center justify-center text-muted-foreground">
+                        <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                        Loading payment form...
+                      </div>
+                    )}
+                    {stripeError && (
+                      <div className="flex items-center justify-center text-red-500 text-sm">
+                        <Info className="h-4 w-4 mr-2" />
+                        {stripeError}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground font-sans">
                   Test card: 4242 4242 4242 4242 (any future date, any CVC)
                 </div>
+                {(stripeError || !stripeInitialized) && (
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        console.log('🔄 Manual retry Stripe initialization...');
+                        setStripeError(null);
+                        setStripeInitialized(false);
+                        // Force re-trigger useEffect
+                        setActiveTab('transactions');
+                        setTimeout(() => setActiveTab('deposit'), 100);
+                      }}
+                      className="text-xs"
+                    >
+                      <RefreshCw className="h-3 w-3 mr-1" />
+                      Retry
+                    </Button>
+                    {stripeError && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.location.reload()}
+                        className="text-xs"
+                      >
+                        <RefreshCw className="h-3 w-3 mr-1" />
+                        Reload Page
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Info Alert */}
@@ -628,9 +799,12 @@ export default function DepositPage() {
               <Button
                 type="submit"
                 className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
-                disabled={isLoading}
+                disabled={isLoading || !stripeInitialized || !!stripeError}
               >
-                {isLoading ? "Processing..." : "Continue to Payment"}
+                {isLoading ? "Processing..." : 
+                 !stripeInitialized ? "Loading Payment Form..." :
+                 stripeError ? "Payment Form Error" :
+                 "Continue to Payment"}
               </Button>
             </form>
           </CardContent>
@@ -738,7 +912,9 @@ export default function DepositPage() {
                   </div>
                 ) : transactions.length === 0 ? (
                   <div className="text-center py-12">
-                    <div className="text-6xl mb-4">💳</div>
+                    <div className="mb-4 flex justify-center">
+                      <CreditCard className="h-16 w-16 text-muted-foreground" />
+                    </div>
                     <h3 className="text-lg font-semibold font-sans mb-2">No transactions yet</h3>
                     <p className="text-muted-foreground font-sans">
                       Your transaction history will appear here once you make your first deposit or withdrawal.

@@ -26,7 +26,7 @@ export interface NavGroup {
 
 export interface MobileNavSection {
   title: string;
-  emoji: string;
+  icon: React.ComponentType<any>;
   items: NavItem[];
   defaultOpen?: boolean;
 }
@@ -90,7 +90,7 @@ export const navGroups: NavGroup[] = [
 export const mobileNavSections: MobileNavSection[] = [
   {
     title: "Products",
-    emoji: "💳",
+    icon: CreditCard,
     defaultOpen: true,
     items: [
       {
@@ -109,7 +109,7 @@ export const mobileNavSections: MobileNavSection[] = [
   },
   {
     title: "Investing",
-    emoji: "📈",
+    icon: TrendingUp,
     items: [
       {
         name: "Stake",
@@ -133,7 +133,7 @@ export const mobileNavSections: MobileNavSection[] = [
   },
   {
     title: "Tools",
-    emoji: "📊",
+    icon: BarChart3,
     items: [
       {
         name: "Dashboard",

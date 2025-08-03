@@ -90,7 +90,7 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
                     <Collapsible open={isGroupOpen} onOpenChange={() => toggleGroup(group.name)}>
                       <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 text-left hover:bg-muted rounded-lg transition-colors">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg">{group.emoji}</span>
+                          <group.icon className="h-8 w-8" />
                           <span className={`font-semibold font-sans ${
                             hasActiveItem ? "text-primary" : "text-foreground"
                           }`}>

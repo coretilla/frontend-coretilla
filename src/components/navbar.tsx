@@ -83,7 +83,7 @@ export default function Navbar() {
                             : "text-foreground hover:bg-primary/5 hover:text-primary"
                         }`}
                       >
-                        <span className="text-sm">{group.emoji}</span>
+                        <group.icon className="h-6 w-6" />
                         {group.name}
                         <ChevronDown className="h-3 w-3" />
                       </Button>
