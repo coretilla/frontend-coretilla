@@ -377,7 +377,8 @@ export default function DepositPage() {
       return;
     }
 
-    await handleStripePayment();
+    // Show confirmation modal instead of processing immediately
+    setShowConfirmation(true);
   };
 
   const handleStripePayment = async () => {
@@ -490,16 +491,9 @@ export default function DepositPage() {
     }
   };
 
-  const handleConfirmDeposit = () => {
+  const handleConfirmDeposit = async () => {
     setShowConfirmation(false);
-    toast.success("Deposit request submitted successfully!");
-    
-    // Reset form
-    setFormData({
-      currency: "",
-      amount: "",
-      paymentMethod: "",
-    });
+    await handleStripePayment();
   };
 
   const selectedCurrency = currencies[0]; // Always USD since it's the only option
@@ -791,7 +785,7 @@ export default function DepositPage() {
               <Alert>
                 <Info className="h-4 w-4" />
                 <AlertDescription className="font-sans">
-                  Deposits are typically processed within 1-3 business days. You'll receive a confirmation email once your deposit is complete.
+                  Deposits will be processed quickly and efficiently. You'll receive a confirmation once your deposit is complete.
                 </AlertDescription>
               </Alert>
 
@@ -859,8 +853,9 @@ export default function DepositPage() {
                 <Button
                   onClick={handleConfirmDeposit}
                   className="flex-1 bg-primary hover:bg-primary/90 font-sans font-semibold"
+                  disabled={isLoading}
                 >
-                  Confirm Deposit
+                  {isLoading ? "Processing..." : "Confirm Deposit"}
                 </Button>
               </div>
             </div>

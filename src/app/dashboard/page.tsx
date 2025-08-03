@@ -1,34 +1,90 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import BalanceCard from "@/components/balance-card";
 import PageWrapper from "@/components/layout/PageWrapper";
-import { DollarSign, TrendingUp, Zap, BarChart3, Calendar } from "lucide-react";
+import { DollarSign, TrendingUp, Zap, BarChart3, Calendar, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { getUserData, parseUserBalance, UserBalance, getBtcPrice, BtcPriceResponse } from "@/lib/api";
+import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 export default function DashboardPage() {
+  const { isAuthenticated } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState("7D");
+  const [balanceData, setBalanceData] = useState<UserBalance>({ USD: 0 });
+  const [apiData, setApiData] = useState<any>(null);
+  const [btcPriceData, setBtcPriceData] = useState<BtcPriceResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Mock balance data
+  // Fetch user data from API
+  const fetchUserData = async () => {
+    if (!isAuthenticated) return;
+    
+    setIsLoading(true);
+    try {
+      // Fetch user data and BTC price in parallel
+      const [userData, btcPrice] = await Promise.all([
+        getUserData(),
+        getBtcPrice()
+      ]);
+      
+      const balances = parseUserBalance(userData);
+      setBalanceData(balances);
+      setApiData(userData);
+      setBtcPriceData(btcPrice);
+      
+      console.log('✅ Dashboard data loaded:', { 
+        userData, 
+        btcPriceResponse: btcPrice,
+        btcPriceValue: btcPrice.data?.price 
+      });
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, [isAuthenticated]);
+
+  // Calculate derived values
+  const wbtcBalance = apiData?.wbtcBalance || 0;
+  const coreBalance = apiData?.coreBalance || 0;
+  const wbtcBalanceInUsd = apiData?.wbtcBalanceInUsd || 0;
+  const coreBalanceInUsd = apiData?.coreBalanceInUsd || 0;
+  const totalAssetInUsd = apiData?.totalAssetInUsd || 0;
+  const corePrice = coreBalance > 0 ? coreBalanceInUsd / coreBalance : 1.2; // fallback price
+  const btcPrice = btcPriceData?.data?.price || 0; // Get BTC price from API
+
+  // Balance data structure
   const balances = {
     fiat: {
-      USD: { amount: "0.00", change: { value: 0, percentage: 0, period: "7D" } },
-      IDR: { amount: "0", change: { value: 0, percentage: 0, period: "7D" } },
-      EUR: { amount: "0.00", change: { value: 0, percentage: 0, period: "7D" } },
+      USD: { 
+        amount: balanceData.USD?.toFixed(2) || "0.00", 
+        change: { value: 0, percentage: 0, period: "7D" } 
+      },
     },
     crypto: {
-      BTC: { amount: "0.00000000", change: { value: 0, percentage: 0, period: "7D" } },
-      lstBTC: { amount: "0.00000000", change: { value: 0, percentage: 0, period: "7D" } },
-      istBTC: { amount: "0.00000000", change: { value: 0, percentage: 0, period: "7D" } },
-    },
-    mockAssets: {
-      mockUSDT: { amount: "0.00", change: { value: 0, percentage: 0, period: "7D" } },
-      mockETH: { amount: "0.00000000", change: { value: 0, percentage: 0, period: "7D" } },
+      BTC: { 
+        amount: wbtcBalance.toFixed(8), 
+        change: { value: 0, percentage: 0, period: "7D" },
+        price: btcPrice,
+        usdValue: wbtcBalanceInUsd
+      },
+      CORE: { 
+        amount: coreBalance.toFixed(2), 
+        change: { value: 0, percentage: 0, period: "7D" },
+        price: corePrice,
+        usdValue: coreBalanceInUsd
+      },
     }
   };
 
@@ -60,8 +116,30 @@ export default function DashboardPage() {
     ],
   };
 
-  const totalPortfolioValue = 0; // USD
+  const totalPortfolioValue = totalAssetInUsd; // USD from API
   const totalChange = { value: 0, percentage: 0 };
+
+  // Show loading or auth required state
+  if (!isAuthenticated) {
+    return (
+      <PageWrapper 
+        title="Portfolio Dashboard"
+        subtitle="Please sign in to view your portfolio"
+        className="bg-gradient-to-br from-orange-50 to-orange-100"
+      >
+        <div className="max-w-6xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans">Authentication Required</CardTitle>
+              <CardDescription className="font-sans">
+                Please connect your wallet and sign in to view your portfolio dashboard.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper 
@@ -74,16 +152,35 @@ export default function DashboardPage() {
         {/* Total Portfolio Value */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="font-sans flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-primary" />
-              Total Portfolio Value
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="font-sans flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Total Portfolio Value
+              </CardTitle>
+              <Button
+                onClick={fetchUserData}
+                disabled={isLoading}
+                variant="outline"
+                size="sm"
+                className="font-sans"
+              >
+                <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-4">
               <div>
                 <div className="text-4xl font-bold font-mono text-foreground">
-                  ${totalPortfolioValue.toLocaleString()}
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <RefreshCw className="h-8 w-8 animate-spin" />
+                      Loading...
+                    </div>
+                  ) : (
+                    `$${totalPortfolioValue.toLocaleString()}`
+                  )}
                 </div>
                 <div className="flex items-center gap-2 text-sm font-sans text-muted-foreground">
                   <TrendingUp className="h-4 w-4" />
@@ -123,10 +220,9 @@ export default function DashboardPage() {
 
         {/* Balance Categories */}
         <Tabs defaultValue="fiat" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="fiat" className="font-sans">Fiat Currency</TabsTrigger>
             <TabsTrigger value="crypto" className="font-sans">Crypto Assets</TabsTrigger>
-            <TabsTrigger value="mock" className="font-sans">Mock Assets</TabsTrigger>
           </TabsList>
 
           <TabsContent value="fiat" className="space-y-4">
@@ -138,67 +234,61 @@ export default function DashboardPage() {
                 change={balances.fiat.USD.change}
                 icon={<DollarSign className="h-5 w-5 text-green-600" />}
               />
-              <BalanceCard
-                title="Indonesian Rupiah"
-                amount={balances.fiat.IDR.amount}
-                symbol="Rp"
-                change={balances.fiat.IDR.change}
-                icon={<DollarSign className="h-5 w-5 text-green-600" />}
-              />
-              <BalanceCard
-                title="Euro"
-                amount={balances.fiat.EUR.amount}
-                symbol="€"
-                change={balances.fiat.EUR.change}
-                icon={<DollarSign className="h-5 w-5 text-green-600" />}
-              />
             </div>
           </TabsContent>
 
           <TabsContent value="crypto" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <BalanceCard
-                title="Bitcoin"
-                amount={balances.crypto.BTC.amount}
-                symbol=""
-                change={balances.crypto.BTC.change}
-                icon={<Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />}
-              />
-              <BalanceCard
-                title="Liquid Staking BTC"
-                amount={balances.crypto.lstBTC.amount}
-                symbol=""
-                change={balances.crypto.lstBTC.change}
-                icon={<TrendingUp className="h-5 w-5 text-primary" />}
-              />
-              <BalanceCard
-                title="Interest BTC"
-                amount={balances.crypto.istBTC.amount}
-                symbol=""
-                change={balances.crypto.istBTC.change}
-                icon={<Zap className="h-5 w-5 text-green-500" />}
-              />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium font-sans">Bitcoin (WBTC)</CardTitle>
+                    <Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold font-mono">{balances.crypto.BTC.amount}</div>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-xs text-muted-foreground font-sans">
+                        ${balances.crypto.BTC.usdValue.toLocaleString()}
+                      </p>
+                      <p className="text-xs text-muted-foreground font-mono">
+                        ${balances.crypto.BTC.price > 0 ? Math.floor(balances.crypto.BTC.price).toLocaleString() : 'Loading...'}/BTC
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium font-sans">Core Balance</CardTitle>
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold font-mono">{balances.crypto.CORE.amount}</div>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="text-xs text-muted-foreground font-sans">
+                        ${balances.crypto.CORE.usdValue.toLocaleString()}
+                      </p>
+                      <p className="text-xs text-muted-foreground font-mono">
+                        ${balances.crypto.CORE.price.toFixed(2)}/CORE
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
           </TabsContent>
 
-          <TabsContent value="mock" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <BalanceCard
-                title="Mock USDT"
-                amount={balances.mockAssets.mockUSDT.amount}
-                symbol="$"
-                change={balances.mockAssets.mockUSDT.change}
-                icon={<DollarSign className="h-5 w-5 text-green-600" />}
-              />
-              <BalanceCard
-                title="Mock Ethereum"
-                amount={balances.mockAssets.mockETH.amount}
-                symbol=""
-                change={balances.mockAssets.mockETH.change}
-                icon={<TrendingUp className="h-5 w-5 text-blue-500" />}
-              />
-            </div>
-          </TabsContent>
         </Tabs>
 
         {/* Quick Actions */}
