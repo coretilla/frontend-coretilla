@@ -18,6 +18,7 @@ import { stripePromise } from "@/lib/stripe";
 import { createDeposit, confirmDeposit, getUserData, parseUserBalance, UserBalance } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useWallet } from "@/hooks/useWallet";
+import { ConnectWallet } from "@/components/wallet/ConnectWallet";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, ArrowDownLeft, ChevronLeft, ChevronRight, History, DollarSign, BarChart3 } from "lucide-react";
 
@@ -561,8 +562,13 @@ export default function DepositPage() {
                 Please connect your wallet to access deposit functionality.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <Alert>
+            <CardContent className="text-center">
+              <ConnectWallet 
+                variant="default" 
+                size="lg" 
+                className="w-full max-w-sm mx-auto" 
+              />
+              <Alert className="mt-4">
                 <Info className="h-4 w-4" />
                 <AlertDescription className="font-sans">
                   You need to connect your wallet first to deposit funds.

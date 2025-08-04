@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Zap, Globe, TrendingUp, Fuel, Eye, Key, Lock } from "lucide-react";
+import { ArrowRight, Shield, Zap, Globe, TrendingUp, Key, Lock, Rocket, Award, Star, Users, Play, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useBTCPrice } from "@/hooks";
@@ -64,7 +64,7 @@ export default function Hero() {
           transition={{ delay: 2, duration: 0.5 }}
           className="absolute top-1/3 right-1/3 hidden sm:block"
         >
-          <TrendingUp className="w-4 h-4 text-primary/40 animate-bounce" style={{ animationDelay: '1s' }} />
+          <TrendingUp className="w-4 h-4 text-primary/40" />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, scale: 0 }}
@@ -72,7 +72,7 @@ export default function Hero() {
           transition={{ delay: 1.8, duration: 0.5 }}
           className="absolute bottom-1/4 left-1/3 hidden sm:block"
         >
-          <div className="w-2 h-2 bg-primary/50 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+          <div className="w-2 h-2 bg-primary/50 rounded-full"></div>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, scale: 0 }}
@@ -80,7 +80,7 @@ export default function Hero() {
           transition={{ delay: 2.2, duration: 0.5 }}
           className="absolute bottom-1/3 right-1/4 hidden sm:block"
         >
-          <Image src="/image/btcLogo.png" alt="Bitcoin" width={12} height={12} className="object-contain opacity-60 animate-bounce" style={{ animationDelay: '0.7s' }} />
+          <Image src="/image/btcLogo.png" alt="Bitcoin" width={12} height={12} className="object-contain opacity-60" />
         </motion.div>
       </motion.div>
 
@@ -89,97 +89,202 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Content */}
           <div className="text-center lg:text-left">
-            <motion.h1
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 font-sans leading-tight"
-            >
-              Bitcoin
-              <span className="block text-primary bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-                Neobank
-              </span>
-            </motion.h1>
-            
-            <motion.p
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 mb-8 font-sans font-normal"
-            >
-              Your digital bank for the Bitcoin economy. Simple, secure, and designed for everyone - 
-              from crypto beginners to Bitcoin veterans.
-            </motion.p>
+            {/* Enhanced Hero Title */}
+            <div className="relative">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="relative mb-8"
+              >
+                {/* Main Title with Enhanced Styling */}
+                <h1 className="relative text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-foreground font-sans leading-[0.9] tracking-tight">
+                  {/* Bitcoin Text with Subtle Glow */}
+                  <span className="relative inline-block">
+                    <span className="relative z-10 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
+                      Bitcoin
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-400/20 to-transparent blur-xl"></div>
+                  </span>
+                  
+                  {/* Neobank Text with Enhanced Gradient */}
+                  <span className="block relative mt-2">
+                    <span className="relative z-10 bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent font-extrabold">
+                      Neobank
+                    </span>
+                    {/* Glowing Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-400/30 via-orange-500/30 to-orange-600/30 blur-2xl"></div>
+                    {/* Accent Line */}
+                    <div className="absolute -bottom-2 left-0 w-24 sm:w-32 md:w-40 lg:w-48 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full"></div>
+                  </span>
+                </h1>
 
-            {/* CTA Buttons */}
+                {/* Decorative Elements */}
+                <div className="absolute -top-4 -right-4 w-16 h-16 bg-orange-400/10 rounded-full blur-xl hidden lg:block"></div>
+                <div className="absolute top-1/2 -left-8 w-24 h-24 bg-orange-300/5 rounded-full blur-2xl hidden lg:block"></div>
+              </motion.div>
+
+              {/* Enhanced Description */}
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+                className="relative mb-8"
+              >
+                <div className="max-w-2xl mx-auto lg:mx-0">
+                  {/* Main Description */}
+                  <p className="text-lg sm:text-xl md:text-2xl lg:text-2xl text-muted-foreground font-sans font-normal leading-relaxed mb-4">
+                    Your <span className="text-orange-600 font-semibold">digital bank</span> for the Bitcoin economy.
+                  </p>
+                  
+                  {/* Enhanced User Type Pills */}
+                  <div className="flex flex-col gap-4">
+                    <p className="text-base sm:text-lg text-muted-foreground/80 font-medium">
+                      Simple, secure, and designed for everyone:
+                    </p>
+                    
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                      {/* Crypto Beginners Card */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.7, duration: 0.4 }}
+                        whileHover={{ 
+                          scale: 1.02,
+                          boxShadow: "0 8px 25px -5px rgba(34, 197, 94, 0.3)"
+                        }}
+                        className="group flex items-center gap-3 bg-gradient-to-br from-green-50 to-green-100/50 border border-green-200/60 rounded-xl px-4 py-3 transition-all duration-300 cursor-pointer flex-1 sm:flex-initial"
+                      >
+                        <div className="flex items-center justify-center w-8 h-8 bg-green-200/70 rounded-lg group-hover:bg-green-300/70 transition-colors duration-300">
+                          <Rocket className="w-4 h-4 text-green-700 group-hover:text-green-800 transition-colors duration-300" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold text-green-800 group-hover:text-green-900 transition-colors duration-300">
+                            Crypto Beginners
+                          </span>
+                          <span className="text-xs text-green-600/80 font-medium">
+                            Start your journey
+                          </span>
+                        </div>
+                        <div className="ml-auto">
+                          <div className="w-2 h-2 bg-green-400 rounded-full group-hover:scale-110 transition-transform duration-300"></div>
+                        </div>
+                      </motion.div>
+
+                      {/* Connector */}
+                      <div className="hidden sm:flex items-center justify-center px-2">
+                        <div className="flex items-center gap-1">
+                          <div className="w-1 h-1 bg-orange-300 rounded-full"></div>
+                          <div className="w-1 h-1 bg-orange-400 rounded-full"></div>
+                          <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
+                        </div>
+                      </div>
+
+                      {/* Bitcoin Veterans Card */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.9, duration: 0.4 }}
+                        whileHover={{ 
+                          scale: 1.02,
+                          boxShadow: "0 8px 25px -5px rgba(249, 115, 22, 0.3)"
+                        }}
+                        className="group flex items-center gap-3 bg-gradient-to-br from-orange-50 to-orange-100/50 border border-orange-200/60 rounded-xl px-4 py-3 transition-all duration-300 cursor-pointer flex-1 sm:flex-initial"
+                      >
+                        <div className="flex items-center justify-center w-8 h-8 bg-orange-200/70 rounded-lg group-hover:bg-orange-300/70 transition-colors duration-300">
+                          <Award className="w-4 h-4 text-orange-700 group-hover:text-orange-800 transition-colors duration-300" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold text-orange-800 group-hover:text-orange-900 transition-colors duration-300">
+                            Bitcoin Veterans
+                          </span>
+                          <span className="text-xs text-orange-600/80 font-medium">
+                            Advanced features
+                          </span>
+                        </div>
+                        <div className="ml-auto">
+                          <Star className="w-3 h-3 text-orange-400 group-hover:text-orange-500 group-hover:scale-110 transition-all duration-300" />
+                        </div>
+                      </motion.div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Background Accent */}
+                <div className="absolute inset-0 -z-10 bg-gradient-to-br from-orange-50/30 via-transparent to-transparent rounded-2xl blur-3xl"></div>
+              </motion.div>
+            </div>
+
+            {/* Minimalist CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.5 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8"
+              className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8"
             >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              {/* Primary CTA - Get Started */}
+              <motion.button
+                whileHover={{ 
+                  scale: 1.02,
+                  boxShadow: "0 8px 25px -8px rgba(249, 115, 22, 0.5)"
+                }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative overflow-hidden bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-lg font-medium text-base transition-all duration-300 hover:from-orange-600 hover:to-orange-700 flex items-center justify-center gap-2 min-w-[140px]"
               >
-                <Button
-                  size="lg"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-semibold group font-sans"
-                >
-                  Get Started
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                <span className="relative z-10">Get Started</span>
+                <ArrowRight className="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-0.5 duration-300" />
+                
+                {/* Subtle shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+              </motion.button>
+
+              {/* Secondary CTA - Try Demo */}
+              <motion.button
+                whileHover={{ 
+                  scale: 1.02,
+                  backgroundColor: "rgba(249, 115, 22, 0.05)"
+                }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative bg-transparent border border-orange-200 text-orange-700 hover:text-orange-800 px-6 py-3 rounded-lg font-medium text-base transition-all duration-300 flex items-center justify-center gap-2 hover:border-orange-300 min-w-[120px]"
               >
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-6 text-lg font-semibold font-sans"
-                >
-                  Try Demo
-                </Button>
-              </motion.div>
+                <Play className="w-3.5 h-3.5 transition-colors group-hover:text-orange-600 duration-300" />
+                <span>Try Demo</span>
+                
+                {/* Subtle background on hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-50/0 via-orange-50/50 to-orange-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
+              </motion.button>
             </motion.div>
 
-            {/* Feature Pills - Web3 Native */}
+            {/* Enhanced Feature Pills - Web3 Native */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.5 }}
-              className="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-3"
+              className="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-4 mt-8"
             >
+              {/* 100% Self-Custody */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.2, duration: 0.4 }}
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2 bg-orange-100 text-orange-800 text-sm px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: "0 10px 25px -3px rgba(34, 197, 94, 0.3), 0 4px 6px -2px rgba(34, 197, 94, 0.1)"
+                }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative overflow-hidden flex items-center gap-3 bg-gradient-to-br from-green-50 to-green-100 border border-green-200 text-green-800 text-sm px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer min-w-fit"
               >
-                <Fuel className="h-4 w-4 flex-shrink-0" />
-                <span className="font-medium font-sans">Gasless Transactions</span>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.4, duration: 0.4 }}
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2 bg-purple-100 text-purple-800 text-sm px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
-              >
-                <Eye className="h-4 w-4 flex-shrink-0" />
-                <span className="font-medium font-sans">No KYC Required</span>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.6, duration: 0.4 }}
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2 bg-green-100 text-green-800 text-sm px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
-              >
-                <Key className="h-4 w-4 flex-shrink-0" />
-                <span className="font-medium font-sans">100% Self-Custody</span>
+                <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative z-10 flex items-center gap-3">
+                  <div className="p-1.5 bg-green-200/50 rounded-lg group-hover:bg-green-300/50 transition-colors duration-300">
+                    <Key className="h-4 w-4 flex-shrink-0 group-hover:text-green-900 transition-colors duration-300" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold font-sans text-green-900 group-hover:text-green-950 transition-colors duration-300">100% Self-Custody</span>
+                    <span className="text-xs text-green-600 font-medium">You own your keys</span>
+                  </div>
+                </div>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-400/20 rounded-full group-hover:scale-110 transition-transform duration-300"></div>
               </motion.div>
             </motion.div>
           </div>
@@ -204,17 +309,10 @@ export default function Hero() {
                 {/* Bitcoin Logo */}
                 <div className="flex justify-center mb-6">
                   <div className="relative">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    >
+                    <div>
                       <Image src="/image/btcLogo.png" alt="Bitcoin" width={64} height={64} className="object-contain" />
-                    </motion.div>
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="absolute inset-0 w-16 h-16 bg-primary/20 rounded-full"
-                    ></motion.div>
+                    </div>
+                    <div className="absolute inset-0 w-16 h-16 bg-primary/20 rounded-full"></div>
                   </div>
                 </div>
 

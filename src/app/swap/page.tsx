@@ -14,6 +14,9 @@ import { toast } from "sonner";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { motion } from "framer-motion";
 import { getUserData, parseUserBalance, getBtcPrice, swapUsdToBtc } from "@/lib/api";
+import { useWallet } from "@/hooks/useWallet";
+import { ConnectWallet } from "@/components/wallet/ConnectWallet";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SwapFormData {
   fromCurrency: string;
@@ -21,6 +24,9 @@ interface SwapFormData {
 }
 
 export default function SwapPage() {
+  const { isConnected } = useWallet();
+  const { isAuthenticated, signIn, isAuthenticating, error: authError } = useAuth();
+  
   const [formData, setFormData] = useState<SwapFormData>({
     fromCurrency: "USD",
     amount: "",
@@ -138,6 +144,88 @@ export default function SwapPage() {
   };
 
   const selectedCurrency = currencies[0];
+
+  // Show connect wallet prompt if not connected
+  if (!isConnected) {
+    return (
+      <PageWrapper 
+        title="Swap USD to Bitcoin"
+        subtitle="Connect your wallet to start swapping currencies."
+        className="bg-gradient-to-br from-orange-50 to-orange-100"
+      >
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans">Connect Wallet Required</CardTitle>
+              <CardDescription className="font-sans">
+                Please connect your wallet to access swap functionality.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <ConnectWallet 
+                variant="default" 
+                size="lg" 
+                className="w-full max-w-sm mx-auto" 
+              />
+              <Alert className="mt-4">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="font-sans">
+                  You need to connect your wallet first to swap currencies.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  // Show authentication prompt if connected but not authenticated
+  if (!isAuthenticated) {
+    return (
+      <PageWrapper 
+        title="Swap USD to Bitcoin"
+        subtitle="Sign in with your wallet to start swapping."
+        className="bg-gradient-to-br from-orange-50 to-orange-100"
+      >
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans">Authentication Required</CardTitle>
+              <CardDescription className="font-sans">
+                Please sign in with your wallet to access swap functionality.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {authError && (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription className="font-sans text-red-600">
+                    {authError}
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              <Button 
+                onClick={signIn}
+                disabled={isAuthenticating}
+                className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
+              >
+                {isAuthenticating ? "Signing in..." : "Sign in with Wallet"}
+              </Button>
+              
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription className="font-sans">
+                  You'll be asked to sign a message with your wallet to authenticate.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        </div>
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper 

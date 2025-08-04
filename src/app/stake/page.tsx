@@ -14,6 +14,10 @@ import Image from "next/image";
 import { toast } from "sonner";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { motion } from "framer-motion";
+import { useWallet } from "@/hooks/useWallet";
+import { useAuth } from "@/hooks/useAuth";
+import { ConnectWallet } from "@/components/wallet/ConnectWallet";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface StakeFormData {
   btcAmount: string;
@@ -21,6 +25,9 @@ interface StakeFormData {
 }
 
 export default function StakePage() {
+  const { isConnected } = useWallet();
+  const { isAuthenticated, signIn, isAuthenticating, error: authError } = useAuth();
+  
   const [formData, setFormData] = useState<StakeFormData>({
     btcAmount: "",
     lstBtcAmount: "",
@@ -89,6 +96,88 @@ export default function StakePage() {
     toast.success("Successfully converted BTC to lstBTC!");
     setFormData({ ...formData, btcAmount: "" });
   };
+
+  // Show connect wallet prompt if not connected
+  if (!isConnected) {
+    return (
+      <PageWrapper 
+        title="lstBTC Staking"
+        subtitle="Connect your wallet to start staking and earning rewards."
+        className="bg-gradient-to-br from-orange-50 to-orange-100"
+      >
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans">Connect Wallet Required</CardTitle>
+              <CardDescription className="font-sans">
+                Please connect your wallet to access staking functionality.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <ConnectWallet 
+                variant="default" 
+                size="lg" 
+                className="w-full max-w-sm mx-auto" 
+              />
+              <Alert className="mt-4">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="font-sans">
+                  You need to connect your wallet first to stake your assets.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  // Show authentication prompt if connected but not authenticated
+  if (!isAuthenticated) {
+    return (
+      <PageWrapper 
+        title="lstBTC Staking"
+        subtitle="Sign in with your wallet to start staking."
+        className="bg-gradient-to-br from-orange-50 to-orange-100"
+      >
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans">Authentication Required</CardTitle>
+              <CardDescription className="font-sans">
+                Please sign in with your wallet to access staking functionality.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {authError && (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription className="font-sans text-red-600">
+                    {authError}
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              <Button 
+                onClick={signIn}
+                disabled={isAuthenticating}
+                className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
+              >
+                {isAuthenticating ? "Signing in..." : "Sign in with Wallet"}
+              </Button>
+              
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription className="font-sans">
+                  You'll be asked to sign a message with your wallet to authenticate.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        </div>
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper 

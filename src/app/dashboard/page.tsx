@@ -10,12 +10,17 @@ import { DollarSign, TrendingUp, Zap, BarChart3, Calendar, RefreshCw } from "luc
 import { Button } from "@/components/ui/button";
 import { getUserData, parseUserBalance, UserBalance, getBtcPrice, BtcPriceResponse } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import { useWallet } from "@/hooks/useWallet";
+import { ConnectWallet } from "@/components/wallet/ConnectWallet";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 export default function DashboardPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, signIn, isAuthenticating, error: authError } = useAuth();
+  const { isConnected } = useWallet();
   const [selectedPeriod, setSelectedPeriod] = useState("7D");
   const [balanceData, setBalanceData] = useState<UserBalance>({ USD: 0 });
   const [apiData, setApiData] = useState<any>(null);
@@ -119,6 +124,41 @@ export default function DashboardPage() {
   const totalPortfolioValue = totalAssetInUsd; // USD from API
   const totalChange = { value: 0, percentage: 0 };
 
+  // Show connect wallet prompt if not connected
+  if (!isConnected) {
+    return (
+      <PageWrapper 
+        title="Portfolio Dashboard"
+        subtitle="Connect your wallet to view your portfolio analytics."
+        className="bg-gradient-to-br from-orange-50 to-orange-100"
+      >
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans">Connect Wallet Required</CardTitle>
+              <CardDescription className="font-sans">
+                Please connect your wallet to access your portfolio dashboard.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <ConnectWallet 
+                variant="default" 
+                size="lg" 
+                className="w-full max-w-sm mx-auto" 
+              />
+              <Alert className="mt-4">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="font-sans">
+                  You need to connect your wallet first to view your portfolio.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        </div>
+      </PageWrapper>
+    );
+  }
+
   // Show loading or auth required state
   if (!isAuthenticated) {
     return (
@@ -132,9 +172,34 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="font-sans">Authentication Required</CardTitle>
               <CardDescription className="font-sans">
-                Please connect your wallet and sign in to view your portfolio dashboard.
+                Please sign in with your wallet to view your portfolio dashboard.
               </CardDescription>
             </CardHeader>
+            <CardContent className="space-y-4">
+              {authError && (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription className="font-sans text-red-600">
+                    {authError}
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              <Button 
+                onClick={signIn}
+                disabled={isAuthenticating}
+                className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
+              >
+                {isAuthenticating ? "Signing in..." : "Sign in with Wallet"}
+              </Button>
+              
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription className="font-sans">
+                  You'll be asked to sign a message with your wallet to authenticate.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
           </Card>
         </div>
       </PageWrapper>

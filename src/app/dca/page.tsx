@@ -13,6 +13,10 @@ import Image from "next/image";
 import { toast } from "sonner";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { motion } from "framer-motion";
+import { useWallet } from "@/hooks/useWallet";
+import { useAuth } from "@/hooks/useAuth";
+import { ConnectWallet } from "@/components/wallet/ConnectWallet";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface DCAData {
   fiatSource: string;
@@ -22,6 +26,9 @@ interface DCAData {
 }
 
 export default function DCAPage() {
+  const { isConnected } = useWallet();
+  const { isAuthenticated, signIn, isAuthenticating, error: authError } = useAuth();
+  
   const [dcaData, setDcaData] = useState<DCAData>({
     fiatSource: "",
     amount: "",
@@ -116,6 +123,88 @@ export default function DCAPage() {
 
   const selectedCurrency = currencies.find(c => c.code === dcaData.fiatSource);
   const projection = calculateProjection();
+
+  // Show connect wallet prompt if not connected
+  if (!isConnected) {
+    return (
+      <PageWrapper 
+        title="DCA Bitcoin Investment"
+        subtitle="Connect your wallet to set up recurring Bitcoin purchases."
+        className="bg-gradient-to-br from-orange-50 to-orange-100"
+      >
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans">Connect Wallet Required</CardTitle>
+              <CardDescription className="font-sans">
+                Please connect your wallet to access DCA functionality.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <ConnectWallet 
+                variant="default" 
+                size="lg" 
+                className="w-full max-w-sm mx-auto" 
+              />
+              <Alert className="mt-4">
+                <DollarSign className="h-4 w-4" />
+                <AlertDescription className="font-sans">
+                  You need to connect your wallet first to set up automated Bitcoin purchases.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  // Show authentication prompt if connected but not authenticated
+  if (!isAuthenticated) {
+    return (
+      <PageWrapper 
+        title="DCA Bitcoin Investment"
+        subtitle="Sign in with your wallet to set up recurring purchases."
+        className="bg-gradient-to-br from-orange-50 to-orange-100"
+      >
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans">Authentication Required</CardTitle>
+              <CardDescription className="font-sans">
+                Please sign in with your wallet to access DCA functionality.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {authError && (
+                <Alert>
+                  <DollarSign className="h-4 w-4" />
+                  <AlertDescription className="font-sans text-red-600">
+                    {authError}
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              <Button 
+                onClick={signIn}
+                disabled={isAuthenticating}
+                className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
+              >
+                {isAuthenticating ? "Signing in..." : "Sign in with Wallet"}
+              </Button>
+              
+              <Alert>
+                <DollarSign className="h-4 w-4" />
+                <AlertDescription className="font-sans">
+                  You'll be asked to sign a message with your wallet to authenticate.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        </div>
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper 
