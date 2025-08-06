@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 interface PageWrapperProps {
   children: ReactNode;
-  title?: string;
+  title?: string | ReactNode;
   subtitle?: string;
   className?: string;
 }

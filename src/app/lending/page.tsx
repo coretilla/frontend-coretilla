@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, Shield, AlertTriangle, Percent } from "lucide-react";
+import Image from "next/image";
 import { toast } from "sonner";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { motion } from "framer-motion";
@@ -233,7 +234,12 @@ export default function LendingPage() {
               {assets.map((asset) => (
                 <div key={asset.symbol} className="p-4 bg-muted rounded-lg">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="font-semibold font-sans">{asset.name}</span>
+                    <div className="flex items-center gap-2">
+                      {asset.symbol === "mockBTC" && (
+                        <Image src="/image/btcLogo.png" alt="Bitcoin" width={16} height={16} className="object-contain" />
+                      )}
+                      <span className="font-semibold font-sans">{asset.name}</span>
+                    </div>
                     <Badge variant="secondary" className="font-sans">
                       {asset.apy}% APY
                     </Badge>

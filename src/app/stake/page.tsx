@@ -181,7 +181,12 @@ export default function StakePage() {
   if (!isConnected) {
     return (
       <PageWrapper 
-        title="mBTC Staking"
+        title={
+          <div className="flex items-center justify-center gap-3">
+            <span>mBTC Staking</span>
+            <Image src="/image/btcLogo.png" alt="Bitcoin" width={40} height={40} className="object-contain" />
+          </div>
+        }
         subtitle="Connect your wallet to start staking and earning rewards."
         className="bg-gradient-to-br from-orange-50 to-orange-100"
       >
@@ -216,7 +221,12 @@ export default function StakePage() {
   if (!isAuthenticated) {
     return (
       <PageWrapper 
-        title="mBTC Staking"
+        title={
+          <div className="flex items-center justify-center gap-3">
+            <span>mBTC Staking</span>
+            <Image src="/image/btcLogo.png" alt="Bitcoin" width={60} height={40} className="object-contain" />
+          </div>
+        }
         subtitle="Sign in with your wallet to start staking."
         className="bg-gradient-to-br from-orange-50 to-orange-100"
       >
@@ -261,7 +271,12 @@ export default function StakePage() {
 
   return (
     <PageWrapper 
-      title="mBTC Staking"
+      title={
+        <div className="flex items-center justify-center gap-3">
+          <span>mBTC Staking</span>
+          <Image src="/image/btcLogo.png" alt="Bitcoin" width={60} height={40} className="object-contain" />
+        </div>
+      }
       subtitle="Stake mBTC tokens to earn rewards"
       className="bg-gradient-to-br from-orange-50 to-orange-100"
     >
@@ -272,7 +287,7 @@ export default function StakePage() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-sans flex items-center gap-2">
-                <Image src="/image/btcLogo.png" alt="mBTC" width={20} height={20} className="object-contain" />
+                <Image src="/image/btcLogo.png" alt="mBTC" width={40} height={20} className="object-contain" />
                 mBTC Balance
               </CardTitle>
             </CardHeader>

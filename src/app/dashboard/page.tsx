@@ -312,7 +312,7 @@ export default function DashboardPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium font-sans">Bitcoin (WBTC)</CardTitle>
-                    <Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />
+                    <Image src="/image/btcLogo.png" alt="Bitcoin" width={50} height={20} className="object-contain" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold font-mono">{balances.crypto.BTC.amount}</div>
@@ -336,7 +336,7 @@ export default function DashboardPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium font-sans">Core Balance</CardTitle>
-                    <TrendingUp className="h-5 w-5 text-primary" />
+                    <Image src="/image/coreDaoLogo.png" alt="coredao" width={50} height={20} className="object-contain" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold font-mono">{balances.crypto.CORE.amount}</div>

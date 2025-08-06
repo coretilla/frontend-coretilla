@@ -77,11 +77,17 @@ export default function SwapPage() {
     return () => clearInterval(interval);
   }, []);
 
+  const coreBalance = userInfo?.coreBalance || 0;
+  const coreBalanceInUsd = userInfo?.coreBalanceInUsd || 0;
+  const wbtcBalance = userInfo?.wbtcBalance || 0;
+  const wbtcBalanceInUsd = userInfo?.wbtcBalanceInUsd || 0;
+
   const currentBalances = {
     USD: userBalance,
-    CORE: userInfo?.coreBalance || 0,
-    WBTC: userInfo?.wbtcBalance || 0,
-    WBTC_USD: userInfo?.wbtcBalanceInUsd || 0,
+    CORE: coreBalance,
+    CORE_USD: coreBalanceInUsd,
+    WBTC: wbtcBalance,
+    WBTC_USD: wbtcBalanceInUsd,
   };
 
   const networkFee = 0.0001; // BTC
@@ -241,7 +247,7 @@ export default function SwapPage() {
             <CardTitle className="font-sans">Available Balances</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-muted rounded-lg">
                 <div className="text-2xl font-bold text-primary font-mono">
                   ${currentBalances.USD.toLocaleString()}
@@ -253,18 +259,21 @@ export default function SwapPage() {
                   {currentBalances.CORE.toLocaleString()}
                 </div>
                 <div className="text-sm text-muted-foreground font-sans">CORE</div>
+                <div className="text-xs text-muted-foreground font-sans mt-1">
+                  ${currentBalances.CORE_USD.toLocaleString()}
+                </div>
               </div>
               <div className="text-center p-4 bg-muted rounded-lg">
                 <div className="text-2xl font-bold text-primary font-mono">
                   {currentBalances.WBTC.toFixed(6)}
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">wBTC</div>
-              </div>
-              <div className="text-center p-4 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-primary font-mono">
-                  ${Math.round(currentBalances.WBTC_USD).toLocaleString()}
+                <div className="text-sm text-muted-foreground font-sans flex items-center justify-center">
+                  <Image src="/image/btcLogo.png" alt="Bitcoin" width={40} height={12} className="object-contain" />
+                  <span className="mr-5">wBTC</span>
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">wBTC in USD</div>
+                <div className="text-xs text-muted-foreground font-sans mt-1">
+                  ${currentBalances.WBTC_USD.toLocaleString()}
+                </div>
               </div>
             </div>
           </CardContent>
