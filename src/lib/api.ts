@@ -320,3 +320,66 @@ export async function swapUsdToBtc(data: SwapRequest): Promise<SwapResponse> {
   console.log('✅ Swap API Success response:', result);
   return result;
 }
+
+export interface StakeHistoryItem {
+  transactionHash: string;
+  blockNumber: string;
+  amount: string;
+}
+
+export interface StakeHistoryResponse {
+  success: boolean;
+  data: StakeHistoryItem[];
+}
+
+export async function getStakeHistory(): Promise<StakeHistoryResponse> {
+  console.log('📊 Fetching stake history with access_token Bearer auth...');
+  
+  const token = getAuthToken();
+  if (!token) {
+    console.error('❌ No access_token found in localStorage');
+    throw new Error('Authentication required. Please login first.');
+  }
+  
+  const requestHeaders = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  };
+  
+  console.log('🔑 Using access_token for stake history:', token.substring(0, 40) + '...');
+  
+  console.log('📡 Stake History API Request (Access Token Bearer Auth):');
+  console.log('- URL:', `${API_BASE_URL}/finance/stake-history`);
+  console.log('- Headers:', requestHeaders);
+  
+  const response = await fetch(`${API_BASE_URL}/finance/stake-history`, {
+    method: 'GET',
+    headers: requestHeaders,
+  });
+
+  console.log('📡 Stake History API Response status:', response.status);
+  console.log('📡 Stake History API Response headers:', Object.fromEntries(response.headers.entries()));
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ Stake History API Error response:', errorText);
+    
+    // Handle specific backend configuration errors
+    if (response.status === 500) {
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.message === "Staking vault address not configured") {
+          throw new Error('Backend configuration error: Staking vault address not configured. Please contact support.');
+        }
+      } catch (parseError) {
+        // If JSON parsing fails, use generic error
+      }
+    }
+    
+    throw new Error(`Failed to fetch stake history (${response.status}): ${errorText}`);
+  }
+
+  const result = await response.json();
+  console.log('✅ Stake History API Success response:', result);
+  return result;
+}

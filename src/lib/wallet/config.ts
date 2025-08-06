@@ -5,7 +5,7 @@ import { defineChain } from 'viem'
 
 // Define CoreDAO Testnet
 const coreDAOTestnet = defineChain({
-  id: 1115,
+  id: 1114,
   name: 'Core Blockchain Testnet',
   nativeCurrency: {
     decimals: 18,
@@ -14,13 +14,13 @@ const coreDAOTestnet = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://rpc.test.btcs.network'],
+      http: ['https://rpc.test2.btcs.network'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'CoreScan Testnet',
-      url: 'https://scan.test.btcs.network',
+      name: 'CoreScan2 Testnet',
+      url: 'https://scan.test2.btcs.network/',
     },
   },
   testnet: true,

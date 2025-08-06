@@ -30,7 +30,7 @@ const features = [
   },
   {
     icon: TrendingUp,
-    title: "lstBTC Staking",
+    title: "mBTC Staking",
     description: "Convert BTC → lstBTC → Stake to earn istBTC rewards automatically",
     color: "bg-green-100 text-green-600",
     comingSoon: false

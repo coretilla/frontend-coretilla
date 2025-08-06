@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Info, Zap } from "lucide-react";
+import { TrendingUp, Info, Zap, Clock, History, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import PageWrapper from "@/components/layout/PageWrapper";
@@ -18,10 +18,13 @@ import { useWallet } from "@/hooks/useWallet";
 import { useAuth } from "@/hooks/useAuth";
 import { ConnectWallet } from "@/components/wallet/ConnectWallet";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useStaking } from "@/hooks/useStaking";
+import { useStakingHistory } from "@/hooks/useStakingHistory";
+import { useYearlyRewards } from "@/hooks/useYearlyRewards";
 
 interface StakeFormData {
-  btcAmount: string;
-  lstBtcAmount: string;
+  mBtcAmount: string;
+  unstakeAmount: string;
 }
 
 export default function StakePage() {
@@ -29,79 +32,156 @@ export default function StakePage() {
   const { isAuthenticated, signIn, isAuthenticating, error: authError } = useAuth();
   
   const [formData, setFormData] = useState<StakeFormData>({
-    btcAmount: "",
-    lstBtcAmount: "",
+    mBtcAmount: "",
+    unstakeAmount: "",
   });
   
-  const [isLoading, setIsLoading] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [activeTab, setActiveTab] = useState("convert");
+  const [activeTab, setActiveTab] = useState("staking");
+  const [showUnstakeDialog, setShowUnstakeDialog] = useState(false);
+  const [pendingStakeAmount, setPendingStakeAmount] = useState<string | null>(null);
 
-  // Mock balances
-  const balances = {
-    BTC: 0.00000000,
-    lstBTC: 0.00000000,
-    istBTC: 0.00000000,
-  };
+  // Use staking hook
+  const {
+    approve,
+    stake,
+    startCooldown,
+    unstake,
+    claimRewards,
+    needsApproval,
+    refetchAll,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    hash,
+    mBTCBalance,
+    apy,
+    cooldownPeriod,
+    stakedAmount,
+    pendingRewards,
+    canUnstake,
+    cooldownEnd,
+    unstakeWindowEnd,
+  } = useStaking();
 
-  const stakingData = {
-    apr: 12.5,
-    totalStaked: 0.00000000,
-    totalRewards: 0.00000000,
-    stakingPeriod: "Flexible",
-    minStake: 0.001,
-  };
+  // Use staking history hook
+  const { history, isLoading: historyLoading, error: historyError, refetch: refetchHistory } = useStakingHistory();
 
-  const handleConvertSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.btcAmount || parseFloat(formData.btcAmount) <= 0) {
-      toast.error("Please enter a valid BTC amount");
-      return;
+  // Use yearly rewards hook with current input amount
+  const { yearlyRewards } = useYearlyRewards(formData.mBtcAmount);
+
+  // Track previous hash to avoid loops
+  const [processedHash, setProcessedHash] = useState<string | null>(null);
+
+  // Handle stake after approval is confirmed
+  useEffect(() => {
+    const handleStakeAfterApproval = async () => {
+      if (isConfirmed && pendingStakeAmount && hash && hash !== processedHash) {
+        try {
+          // Wait a bit for allowance to update
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          toast.success("Approval confirmed! Now staking...");
+          await stake(pendingStakeAmount);
+          setPendingStakeAmount(null);
+          setProcessedHash(hash);
+        } catch (error) {
+          console.error("Staking after approval error:", error);
+          toast.error("Failed to stake after approval");
+          setPendingStakeAmount(null);
+          setProcessedHash(hash);
+        }
+      }
+    };
+
+    handleStakeAfterApproval();
+  }, [isConfirmed, pendingStakeAmount, hash, processedHash, stake]);
+
+  // Refresh data when transaction is confirmed (non-approval transactions)
+  useEffect(() => {
+    if (isConfirmed && hash && hash !== processedHash && !pendingStakeAmount) {
+      refetchAll();
+      refetchHistory();
+      setFormData({ mBtcAmount: "", unstakeAmount: "" });
+      toast.success("Transaction confirmed successfully!");
+      setProcessedHash(hash);
     }
-
-    if (parseFloat(formData.btcAmount) > balances.BTC) {
-      toast.error("Insufficient BTC balance");
-      return;
-    }
-
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setShowConfirmation(true);
-    }, 2000);
-  };
+  }, [isConfirmed, hash, processedHash, pendingStakeAmount, refetchAll, refetchHistory]);
 
   const handleStakeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.lstBtcAmount || parseFloat(formData.lstBtcAmount) <= 0) {
-      toast.error("Please enter a valid lstBTC amount");
+    if (!formData.mBtcAmount || parseFloat(formData.mBtcAmount) <= 0) {
+      toast.error("Please enter a valid mBTC amount");
       return;
     }
 
-    if (parseFloat(formData.lstBtcAmount) > balances.lstBTC) {
-      toast.error("Insufficient lstBTC balance");
+    if (parseFloat(formData.mBtcAmount) > parseFloat(mBTCBalance)) {
+      toast.error("Insufficient mBTC balance");
       return;
     }
 
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success("Successfully staked lstBTC!");
-      setFormData({ ...formData, lstBtcAmount: "" });
-    }, 2000);
+    try {
+      // Check if approval is needed
+      if (needsApproval(formData.mBtcAmount)) {
+        toast.info("Step 1/2: Approving mBTC for staking...");
+        setPendingStakeAmount(formData.mBtcAmount);
+        await approve(formData.mBtcAmount);
+        return;
+      }
+
+      // If already approved, stake directly
+      toast.info("Staking mBTC...");
+      await stake(formData.mBtcAmount);
+    } catch (error) {
+      console.error("Staking error:", error);
+      toast.error("Failed to stake mBTC");
+      setPendingStakeAmount(null);
+    }
   };
 
-  const handleConfirmConvert = () => {
-    setShowConfirmation(false);
-    toast.success("Successfully converted BTC to lstBTC!");
-    setFormData({ ...formData, btcAmount: "" });
+  const handleUnstakeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.unstakeAmount || parseFloat(formData.unstakeAmount) <= 0) {
+      toast.error("Please enter a valid unstake amount");
+      return;
+    }
+
+    if (parseFloat(formData.unstakeAmount) > parseFloat(stakedAmount)) {
+      toast.error("Insufficient staked amount");
+      return;
+    }
+
+    try {
+      if (!canUnstake) {
+        await startCooldown();
+        toast.info("Cooldown started. You can unstake after the cooldown period.");
+        setShowUnstakeDialog(false);
+        return;
+      }
+
+      await unstake(formData.unstakeAmount);
+      toast.info("Unstaking transaction submitted...");
+      setShowUnstakeDialog(false);
+    } catch (error) {
+      console.error("Unstaking error:", error);
+      toast.error("Failed to unstake");
+    }
+  };
+
+  const handleClaimRewards = async () => {
+    try {
+      await claimRewards();
+      toast.info("Claim rewards transaction submitted...");
+    } catch (error) {
+      console.error("Claim rewards error:", error);
+      toast.error("Failed to claim rewards");
+    }
   };
 
   // Show connect wallet prompt if not connected
   if (!isConnected) {
     return (
       <PageWrapper 
-        title="lstBTC Staking"
+        title="mBTC Staking"
         subtitle="Connect your wallet to start staking and earning rewards."
         className="bg-gradient-to-br from-orange-50 to-orange-100"
       >
@@ -136,7 +216,7 @@ export default function StakePage() {
   if (!isAuthenticated) {
     return (
       <PageWrapper 
-        title="lstBTC Staking"
+        title="mBTC Staking"
         subtitle="Sign in with your wallet to start staking."
         className="bg-gradient-to-br from-orange-50 to-orange-100"
       >
@@ -181,8 +261,8 @@ export default function StakePage() {
 
   return (
     <PageWrapper 
-      title="lstBTC Staking"
-      subtitle="Convert BTC to lstBTC and stake to earn istBTC rewards"
+      title="mBTC Staking"
+      subtitle="Stake mBTC tokens to earn rewards"
       className="bg-gradient-to-br from-orange-50 to-orange-100"
     >
       <div className="max-w-4xl mx-auto">
@@ -192,13 +272,13 @@ export default function StakePage() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-sans flex items-center gap-2">
-                <Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />
-                BTC Balance
+                <Image src="/image/btcLogo.png" alt="mBTC" width={20} height={20} className="object-contain" />
+                mBTC Balance
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono text-foreground">
-                {balances.BTC.toFixed(8)}
+                {parseFloat(mBTCBalance).toFixed(8)}
               </div>
               <div className="text-sm text-muted-foreground font-sans">Available</div>
             </CardContent>
@@ -208,14 +288,14 @@ export default function StakePage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-sans flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-primary" />
-                lstBTC Balance
+                Staked Amount
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono text-foreground">
-                {balances.lstBTC.toFixed(8)}
+                {parseFloat(stakedAmount).toFixed(8)}
               </div>
-              <div className="text-sm text-muted-foreground font-sans">Liquid Staking</div>
+              <div className="text-sm text-muted-foreground font-sans">mBTC Staked</div>
             </CardContent>
           </Card>
 
@@ -223,14 +303,24 @@ export default function StakePage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-sans flex items-center gap-2">
                 <Zap className="h-5 w-5 text-green-500" />
-                istBTC Earned
+                Pending Rewards
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono text-green-600">
-                {balances.istBTC.toFixed(8)}
+                {parseFloat(pendingRewards).toFixed(8)}
               </div>
-              <div className="text-sm text-muted-foreground font-sans">Rewards</div>
+              <div className="text-sm text-muted-foreground font-sans">
+                <Button
+                  onClick={handleClaimRewards}
+                  size="sm"
+                  variant="ghost"
+                  className="text-green-600 hover:text-green-700 p-0 h-auto"
+                  disabled={isPending || isConfirming || parseFloat(pendingRewards) === 0}
+                >
+                  Claim Rewards
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -244,220 +334,304 @@ export default function StakePage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary font-mono">
-                  {stakingData.apr}%
+                  {(apy * 100).toFixed(1)}%
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">APR</div>
+                <div className="text-sm text-muted-foreground font-sans">APY</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-foreground font-mono">
-                  {stakingData.totalStaked}
+                  {parseFloat(stakedAmount).toFixed(8)}
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">Total Staked</div>
+                <div className="text-sm text-muted-foreground font-sans">Your Staked</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600 font-mono">
-                  {stakingData.totalRewards}
+                  {parseFloat(pendingRewards).toFixed(8)}
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">Total Rewards</div>
+                <div className="text-sm text-muted-foreground font-sans">Pending Rewards</div>
               </div>
               <div className="text-center">
-                <Badge variant="secondary" className="text-sm font-sans">
-                  {stakingData.stakingPeriod}
-                </Badge>
-                <div className="text-sm text-muted-foreground font-sans mt-1">Period</div>
+                <div className="text-lg font-bold text-foreground font-mono">
+                  {Math.floor(cooldownPeriod / 86400)}d
+                </div>
+                <div className="text-sm text-muted-foreground font-sans">Cooldown</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Main Staking Interface */}
+        {/* Main Interface */}
         <Card>
           <CardHeader>
-            <CardTitle className="font-sans">Staking Actions</CardTitle>
+            <CardTitle className="font-sans">Staking & History</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="convert" className="font-sans">Convert BTC</TabsTrigger>
-                <TabsTrigger value="stake" className="font-sans">Stake lstBTC</TabsTrigger>
+                <TabsTrigger value="staking" className="font-sans">Staking</TabsTrigger>
+                <TabsTrigger value="history" className="font-sans flex items-center gap-2">
+                  <History className="h-4 w-4" />
+                  Staking History
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="convert" className="space-y-4">
-                <div className="text-center py-4">
-                  <h3 className="text-lg font-semibold font-sans mb-2">Convert BTC to lstBTC</h3>
-                  <p className="text-muted-foreground font-sans text-sm">
-                    Convert your BTC to lstBTC tokens for liquid staking
-                  </p>
-                </div>
+              {/* Staking Tab */}
+              <TabsContent value="staking" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Stake Section */}
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <h3 className="text-lg font-semibold font-sans mb-2">Stake mBTC</h3>
+                      <p className="text-muted-foreground font-sans text-sm">
+                        Stake your mBTC tokens to earn rewards
+                      </p>
+                    </div>
 
-                <form onSubmit={handleConvertSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="btcAmount" className="font-sans font-medium">
-                      BTC Amount
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="btcAmount"
-                        type="number"
-                        placeholder="0.00000000"
-                        value={formData.btcAmount}
-                        onChange={(e) => setFormData({...formData, btcAmount: e.target.value})}
-                        className="font-mono"
-                        step="0.00000001"
-                        max={balances.BTC}
-                      />
+                    <form onSubmit={handleStakeSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="mBtcAmount" className="font-sans font-medium">
+                          mBTC Amount
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            id="mBtcAmount"
+                            type="number"
+                            placeholder="0.00000000"
+                            value={formData.mBtcAmount}
+                            onChange={(e) => setFormData({...formData, mBtcAmount: e.target.value})}
+                            className="font-mono"
+                            step="0.00000001"
+                            max={mBTCBalance}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary font-sans"
+                            onClick={() => setFormData({...formData, mBtcAmount: mBTCBalance})}
+                          >
+                            Max
+                          </Button>
+                        </div>
+                        <div className="text-sm text-muted-foreground font-sans">
+                          Available: {parseFloat(mBTCBalance).toFixed(8)} mBTC
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-muted rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <TrendingUp className="h-4 w-4 text-green-500" />
+                          <span className="font-medium font-sans">Estimated Yearly Rewards</span>
+                        </div>
+                        <div className="text-lg font-bold text-green-600 font-mono">
+                          {parseFloat(yearlyRewards || "0").toFixed(8)} mBTC
+                        </div>
+                        <div className="text-sm text-muted-foreground font-sans">
+                          APY: {(apy * 100).toFixed(1)}%
+                        </div>
+                        <div className="text-xs text-muted-foreground font-sans mt-1">
+                          * Calculated from smart contract
+                        </div>
+                      </div>
+
                       <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary font-sans"
-                        onClick={() => setFormData({...formData, btcAmount: balances.BTC.toString()})}
+                        type="submit"
+                        className="w-full bg-green-600 hover:bg-green-700 font-sans font-semibold"
+                        disabled={isPending || isConfirming}
                       >
-                        Max
+                        {isPending ? (pendingStakeAmount ? "Approving..." : "Processing...") : 
+                         isConfirming ? (pendingStakeAmount ? "Confirming Approval..." : "Confirming...") : 
+                         needsApproval(formData.mBtcAmount) ? "Approve & Stake" : "Stake mBTC"}
+                      </Button>
+                    </form>
+                  </div>
+
+                  {/* Unstake Section */}
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <h3 className="text-lg font-semibold font-sans mb-2">Unstake mBTC</h3>
+                      <p className="text-muted-foreground font-sans text-sm">
+                        Unstake your mBTC tokens
+                      </p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="p-4 bg-muted rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Clock className="h-4 w-4 text-primary" />
+                          <span className="font-medium font-sans">Unstaking Status</span>
+                        </div>
+                        <div className="text-sm text-muted-foreground font-sans">
+                          {canUnstake ? (
+                            <span className="text-green-600">✓ Ready to unstake</span>
+                          ) : (
+                            <span className="text-orange-600">⏳ Cooldown required</span>
+                          )}
+                        </div>
+                        {cooldownEnd > 0 && (
+                          <div className="text-sm text-muted-foreground font-sans">
+                            Cooldown ends: {new Date(cooldownEnd * 1000).toLocaleString()}
+                          </div>
+                        )}
+                      </div>
+
+                      <Button
+                        onClick={() => setShowUnstakeDialog(true)}
+                        className="w-full bg-orange-600 hover:bg-orange-700 font-sans font-semibold"
+                        disabled={isPending || isConfirming || parseFloat(stakedAmount) === 0}
+                      >
+                        {canUnstake ? "Unstake mBTC" : "Start Cooldown"}
                       </Button>
                     </div>
-                    <div className="text-sm text-muted-foreground font-sans">
-                      Available: {balances.BTC.toFixed(8)} BTC
-                    </div>
                   </div>
-
-                  <div className="p-4 bg-muted rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Info className="h-4 w-4 text-primary" />
-                      <span className="font-medium font-sans">Conversion Rate</span>
-                    </div>
-                    <div className="text-sm text-muted-foreground font-sans">
-                      1 BTC = 1 lstBTC (1:1 conversion)
-                    </div>
-                    <div className="text-sm text-muted-foreground font-sans">
-                      You'll receive: {formData.btcAmount || "0.00000000"} lstBTC
-                    </div>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Converting..." : "Convert to lstBTC"}
-                  </Button>
-                </form>
+                </div>
               </TabsContent>
 
-              <TabsContent value="stake" className="space-y-4">
+              {/* History Tab */}
+              <TabsContent value="history" className="space-y-4">
                 <div className="text-center py-4">
-                  <h3 className="text-lg font-semibold font-sans mb-2">Stake lstBTC</h3>
+                  <h3 className="text-lg font-semibold font-sans mb-2">Staking History</h3>
                   <p className="text-muted-foreground font-sans text-sm">
-                    Stake your lstBTC tokens to start earning istBTC rewards
+                    View your past staking transactions
                   </p>
                 </div>
 
-                <form onSubmit={handleStakeSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="lstBtcAmount" className="font-sans font-medium">
-                      lstBTC Amount
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="lstBtcAmount"
-                        type="number"
-                        placeholder="0.00000000"
-                        value={formData.lstBtcAmount}
-                        onChange={(e) => setFormData({...formData, lstBtcAmount: e.target.value})}
-                        className="font-mono"
-                        step="0.00000001"
-                        max={balances.lstBTC}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary font-sans"
-                        onClick={() => setFormData({...formData, lstBtcAmount: balances.lstBTC.toString()})}
-                      >
-                        Max
-                      </Button>
-                    </div>
-                    <div className="text-sm text-muted-foreground font-sans">
-                      Available: {balances.lstBTC.toFixed(8)} lstBTC
-                    </div>
+                {historyLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                    <p className="text-muted-foreground font-sans text-sm mt-2">Loading history...</p>
                   </div>
-
-                  <div className="p-4 bg-muted rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                      <span className="font-medium font-sans">Staking Rewards</span>
-                    </div>
-                    <div className="text-sm text-muted-foreground font-sans">
-                      APR: {stakingData.apr}% (paid in istBTC)
-                    </div>
-                    <div className="text-sm text-muted-foreground font-sans">
-                      Minimum stake: {stakingData.minStake} lstBTC
-                    </div>
+                ) : historyError ? (
+                  <Alert variant={historyError.includes('Backend configuration') ? 'destructive' : 'default'}>
+                    <Info className="h-4 w-4" />
+                    <AlertDescription className="font-sans">
+                      {historyError}
+                      {historyError.includes('Authentication') && (
+                        <div className="mt-2">
+                          <Button
+                            onClick={() => signIn()}
+                            size="sm"
+                            variant="outline"
+                            disabled={isAuthenticating}
+                          >
+                            {isAuthenticating ? "Signing in..." : "Sign In to View History"}
+                          </Button>
+                        </div>
+                      )}
+                      {historyError.includes('Backend configuration') && (
+                        <div className="mt-2 text-sm">
+                          <p>This is a backend configuration issue. The staking vault address needs to be configured:</p>
+                          <code className="block mt-1 p-2 bg-muted rounded text-xs">
+                            StakingVault: 0x3EF7d600DB474F1a544602Bd7dA33c53d98B7B1b
+                          </code>
+                        </div>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                ) : history.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground font-sans">No staking history found</p>
                   </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full bg-green-600 hover:bg-green-700 font-sans font-semibold"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Staking..." : "Stake lstBTC"}
-                  </Button>
-                </form>
+                ) : (
+                  <div className="space-y-3">
+                    {history.map((item, index) => (
+                      <Card key={index}>
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium font-sans">Stake Transaction</div>
+                              <div className="text-sm text-muted-foreground font-mono">
+                                Block: {item.blockNumber}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-bold font-mono">
+                                {parseFloat(item.amount).toFixed(8)} mBTC
+                              </div>
+                              <a
+                                href={`https://scan.test2.btcs.network/tx/${item.transactionHash}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-primary hover:underline font-mono flex items-center gap-1"
+                              >
+                                View Tx <ChevronRight className="h-3 w-3" />
+                              </a>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
 
-        {/* Confirmation Modal */}
-        <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+        {/* Unstake Dialog */}
+        <Dialog open={showUnstakeDialog} onOpenChange={setShowUnstakeDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="font-sans font-bold">Confirm Conversion</DialogTitle>
+              <DialogTitle className="font-sans font-bold">Unstake mBTC</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div className="bg-muted rounded-lg p-4">
-                <h3 className="font-semibold mb-3 font-sans">Transaction Summary</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground font-sans">Converting:</span>
-                    <span className="font-mono font-semibold">
-                      {formData.btcAmount} BTC
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground font-sans">Receiving:</span>
-                    <span className="font-mono font-semibold">
-                      {formData.btcAmount} lstBTC
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground font-sans">Conversion Rate:</span>
-                    <span className="font-mono">1:1</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground font-sans">Network Fee:</span>
-                    <span className="font-mono">Free</span>
-                  </div>
+            <form onSubmit={handleUnstakeSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="unstakeAmount" className="font-sans font-medium">
+                  Amount to Unstake
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="unstakeAmount"
+                    type="number"
+                    placeholder="0.00000000"
+                    value={formData.unstakeAmount}
+                    onChange={(e) => setFormData({...formData, unstakeAmount: e.target.value})}
+                    className="font-mono"
+                    step="0.00000001"
+                    max={stakedAmount}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary font-sans"
+                    onClick={() => setFormData({...formData, unstakeAmount: stakedAmount})}
+                  >
+                    Max
+                  </Button>
+                </div>
+                <div className="text-sm text-muted-foreground font-sans">
+                  Staked: {parseFloat(stakedAmount).toFixed(8)} mBTC
                 </div>
               </div>
 
+              {!canUnstake && (
+                <Alert>
+                  <Clock className="h-4 w-4" />
+                  <AlertDescription className="font-sans">
+                    You need to start cooldown before unstaking. This will start the {Math.floor(cooldownPeriod / 86400)} day cooldown period.
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <div className="flex space-x-2">
                 <Button
+                  type="button"
                   variant="outline"
-                  onClick={() => setShowConfirmation(false)}
+                  onClick={() => setShowUnstakeDialog(false)}
                   className="flex-1 font-sans font-medium"
                 >
                   Cancel
                 </Button>
                 <Button
-                  onClick={handleConfirmConvert}
-                  className="flex-1 bg-primary hover:bg-primary/90 font-sans font-semibold"
+                  type="submit"
+                  className="flex-1 bg-orange-600 hover:bg-orange-700 font-sans font-semibold"
+                  disabled={isPending || isConfirming}
                 >
-                  Confirm
+                  {canUnstake ? "Unstake" : "Start Cooldown"}
                 </Button>
               </div>
-            </div>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
