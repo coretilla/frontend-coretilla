@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import RouteLoader from "./ui/RouteLoader";
 import Image from "next/image";
 import BTCPrice from "./navbar/BTCPrice";
 import MobileDrawer from "./MobileDrawer";
@@ -47,7 +46,8 @@ export default function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
               >
-                <Image src="/image/coretillaLogo.png" alt="Coretilla" width={150} height={50} className="object-contain" />
+                <Image src="/image/coretillaLogo.png" alt="Coretilla" width={150} height={50} className="object-contain hidden md:block" 
+                 />
               </motion.div>
             </Link>
           </motion.div>
@@ -138,7 +138,6 @@ export default function Navbar() {
             })}
           </motion.div>
 
-          {/* Desktop Right Side - BTC Price + Connect Wallet */}
           <motion.div 
             className="hidden md:flex items-center space-x-4"
             initial={{ opacity: 0, x: 20 }}

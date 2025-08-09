@@ -536,7 +536,7 @@ export default function LendingPage() {
               onValueChange={setActiveTab}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-7">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="deposit" className="font-sans">
                   Deposit
                 </TabsTrigger>
@@ -549,8 +549,8 @@ export default function LendingPage() {
                 <TabsTrigger value="repay" className="font-sans">
                   Repay
                 </TabsTrigger>
-                <TabsTrigger value="fund" className="font-sans">Fund Pool</TabsTrigger>
-                <TabsTrigger value="mint" className="font-sans">Mint USDT</TabsTrigger>
+                {/* <TabsTrigger value="fund" className="font-sans">Fund Pool</TabsTrigger> */}
+                {/* <TabsTrigger value="mint" className="font-sans">Mint USDT</TabsTrigger> */}
                 <TabsTrigger value="history" className="font-sans">
                   History
                 </TabsTrigger>

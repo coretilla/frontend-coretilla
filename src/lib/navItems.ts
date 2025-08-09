@@ -8,7 +8,8 @@ import {
   CalendarDays, 
   BarChart3,
   TrendingUp,
-  Settings
+  Settings,
+  House
 } from "lucide-react";
 
 export interface NavItem {
@@ -24,6 +25,14 @@ export interface NavGroup {
 }
 
 export const navGroups: NavGroup[] = [
+  {
+    name: "Home",
+    icon: House,
+    items: [
+      { name: "Home", href: "/", icon: House },
+    ]
+  },
+
   {
     name: "Transactions",
     icon: CreditCard,

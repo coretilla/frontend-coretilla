@@ -896,7 +896,7 @@ export default function DCAPage() {
                         type="button"
                         variant={isCustomGrowth ? "default" : "outline"}
                         size="sm"
-                        className={`font-sans text-xs cursor-pointer ${
+                        className={`font-sans text-xs cursor-pointer  ${
                           isCustomGrowth
                             ? "bg-orange-600 hover:bg-orange-700"
                             : "hover:bg-orange-50 hover:border-orange-300"
