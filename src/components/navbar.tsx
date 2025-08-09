@@ -167,7 +167,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      <RouteLoader show={isNavigating} />
+      {/* <RouteLoader show={isNavigating} /> */}
     </motion.nav>
   );
 }

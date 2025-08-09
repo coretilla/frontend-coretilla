@@ -120,9 +120,6 @@ export default function DepositPage() {
     setIsLoadingTransactions(true);
     try {
       const token = localStorage.getItem('jwt_token');
-      if (!token) {
-        throw new Error('No access token found');
-      }
 
       console.log(`Fetching transactions - page: ${page}, limit: ${limit}`);
       
@@ -399,9 +396,6 @@ export default function DepositPage() {
     try {
       // Step 0: First check if user exists with /users/me
       const token = localStorage.getItem('jwt_token');
-      if (!token) {
-        throw new Error('No access token found');
-      }
 
       console.log('👤 Checking user exists with /users/me...');
       const userCheckResponse = await fetch('https://core-backend-production-0965.up.railway.app/users/me', {

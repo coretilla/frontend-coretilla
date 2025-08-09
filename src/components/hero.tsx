@@ -251,7 +251,7 @@ export default function Hero() {
                 className="cursor-pointer group relative bg-transparent border border-orange-200 text-orange-700 hover:text-orange-800 px-6 py-3 rounded-lg font-medium text-base transition-all duration-300 flex items-center justify-center gap-2 hover:border-orange-300 min-w-[120px]"
               >
                 <Play className="w-3.5 h-3.5 transition-colors group-hover:text-orange-600 duration-300" />
-                <span>Bitcoin Neobank Features</span>
+                <span>Neobank Features</span>
                 
                 {/* Subtle background on hover */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-50/0 via-orange-50/50 to-orange-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
@@ -267,30 +267,6 @@ export default function Hero() {
               transition={{ delay: 1, duration: 0.5 }}
               className="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-4 mt-8"
             >
-              {/* 100% Self-Custody */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.2, duration: 0.4 }}
-                whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: "0 10px 25px -3px rgba(34, 197, 94, 0.3), 0 4px 6px -2px rgba(34, 197, 94, 0.1)"
-                }}
-                whileTap={{ scale: 0.98 }}
-                className="group relative overflow-hidden flex items-center gap-3 bg-gradient-to-br from-green-50 to-green-100 border border-green-200 text-green-800 text-sm px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer min-w-fit"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative z-10 flex items-center gap-3">
-                  <div className="p-1.5 bg-green-200/50 rounded-lg group-hover:bg-green-300/50 transition-colors duration-300">
-                    <Key className="h-4 w-4 flex-shrink-0 group-hover:text-green-900 transition-colors duration-300" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-semibold font-sans text-green-900 group-hover:text-green-950 transition-colors duration-300">100% Self-Custody</span>
-                    <span className="text-xs text-green-600 font-medium">You own your keys</span>
-                  </div>
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-400/20 rounded-full group-hover:scale-110 transition-transform duration-300"></div>
-              </motion.div>
             </motion.div>
           </div>
 

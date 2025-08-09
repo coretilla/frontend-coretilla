@@ -14,7 +14,13 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Coretilla - Your Digital Bank for CoreDAO",
-  description: "Simple, secure, and designed for everyone - from crypto beginners to CoreDAO veterans.",
+  description:
+    "Simple, secure, and designed for everyone - from crypto beginners to CoreDAO veterans.",
+    icons: {
+    icon: `/favicon.ico?v=${Date.now()}`,
+    shortcut: `/favicon.ico?v=${Date.now()}`,
+    apple: `/favicon.ico?v=${Date.now()}`,
+  },
 };
 
 export default function RootLayout({
@@ -24,14 +30,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${poppins.variable} antialiased`}
-      >
+      <head>
+        <link rel="icon" href="/public/favicon.ico" sizes="any" />
+      </head>
+      <body className={`${poppins.variable} antialiased`}>
         <JotaiProvider>
           <WalletProvider>
-            <MainLayout>
-              {children}
-            </MainLayout>
+            <MainLayout>{children}</MainLayout>
             <Toaster />
           </WalletProvider>
         </JotaiProvider>

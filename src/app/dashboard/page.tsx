@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import BalanceCard from "@/components/balance-card";
 import PageWrapper from "@/components/layout/PageWrapper";
-import { DollarSign, TrendingUp, Zap, BarChart3, Calendar, RefreshCw } from "lucide-react";
+import { DollarSign, TrendingUp, Zap, BarChart3, Calendar, RefreshCw, Bitcoin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getUserData, parseUserBalance, UserBalance, getBtcPrice, BtcPriceResponse } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,6 +16,90 @@ import { Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+function AssetCard({
+  title,
+  icon,
+  logoSrc,
+  amountText,
+  usdValueText,
+  priceText,
+  priceTooltip,
+  delay = 0.1,
+}: {
+  title: string;
+  icon?: React.ReactNode;
+  logoSrc?: string;
+  amountText: string;
+  usdValueText?: string;
+  priceText?: string;
+  priceTooltip?: string;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+    >
+      <Card className="rounded-2xl border border-border/60 shadow-sm hover:shadow-md transition-all hover:border-primary/40">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium font-sans flex items-center gap-2">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
+              {icon}
+            </span>
+            {title}
+          </CardTitle>
+          {logoSrc && (
+            <Image
+              src={logoSrc}
+              alt={title}
+              width={28}
+              height={28}
+              className="object-contain"
+            />
+          )}
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold font-mono tracking-tight">
+            {amountText}
+          </div>
+
+          {(usdValueText || priceText) && (
+            <div className="flex items-center justify-between mt-2">
+              <p className="text-xs text-muted-foreground font-sans">
+                {usdValueText ?? "\u00A0"}
+              </p>
+
+              {priceText ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <p className="text-xs text-muted-foreground font-mono cursor-help">
+                        {priceText}
+                      </p>
+                    </TooltipTrigger>
+                    <TooltipContent className="text-xs">
+                      {priceTooltip ?? "Latest price"}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <span className="text-xs text-muted-foreground font-mono">&nbsp;</span>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
 
 export default function DashboardPage() {
   const { isAuthenticated, signIn, isAuthenticating, error: authError } = useAuth();
@@ -283,78 +366,45 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Balance Categories */}
-        <Tabs defaultValue="fiat" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="fiat" className="font-sans">Fiat Currency</TabsTrigger>
-            <TabsTrigger value="crypto" className="font-sans">Crypto Assets</TabsTrigger>
-          </TabsList>
+        {/* Combined Asset Balances */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+          {/* USD */}
+          <AssetCard
+            title="US Dollar Balance"
+            icon={<DollarSign className="h-4 w-4" />}
+            amountText={`$${balances.fiat.USD.amount}`}
+            usdValueText="Available balance"
+            delay={0.1}
+          />
 
-          <TabsContent value="fiat" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <BalanceCard
-                title="US Dollar"
-                amount={balances.fiat.USD.amount}
-                symbol="$"
-                change={balances.fiat.USD.change}
-                icon={<DollarSign className="h-5 w-5 text-green-600" />}
-              />
-            </div>
-          </TabsContent>
+          {/* BTC */}
+          <AssetCard
+            title="Bitcoin"
+            logoSrc="/image/btcLogo.png"
+            icon={<Bitcoin className="h-4 w-4" />}
+            amountText={balances.crypto.BTC.amount}
+            usdValueText={`$${balances.crypto.BTC.usdValue.toLocaleString()}`}
+            priceText={
+              balances.crypto.BTC.price > 0
+                ? `$${Math.floor(balances.crypto.BTC.price).toLocaleString()}/BTC`
+                : "Loading..."
+            }
+            priceTooltip="Spot price (approx.)"
+            delay={0.2}
+          />
 
-          <TabsContent value="crypto" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-              >
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium font-sans">Bitcoin (mBTC)</CardTitle>
-                    <Image src="/image/btcLogo.png" alt="Bitcoin" width={50} height={20} className="object-contain" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold font-mono">{balances.crypto.BTC.amount}</div>
-                    <div className="flex items-center justify-between mt-2">
-                      <p className="text-xs text-muted-foreground font-sans">
-                        ${balances.crypto.BTC.usdValue.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        ${balances.crypto.BTC.price > 0 ? Math.floor(balances.crypto.BTC.price).toLocaleString() : 'Loading...'}/BTC
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium font-sans">Core Balance</CardTitle>
-                    <Image src="/image/coreDaoLogo.png" alt="coredao" width={50} height={20} className="object-contain" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold font-mono">{balances.crypto.CORE.amount}</div>
-                    <div className="flex items-center justify-between mt-2">
-                      <p className="text-xs text-muted-foreground font-sans">
-                        ${balances.crypto.CORE.usdValue.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        ${balances.crypto.CORE.price.toFixed(2)}/CORE
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </div>
-          </TabsContent>
-
-        </Tabs>
+          {/* CORE */}
+          <AssetCard
+            title="Core Balance"
+            logoSrc="/image/coreDaoLogo.png"
+            icon={<TrendingUp className="h-4 w-4" />}
+            amountText={balances.crypto.CORE.amount}
+            usdValueText={`$${balances.crypto.CORE.usdValue.toLocaleString()}`}
+            priceText={`$${balances.crypto.CORE.price.toFixed(2)}/CORE`}
+            priceTooltip="Estimated price"
+            delay={0.3}
+          />
+        </div>
 
         {/* Quick Actions */}
         <Card className="mt-8">
@@ -384,7 +434,7 @@ export default function DashboardPage() {
               <Link href="/dca" className="p-4 border rounded-lg hover:border-primary transition-colors text-center">
                 <Calendar className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                 <div className="font-medium font-sans">DCA</div>
-                <div className="text-sm text-muted-foreground font-sans">Auto invest</div>
+                <div className="text-sm text-muted-foreground font-sans">DCA Simulation</div>
               </Link>
             </div>
           </CardContent>

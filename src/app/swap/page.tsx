@@ -2,18 +2,39 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowRightLeft, Info, Clock, Network, CheckCircle } from "lucide-react";
+import { ArrowRightLeft, Info, Clock, Network, DollarSign } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import PageWrapper from "@/components/layout/PageWrapper";
-import { motion } from "framer-motion";
-import { getUserData, parseUserBalance, getBtcPrice, swapUsdToBtc } from "@/lib/api";
+import {
+  getUserData,
+  parseUserBalance,
+  getBtcPrice,
+  swapUsdToBtc,
+} from "@/lib/api";
 import { useWallet } from "@/hooks/useWallet";
 import { ConnectWallet } from "@/components/wallet/ConnectWallet";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,13 +46,18 @@ interface SwapFormData {
 
 export default function SwapPage() {
   const { isConnected } = useWallet();
-  const { isAuthenticated, signIn, isAuthenticating, error: authError } = useAuth();
-  
+  const {
+    isAuthenticated,
+    signIn,
+    isAuthenticating,
+    error: authError,
+  } = useAuth();
+
   const [formData, setFormData] = useState<SwapFormData>({
     fromCurrency: "USD",
     amount: "",
   });
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [btcAmount, setBtcAmount] = useState("0.00000000");
@@ -55,7 +81,7 @@ export default function SwapPage() {
           setUserBalance(balances.USD || 0);
         }
       } catch (error) {
-        console.error('Error fetching user info:', error);
+        console.error("Error fetching user info:", error);
       }
     };
 
@@ -66,7 +92,7 @@ export default function SwapPage() {
           setBtcPrice(parseFloat(data.data.price.toString()));
         }
       } catch (error) {
-        console.error('Error fetching BTC price:', error);
+        console.error("Error fetching BTC price:", error);
       }
     };
 
@@ -123,27 +149,29 @@ export default function SwapPage() {
   const handleConfirmSwap = async () => {
     setShowConfirmation(false);
     setIsLoading(true);
-    
+
     try {
       const data = await swapUsdToBtc({
-        amount: parseFloat(formData.amount)
+        amount: parseFloat(formData.amount),
       });
-      
+
       if (data.success) {
         setUserBalance(data.data.remainingBalance);
-        toast.success("Swap completed successfully! Bitcoin has been added to your wallet.");
-        
+        toast.success(
+          "Swap completed successfully! Bitcoin has been added to your wallet."
+        );
+
         // Reset form
         setFormData({
           fromCurrency: "USD",
           amount: "",
         });
       } else {
-        throw new Error('Swap failed');
+        throw new Error("Swap failed");
       }
     } catch (error) {
-      toast.error('Failed to process swap. Please try again.');
-      console.error('Swap error:', error);
+      toast.error("Failed to process swap. Please try again.");
+      console.error("Swap error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -154,24 +182,26 @@ export default function SwapPage() {
   // Show connect wallet prompt if not connected
   if (!isConnected) {
     return (
-      <PageWrapper 
-        title="Swap USD to Bitcoin"
+      <PageWrapper
+        title="Buy Bitcoin with USD"
         subtitle="Connect your wallet to start swapping currencies."
         className="bg-gradient-to-br from-orange-50 to-orange-100"
       >
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="font-sans">Connect Wallet Required</CardTitle>
+              <CardTitle className="font-sans">
+                Connect Wallet Required
+              </CardTitle>
               <CardDescription className="font-sans">
                 Please connect your wallet to access swap functionality.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <ConnectWallet 
-                variant="default" 
-                size="lg" 
-                className="w-full max-w-sm mx-auto" 
+              <ConnectWallet
+                variant="default"
+                size="lg"
+                className="w-full max-w-sm mx-auto"
               />
               <Alert className="mt-4">
                 <Info className="h-4 w-4" />
@@ -189,7 +219,7 @@ export default function SwapPage() {
   // Show authentication prompt if connected but not authenticated
   if (!isAuthenticated) {
     return (
-      <PageWrapper 
+      <PageWrapper
         title="Swap USD to Bitcoin"
         subtitle="Sign in with your wallet to start swapping."
         className="bg-gradient-to-br from-orange-50 to-orange-100"
@@ -197,7 +227,9 @@ export default function SwapPage() {
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="font-sans">Authentication Required</CardTitle>
+              <CardTitle className="font-sans">
+                Authentication Required
+              </CardTitle>
               <CardDescription className="font-sans">
                 Please sign in with your wallet to access swap functionality.
               </CardDescription>
@@ -211,19 +243,20 @@ export default function SwapPage() {
                   </AlertDescription>
                 </Alert>
               )}
-              
-              <Button 
+
+              <Button
                 onClick={signIn}
                 disabled={isAuthenticating}
                 className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
               >
                 {isAuthenticating ? "Signing in..." : "Sign in with Wallet"}
               </Button>
-              
+
               <Alert>
                 <Info className="h-4 w-4" />
                 <AlertDescription className="font-sans">
-                  You'll be asked to sign a message with your wallet to authenticate.
+                  You'll be asked to sign a message with your wallet to
+                  authenticate.
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -234,13 +267,12 @@ export default function SwapPage() {
   }
 
   return (
-    <PageWrapper 
+    <PageWrapper
       title="Swap USD to Bitcoin"
       subtitle="Convert your fiat currency to Bitcoin on Core Network"
       className="bg-gradient-to-br from-orange-50 to-orange-100"
     >
       <div className="max-w-2xl mx-auto">
-
         {/* Current Balances */}
         <Card className="mb-6">
           <CardHeader>
@@ -252,13 +284,27 @@ export default function SwapPage() {
                 <div className="text-2xl font-bold text-primary font-mono">
                   ${currentBalances.USD.toLocaleString()}
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">US Dollar</div>
+                <div className="text-sm text-muted-foreground font-sans flex items-center justify-center mt-3">
+                  <DollarSign className="h-3 w-3 text-primary mb-2 flex items-center justify-center mt-1.5" />
+                  <div className="text-sm text-muted-foreground font-sans">
+                    US Dollar
+                  </div>
+                </div>
               </div>
               <div className="text-center p-4 bg-muted rounded-lg">
                 <div className="text-2xl font-bold text-primary font-mono">
                   {currentBalances.CORE.toLocaleString()}
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">CORE</div>
+                   <div className="text-sm text-muted-foreground font-sans flex items-center justify-center gap-1 mt-3">
+                  <Image
+                    src="/image/coreDaoLogo.png"
+                    alt="Bitcoin"
+                    width={20}
+                    height={12}
+                    className="object-contain"
+                  />
+                  <span className="mr-5">Core</span>
+                </div>
                 <div className="text-xs text-muted-foreground font-sans mt-1">
                   ${currentBalances.CORE_USD.toLocaleString()}
                 </div>
@@ -268,8 +314,14 @@ export default function SwapPage() {
                   {currentBalances.WBTC.toFixed(6)}
                 </div>
                 <div className="text-sm text-muted-foreground font-sans flex items-center justify-center">
-                  <Image src="/image/btcLogo.png" alt="Bitcoin" width={40} height={12} className="object-contain" />
-                  <span className="mr-5">mBTC</span>
+                  <Image
+                    src="/image/btcLogo.png"
+                    alt="Bitcoin"
+                    width={30}
+                    height={12}
+                    className="object-contain "
+                  />
+                  <span className="mr-5">Bitcoin</span>
                 </div>
                 <div className="text-xs text-muted-foreground font-sans mt-1">
                   ${currentBalances.WBTC_USD.toLocaleString()}
@@ -291,17 +343,25 @@ export default function SwapPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* From Currency */}
               <div className="space-y-2">
-                <Label htmlFor="fromCurrency" className="font-sans font-medium">From</Label>
-                <Select 
-                  value={formData.fromCurrency} 
-                  onValueChange={(value) => setFormData({...formData, fromCurrency: value})}
+                <Label htmlFor="fromCurrency" className="font-sans font-medium">
+                  From
+                </Label>
+                <Select
+                  value={formData.fromCurrency}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, fromCurrency: value })
+                  }
                 >
                   <SelectTrigger className="font-sans">
                     <SelectValue placeholder="Select currency to swap from" />
                   </SelectTrigger>
                   <SelectContent>
                     {currencies.map((currency) => (
-                      <SelectItem key={currency.code} value={currency.code} className="font-sans">
+                      <SelectItem
+                        key={currency.code}
+                        value={currency.code}
+                        className="font-sans"
+                      >
                         {currency.symbol} {currency.name}
                       </SelectItem>
                     ))}
@@ -311,7 +371,9 @@ export default function SwapPage() {
 
               {/* Amount Input */}
               <div className="space-y-2">
-                <Label htmlFor="amount" className="font-sans font-medium">Amount</Label>
+                <Label htmlFor="amount" className="font-sans font-medium">
+                  Amount
+                </Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground font-mono">
                     {selectedCurrency?.symbol || "$"}
@@ -321,7 +383,9 @@ export default function SwapPage() {
                     type="number"
                     placeholder="0.00"
                     value={formData.amount}
-                    onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, amount: e.target.value })
+                    }
                     className="pl-8 font-mono"
                     min="0"
                     step="0.01"
@@ -329,7 +393,10 @@ export default function SwapPage() {
                 </div>
                 {selectedCurrency && (
                   <div className="text-sm text-muted-foreground font-sans">
-                    Available: {selectedCurrency.symbol}{currentBalances[selectedCurrency.code as keyof typeof currentBalances].toLocaleString()}
+                    Available: {selectedCurrency.symbol}
+                    {currentBalances[
+                      selectedCurrency.code as keyof typeof currentBalances
+                    ].toLocaleString()}
                   </div>
                 )}
               </div>
@@ -343,10 +410,16 @@ export default function SwapPage() {
 
               {/* To Bitcoin */}
               <div className="space-y-2">
-                <Label className="font-sans font-medium">To</Label>
+                <Label className="font-sans font-medium">Bitcoin Amount</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary">
-                    <Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />
+                    <Image
+                      src="/image/btcLogo.png"
+                      alt="Bitcoin"
+                      width={20}
+                      height={20}
+                      className="object-contain"
+                    />
                   </span>
                   <Input
                     value={btcAmount}
@@ -364,9 +437,12 @@ export default function SwapPage() {
               {selectedCurrency && (
                 <div className="p-4 bg-muted rounded-lg">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium font-sans">Exchange Rate</span>
+                    <span className="text-sm font-medium font-sans">
+                      Exchange Rate
+                    </span>
                     <span className="text-sm font-mono">
-                      1 BTC = {selectedCurrency.symbol}{selectedCurrency.rate.toLocaleString()}
+                      1 BTC = {selectedCurrency.symbol}
+                      {selectedCurrency.rate.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-sm text-muted-foreground">
@@ -382,7 +458,10 @@ export default function SwapPage() {
                 <AlertDescription className="font-sans">
                   <div className="flex items-center gap-2">
                     <Info className="h-4 w-4" />
-                    <span>Powered by Core Network. BTC will be sent to your Core wallet.</span>
+                    <span>
+                      Powered by Core Network. BTC will be sent to your Core
+                      wallet.
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 mt-2">
                     <Clock className="h-4 w-4" />
@@ -395,9 +474,11 @@ export default function SwapPage() {
               <Button
                 type="submit"
                 className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
-                disabled={isLoading || !formData.amount || !formData.fromCurrency}
+                disabled={
+                  isLoading || !formData.amount || !formData.fromCurrency
+                }
               >
-                {isLoading ? "Processing..." : "Swap Now"}
+                {isLoading ? "Processing..." : "Buy Bitcoin"}
               </Button>
             </form>
           </CardContent>
@@ -407,16 +488,23 @@ export default function SwapPage() {
         <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="font-sans font-bold">Confirm Swap</DialogTitle>
+              <DialogTitle className="font-sans font-bold">
+                Confirm Swap
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="bg-muted rounded-lg p-4">
-                <h3 className="font-semibold mb-3 font-sans">Transaction Summary</h3>
+                <h3 className="font-semibold mb-3 font-sans">
+                  Transaction Summary
+                </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground font-sans">From:</span>
+                    <span className="text-muted-foreground font-sans">
+                      From:
+                    </span>
                     <span className="font-mono font-semibold">
-                      {selectedCurrency?.symbol}{formData.amount} {formData.fromCurrency}
+                      {selectedCurrency?.symbol}
+                      {formData.amount} {formData.fromCurrency}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -426,15 +514,21 @@ export default function SwapPage() {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground font-sans">Network:</span>
+                    <span className="text-muted-foreground font-sans">
+                      Network:
+                    </span>
                     <span className="font-sans">Core Network</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground font-sans">Network Fee:</span>
+                    <span className="text-muted-foreground font-sans">
+                      Network Fee:
+                    </span>
                     <span className="font-mono">{networkFee} BTC</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground font-sans">Estimated Time:</span>
+                    <span className="text-muted-foreground font-sans">
+                      Estimated Time:
+                    </span>
                     <span className="font-sans">{estimatedTime}</span>
                   </div>
                   <hr className="my-2" />

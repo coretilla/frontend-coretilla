@@ -2,14 +2,32 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Info, Zap, Clock, History, ChevronRight } from "lucide-react";
+import {
+  TrendingUp,
+  Info,
+  Zap,
+  Clock,
+  History,
+  ChevronRight,
+} from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import PageWrapper from "@/components/layout/PageWrapper";
@@ -29,16 +47,23 @@ interface StakeFormData {
 
 export default function StakePage() {
   const { isConnected } = useWallet();
-  const { isAuthenticated, signIn, isAuthenticating, error: authError } = useAuth();
-  
+  const {
+    isAuthenticated,
+    signIn,
+    isAuthenticating,
+    error: authError,
+  } = useAuth();
+
   const [formData, setFormData] = useState<StakeFormData>({
     mBtcAmount: "",
     unstakeAmount: "",
   });
-  
+
   const [activeTab, setActiveTab] = useState("staking");
   const [showUnstakeDialog, setShowUnstakeDialog] = useState(false);
-  const [pendingStakeAmount, setPendingStakeAmount] = useState<string | null>(null);
+  const [pendingStakeAmount, setPendingStakeAmount] = useState<string | null>(
+    null
+  );
 
   // Use staking hook
   const {
@@ -64,7 +89,12 @@ export default function StakePage() {
   } = useStaking();
 
   // Use staking history hook
-  const { history, isLoading: historyLoading, error: historyError, refetch: refetchHistory } = useStakingHistory();
+  const {
+    history,
+    isLoading: historyLoading,
+    error: historyError,
+    refetch: refetchHistory,
+  } = useStakingHistory();
 
   // Use yearly rewards hook with current input amount
   const { yearlyRewards } = useYearlyRewards(formData.mBtcAmount);
@@ -78,8 +108,8 @@ export default function StakePage() {
       if (isConfirmed && pendingStakeAmount && hash && hash !== processedHash) {
         try {
           // Wait a bit for allowance to update
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
           toast.success("Approval confirmed! Now staking...");
           await stake(pendingStakeAmount);
           setPendingStakeAmount(null);
@@ -105,35 +135,42 @@ export default function StakePage() {
       toast.success("Transaction confirmed successfully!");
       setProcessedHash(hash);
     }
-  }, [isConfirmed, hash, processedHash, pendingStakeAmount, refetchAll, refetchHistory]);
+  }, [
+    isConfirmed,
+    hash,
+    processedHash,
+    pendingStakeAmount,
+    refetchAll,
+    refetchHistory,
+  ]);
 
   const handleStakeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.mBtcAmount || parseFloat(formData.mBtcAmount) <= 0) {
-      toast.error("Please enter a valid mBTC amount");
+      toast.error("Please enter a valid Bitcoin amount");
       return;
     }
 
     if (parseFloat(formData.mBtcAmount) > parseFloat(mBTCBalance)) {
-      toast.error("Insufficient mBTC balance");
+      toast.error("Insufficient Bitcoin balance");
       return;
     }
 
     try {
       // Check if approval is needed
       if (needsApproval(formData.mBtcAmount)) {
-        toast.info("Step 1/2: Approving mBTC for staking...");
+        toast.info("Step 1/2: Approving Bitcoin for staking...");
         setPendingStakeAmount(formData.mBtcAmount);
         await approve(formData.mBtcAmount);
         return;
       }
 
       // If already approved, stake directly
-      toast.info("Staking mBTC...");
+      toast.info("Staking Bitcoin...");
       await stake(formData.mBtcAmount);
     } catch (error) {
       console.error("Staking error:", error);
-      toast.error("Failed to stake mBTC");
+      toast.error("Failed to stake Bitcoin");
       setPendingStakeAmount(null);
     }
   };
@@ -153,7 +190,9 @@ export default function StakePage() {
     try {
       if (!canUnstake) {
         await startCooldown();
-        toast.info("Cooldown started. You can unstake after the cooldown period.");
+        toast.info(
+          "Cooldown started. You can unstake after the cooldown period."
+        );
         setShowUnstakeDialog(false);
         return;
       }
@@ -180,11 +219,17 @@ export default function StakePage() {
   // Show connect wallet prompt if not connected
   if (!isConnected) {
     return (
-      <PageWrapper 
+      <PageWrapper
         title={
-          <div className="flex items-center justify-center gap-3">
-            <span>mBTC Staking</span>
-            <Image src="/image/btcLogo.png" alt="Bitcoin" width={40} height={40} className="object-contain" />
+          <div className="flex items-center justify-center">
+            <Image
+              src="/image/btcLogo.png"
+              alt="Bitcoin"
+              width={40}
+              height={40}
+              className="object-contain"
+            />
+            <span>Bitcoin Staking</span>
           </div>
         }
         subtitle="Connect your wallet to start staking and earning rewards."
@@ -193,16 +238,18 @@ export default function StakePage() {
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="font-sans">Connect Wallet Required</CardTitle>
+              <CardTitle className="font-sans">
+                Connect Wallet Required
+              </CardTitle>
               <CardDescription className="font-sans">
                 Please connect your wallet to access staking functionality.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <ConnectWallet 
-                variant="default" 
-                size="lg" 
-                className="w-full max-w-sm mx-auto" 
+              <ConnectWallet
+                variant="default"
+                size="lg"
+                className="w-full max-w-sm mx-auto"
               />
               <Alert className="mt-4">
                 <Info className="h-4 w-4" />
@@ -220,11 +267,17 @@ export default function StakePage() {
   // Show authentication prompt if connected but not authenticated
   if (!isAuthenticated) {
     return (
-      <PageWrapper 
+      <PageWrapper
         title={
-          <div className="flex items-center justify-center gap-3">
-            <span>mBTC Staking</span>
-            <Image src="/image/btcLogo.png" alt="Bitcoin" width={60} height={40} className="object-contain" />
+          <div className="flex items-center justify-center">
+            <Image
+              src="/image/btcLogo.png"
+              alt="Bitcoin"
+              width={60}
+              height={40}
+              className="object-contain"
+            />
+            <span>Bitcoin Staking</span>
           </div>
         }
         subtitle="Sign in with your wallet to start staking."
@@ -233,7 +286,9 @@ export default function StakePage() {
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="font-sans">Authentication Required</CardTitle>
+              <CardTitle className="font-sans">
+                Authentication Required
+              </CardTitle>
               <CardDescription className="font-sans">
                 Please sign in with your wallet to access staking functionality.
               </CardDescription>
@@ -247,19 +302,20 @@ export default function StakePage() {
                   </AlertDescription>
                 </Alert>
               )}
-              
-              <Button 
+
+              <Button
                 onClick={signIn}
                 disabled={isAuthenticating}
                 className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
               >
                 {isAuthenticating ? "Signing in..." : "Sign in with Wallet"}
               </Button>
-              
+
               <Alert>
                 <Info className="h-4 w-4" />
                 <AlertDescription className="font-sans">
-                  You'll be asked to sign a message with your wallet to authenticate.
+                  You'll be asked to sign a message with your wallet to
+                  authenticate.
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -270,32 +326,45 @@ export default function StakePage() {
   }
 
   return (
-    <PageWrapper 
+    <PageWrapper
       title={
-        <div className="flex items-center justify-center gap-3">
-          <span>mBTC Staking</span>
-          <Image src="/image/btcLogo.png" alt="Bitcoin" width={60} height={40} className="object-contain" />
+        <div className="flex items-center justify-center">
+          <Image
+            src="/image/btcLogo.png"
+            alt="Bitcoin"
+            width={60}
+            height={40}
+            className="object-contain"
+          />
+          <span>Bitcoin Staking</span>
         </div>
       }
-      subtitle="Stake mBTC tokens to earn rewards"
+      subtitle="Stake your Bitcoin to earn rewards"
       className="bg-gradient-to-br from-orange-50 to-orange-100"
     >
       <div className="max-w-4xl mx-auto">
-
         {/* Balance Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-sans flex items-center gap-2">
-                <Image src="/image/btcLogo.png" alt="mBTC" width={40} height={20} className="object-contain" />
-                mBTC Balance
+              <CardTitle className="text-lg font-sans flex items-center">
+                <Image
+                  src="/image/btcLogo.png"
+                  alt="Bitcoin"
+                  width={40}
+                  height={20}
+                  className="object-contain"
+                />
+                Bitcoin Balance
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono text-foreground">
                 {parseFloat(mBTCBalance).toFixed(8)}
               </div>
-              <div className="text-sm text-muted-foreground font-sans">Available</div>
+              <div className="text-sm text-muted-foreground font-sans">
+                Available
+              </div>
             </CardContent>
           </Card>
 
@@ -310,7 +379,9 @@ export default function StakePage() {
               <div className="text-2xl font-bold font-mono text-foreground">
                 {parseFloat(stakedAmount).toFixed(8)}
               </div>
-              <div className="text-sm text-muted-foreground font-sans">mBTC Staked</div>
+              <div className="text-sm text-muted-foreground font-sans">
+                Bitcoin Staked
+              </div>
             </CardContent>
           </Card>
 
@@ -331,7 +402,11 @@ export default function StakePage() {
                   size="sm"
                   variant="ghost"
                   className="text-green-600 hover:text-green-700 p-0 h-auto"
-                  disabled={isPending || isConfirming || parseFloat(pendingRewards) === 0}
+                  disabled={
+                    isPending ||
+                    isConfirming ||
+                    parseFloat(pendingRewards) === 0
+                  }
                 >
                   Claim Rewards
                 </Button>
@@ -351,25 +426,33 @@ export default function StakePage() {
                 <div className="text-2xl font-bold text-primary font-mono">
                   {(apy * 100).toFixed(1)}%
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">APY</div>
+                <div className="text-sm text-muted-foreground font-sans">
+                  APY
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-foreground font-mono">
                   {parseFloat(stakedAmount).toFixed(8)}
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">Your Staked</div>
+                <div className="text-sm text-muted-foreground font-sans">
+                  Your Staked
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600 font-mono">
                   {parseFloat(pendingRewards).toFixed(8)}
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">Pending Rewards</div>
+                <div className="text-sm text-muted-foreground font-sans">
+                  Pending Rewards
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-bold text-foreground font-mono">
                   {Math.floor(cooldownPeriod / 86400)}d
                 </div>
-                <div className="text-sm text-muted-foreground font-sans">Cooldown</div>
+                <div className="text-sm text-muted-foreground font-sans">
+                  Cooldown
+                </div>
               </div>
             </div>
           </CardContent>
@@ -383,8 +466,13 @@ export default function StakePage() {
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="staking" className="font-sans">Staking</TabsTrigger>
-                <TabsTrigger value="history" className="font-sans flex items-center gap-2">
+                <TabsTrigger value="staking" className="font-sans">
+                  Staking
+                </TabsTrigger>
+                <TabsTrigger
+                  value="history"
+                  className="font-sans flex items-center gap-2"
+                >
                   <History className="h-4 w-4" />
                   Staking History
                 </TabsTrigger>
@@ -396,16 +484,21 @@ export default function StakePage() {
                   {/* Stake Section */}
                   <div className="space-y-4">
                     <div className="text-center">
-                      <h3 className="text-lg font-semibold font-sans mb-2">Stake mBTC</h3>
+                      <h3 className="text-lg font-semibold font-sans mb-2">
+                        Stake Bitcoin
+                      </h3>
                       <p className="text-muted-foreground font-sans text-sm">
-                        Stake your mBTC tokens to earn rewards
+                        Stake your Bitcoin to earn rewards
                       </p>
                     </div>
 
                     <form onSubmit={handleStakeSubmit} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="mBtcAmount" className="font-sans font-medium">
-                          mBTC Amount
+                        <Label
+                          htmlFor="mBtcAmount"
+                          className="font-sans font-medium"
+                        >
+                          Bitcoin Amount
                         </Label>
                         <div className="relative">
                           <Input
@@ -413,7 +506,12 @@ export default function StakePage() {
                             type="number"
                             placeholder="0.00000000"
                             value={formData.mBtcAmount}
-                            onChange={(e) => setFormData({...formData, mBtcAmount: e.target.value})}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                mBtcAmount: e.target.value,
+                              })
+                            }
                             className="font-mono"
                             step="0.00000001"
                             max={mBTCBalance}
@@ -423,23 +521,31 @@ export default function StakePage() {
                             variant="ghost"
                             size="sm"
                             className="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary font-sans"
-                            onClick={() => setFormData({...formData, mBtcAmount: mBTCBalance})}
+                            onClick={() =>
+                              setFormData({
+                                ...formData,
+                                mBtcAmount: mBTCBalance,
+                              })
+                            }
                           >
                             Max
                           </Button>
                         </div>
                         <div className="text-sm text-muted-foreground font-sans">
-                          Available: {parseFloat(mBTCBalance).toFixed(8)} mBTC
+                          Available: {parseFloat(mBTCBalance).toFixed(8)}{" "}
+                          Bitcoin
                         </div>
                       </div>
 
                       <div className="p-4 bg-muted rounded-lg">
                         <div className="flex items-center gap-2 mb-2">
                           <TrendingUp className="h-4 w-4 text-green-500" />
-                          <span className="font-medium font-sans">Estimated Yearly Rewards</span>
+                          <span className="font-medium font-sans">
+                            Estimated Yearly Rewards
+                          </span>
                         </div>
                         <div className="text-lg font-bold text-green-600 font-mono">
-                          {parseFloat(yearlyRewards || "0").toFixed(8)} mBTC
+                          {parseFloat(yearlyRewards || "0").toFixed(8)} Bitcoin
                         </div>
                         <div className="text-sm text-muted-foreground font-sans">
                           APY: {(apy * 100).toFixed(1)}%
@@ -454,9 +560,17 @@ export default function StakePage() {
                         className="w-full bg-green-600 hover:bg-green-700 font-sans font-semibold"
                         disabled={isPending || isConfirming}
                       >
-                        {isPending ? (pendingStakeAmount ? "Approving..." : "Processing...") : 
-                         isConfirming ? (pendingStakeAmount ? "Confirming Approval..." : "Confirming...") : 
-                         needsApproval(formData.mBtcAmount) ? "Approve & Stake" : "Stake mBTC"}
+                        {isPending
+                          ? pendingStakeAmount
+                            ? "Approving..."
+                            : "Processing..."
+                          : isConfirming
+                          ? pendingStakeAmount
+                            ? "Confirming Approval..."
+                            : "Confirming..."
+                          : needsApproval(formData.mBtcAmount)
+                          ? "Approve & Stake"
+                          : "Stake Bitcoin"}
                       </Button>
                     </form>
                   </div>
@@ -464,9 +578,11 @@ export default function StakePage() {
                   {/* Unstake Section */}
                   <div className="space-y-4">
                     <div className="text-center">
-                      <h3 className="text-lg font-semibold font-sans mb-2">Unstake mBTC</h3>
+                      <h3 className="text-lg font-semibold font-sans mb-2">
+                        Unstake Bitcoin
+                      </h3>
                       <p className="text-muted-foreground font-sans text-sm">
-                        Unstake your mBTC tokens
+                        Unstake your Bitcoin
                       </p>
                     </div>
 
@@ -474,18 +590,25 @@ export default function StakePage() {
                       <div className="p-4 bg-muted rounded-lg">
                         <div className="flex items-center gap-2 mb-2">
                           <Clock className="h-4 w-4 text-primary" />
-                          <span className="font-medium font-sans">Unstaking Status</span>
+                          <span className="font-medium font-sans">
+                            Unstaking Status
+                          </span>
                         </div>
                         <div className="text-sm text-muted-foreground font-sans">
                           {canUnstake ? (
-                            <span className="text-green-600">✓ Ready to unstake</span>
+                            <span className="text-green-600">
+                              ✓ Ready to unstake
+                            </span>
                           ) : (
-                            <span className="text-orange-600">⏳ Cooldown required</span>
+                            <span className="text-orange-600">
+                              ⏳ Cooldown required
+                            </span>
                           )}
                         </div>
                         {cooldownEnd > 0 && (
                           <div className="text-sm text-muted-foreground font-sans">
-                            Cooldown ends: {new Date(cooldownEnd * 1000).toLocaleString()}
+                            Cooldown ends:{" "}
+                            {new Date(cooldownEnd * 1000).toLocaleString()}
                           </div>
                         )}
                       </div>
@@ -493,9 +616,13 @@ export default function StakePage() {
                       <Button
                         onClick={() => setShowUnstakeDialog(true)}
                         className="w-full bg-orange-600 hover:bg-orange-700 font-sans font-semibold"
-                        disabled={isPending || isConfirming || parseFloat(stakedAmount) === 0}
+                        disabled={
+                          isPending ||
+                          isConfirming ||
+                          parseFloat(stakedAmount) === 0
+                        }
                       >
-                        {canUnstake ? "Unstake mBTC" : "Start Cooldown"}
+                        {canUnstake ? "Unstake Bitcoin" : "Start Cooldown"}
                       </Button>
                     </div>
                   </div>
@@ -505,7 +632,9 @@ export default function StakePage() {
               {/* History Tab */}
               <TabsContent value="history" className="space-y-4">
                 <div className="text-center py-4">
-                  <h3 className="text-lg font-semibold font-sans mb-2">Staking History</h3>
+                  <h3 className="text-lg font-semibold font-sans mb-2">
+                    Staking History
+                  </h3>
                   <p className="text-muted-foreground font-sans text-sm">
                     View your past staking transactions
                   </p>
@@ -514,14 +643,22 @@ export default function StakePage() {
                 {historyLoading ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                    <p className="text-muted-foreground font-sans text-sm mt-2">Loading history...</p>
+                    <p className="text-muted-foreground font-sans text-sm mt-2">
+                      Loading history...
+                    </p>
                   </div>
                 ) : historyError ? (
-                  <Alert variant={historyError.includes('Backend configuration') ? 'destructive' : 'default'}>
+                  <Alert
+                    variant={
+                      historyError.includes("Backend configuration")
+                        ? "destructive"
+                        : "default"
+                    }
+                  >
                     <Info className="h-4 w-4" />
                     <AlertDescription className="font-sans">
                       {historyError}
-                      {historyError.includes('Authentication') && (
+                      {historyError.includes("Authentication") && (
                         <div className="mt-2">
                           <Button
                             onClick={() => signIn()}
@@ -529,15 +666,21 @@ export default function StakePage() {
                             variant="outline"
                             disabled={isAuthenticating}
                           >
-                            {isAuthenticating ? "Signing in..." : "Sign In to View History"}
+                            {isAuthenticating
+                              ? "Signing in..."
+                              : "Sign In to View History"}
                           </Button>
                         </div>
                       )}
-                      {historyError.includes('Backend configuration') && (
+                      {historyError.includes("Backend configuration") && (
                         <div className="mt-2 text-sm">
-                          <p>This is a backend configuration issue. The staking vault address needs to be configured:</p>
+                          <p>
+                            This is a backend configuration issue. The staking
+                            vault address needs to be configured:
+                          </p>
                           <code className="block mt-1 p-2 bg-muted rounded text-xs">
-                            StakingVault: 0x3EF7d600DB474F1a544602Bd7dA33c53d98B7B1b
+                            StakingVault:
+                            0x3EF7d600DB474F1a544602Bd7dA33c53d98B7B1b
                           </code>
                         </div>
                       )}
@@ -545,7 +688,9 @@ export default function StakePage() {
                   </Alert>
                 ) : history.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-muted-foreground font-sans">No staking history found</p>
+                    <p className="text-muted-foreground font-sans">
+                      No staking history found
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -554,14 +699,23 @@ export default function StakePage() {
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between">
                             <div>
-                              <div className="font-medium font-sans">Stake Transaction</div>
+                              <div className="font-medium font-sans">
+                                Stake Bitcoin
+                              </div>
                               <div className="text-sm text-muted-foreground font-mono">
                                 Block: {item.blockNumber}
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="font-bold font-mono">
-                                {parseFloat(item.amount).toFixed(8)} mBTC
+                              <div className="font-bold font-mono flex items-center justify-center">
+                                {parseFloat(item.amount).toFixed(8)} BTC
+                                <Image
+                                  src="/image/btcLogo.png"
+                                  alt="Bitcoin"
+                                  width={40}
+                                  height={40}
+                                  className="object-contain"
+                                />
                               </div>
                               <a
                                 href={`https://scan.test2.btcs.network/tx/${item.transactionHash}`}
@@ -569,7 +723,8 @@ export default function StakePage() {
                                 rel="noopener noreferrer"
                                 className="text-sm text-primary hover:underline font-mono flex items-center gap-1"
                               >
-                                View Tx <ChevronRight className="h-3 w-3" />
+                                View your transaction hash{" "}
+                                <ChevronRight className="h-3 w-3" />
                               </a>
                             </div>
                           </div>
@@ -587,11 +742,16 @@ export default function StakePage() {
         <Dialog open={showUnstakeDialog} onOpenChange={setShowUnstakeDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="font-sans font-bold">Unstake mBTC</DialogTitle>
+              <DialogTitle className="font-sans font-bold">
+                Unstake Bitcoin
+              </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleUnstakeSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="unstakeAmount" className="font-sans font-medium">
+                <Label
+                  htmlFor="unstakeAmount"
+                  className="font-sans font-medium"
+                >
                   Amount to Unstake
                 </Label>
                 <div className="relative">
@@ -600,7 +760,12 @@ export default function StakePage() {
                     type="number"
                     placeholder="0.00000000"
                     value={formData.unstakeAmount}
-                    onChange={(e) => setFormData({...formData, unstakeAmount: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        unstakeAmount: e.target.value,
+                      })
+                    }
                     className="font-mono"
                     step="0.00000001"
                     max={stakedAmount}
@@ -610,13 +775,15 @@ export default function StakePage() {
                     variant="ghost"
                     size="sm"
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary font-sans"
-                    onClick={() => setFormData({...formData, unstakeAmount: stakedAmount})}
+                    onClick={() =>
+                      setFormData({ ...formData, unstakeAmount: stakedAmount })
+                    }
                   >
                     Max
                   </Button>
                 </div>
                 <div className="text-sm text-muted-foreground font-sans">
-                  Staked: {parseFloat(stakedAmount).toFixed(8)} mBTC
+                  Staked: {parseFloat(stakedAmount).toFixed(8)} Bitcoin
                 </div>
               </div>
 
@@ -624,7 +791,9 @@ export default function StakePage() {
                 <Alert>
                   <Clock className="h-4 w-4" />
                   <AlertDescription className="font-sans">
-                    You need to start cooldown before unstaking. This will start the {Math.floor(cooldownPeriod / 86400)} day cooldown period.
+                    You need to start cooldown before unstaking. This will start
+                    the {Math.floor(cooldownPeriod / 86400)} day cooldown
+                    period.
                   </AlertDescription>
                 </Alert>
               )}
