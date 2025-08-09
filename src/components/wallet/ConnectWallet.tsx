@@ -161,7 +161,7 @@ export function ConnectWallet({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.open(`https://scan.test2.btcs.network/address/${address}`, '_blank')}
+                onClick={() => window.open(`https://scan.coredao.org/address/${address}`, '_blank')}
                 className="flex-1"
               >
                 <ExternalLink className="w-4 h-4 mr-2" />

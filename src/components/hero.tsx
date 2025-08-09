@@ -353,7 +353,7 @@ export default function Hero() {
                         {isLoadingBalance ? (
                           <div className="animate-pulse bg-muted rounded w-20 h-6 mx-auto" />
                         ) : isAuthenticated ? (
-                          wbtcBalance.toFixed(8)
+                          wbtcBalance.toFixed(4)
                         ) : (
                           "0.00000000"
                         )}

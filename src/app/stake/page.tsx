@@ -691,7 +691,7 @@ export default function StakePage() {
                                 />
                               </div>
                               <a
-                                href={`https://scan.test2.btcs.network/tx/${item.transactionHash}`}
+                                href={`https://scan.coredao.org/tx/${item.transactionHash}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-sm text-primary hover:underline font-mono flex items-center gap-1"

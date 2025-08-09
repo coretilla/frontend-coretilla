@@ -993,7 +993,7 @@ export default function LendingPage() {
                                   className="mt-2"
                                   onClick={() => {
                                     window.open(
-                                      `https://scan.test2.btcs.network/tx/${deposit.transactionHash}`,
+                                      `https://scan.coredao.org/tx/${deposit.transactionHash}`,
                                       "_blank"
                                     );
                                   }}
@@ -1032,7 +1032,7 @@ export default function LendingPage() {
                                   className="mt-2"
                                   onClick={() => {
                                     window.open(
-                                      `https://scan.test2.btcs.network/tx/${loan.transactionHash}`,
+                                      `https://scan.coredao.org/tx/${loan.transactionHash}`,
                                       "_blank"
                                     );
                                   }}
