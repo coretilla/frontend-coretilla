@@ -30,19 +30,11 @@ export function useAuth(): AuthState {
   const [signature, setSignature] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Check stored auth on mount and validate token
   useEffect(() => {
     const checkAndRestoreAuth = async () => {
       const { token: storedToken, user: storedUser } = getStoredAuth();
-      console.log("🔄 Checking stored auth on mount:");
-      console.log(
-        "- storedToken:",
-        storedToken ? `${storedToken.substring(0, 30)}...` : "null",
-      );
-      console.log("- storedUser:", storedUser);
 
       if (storedToken && storedUser) {
-        // Validate token by checking if it's expired
         try {
           const payload = JSON.parse(atob(storedToken.split(".")[1]));
           const isExpired = payload.exp && Date.now() >= payload.exp * 1000;
@@ -54,12 +46,9 @@ export function useAuth(): AuthState {
             return;
           }
 
-          // Token is valid, restore auth state
           setToken(storedToken);
           setUser(storedUser);
           setIsAuthenticated(true);
-          console.log("✅ JWT authentication restored from localStorage");
-          console.log("🔑 JWT token ready for API calls");
         } catch (error) {
           console.log("❌ Invalid token format, clearing auth");
           clearAuth();
@@ -67,7 +56,7 @@ export function useAuth(): AuthState {
         }
       } else {
         console.log(
-          "❌ No stored JWT authentication found - user needs to sign in",
+          "❌ No stored JWT authentication found - user needs to sign in"
         );
         setIsAuthenticated(false);
       }
@@ -76,24 +65,17 @@ export function useAuth(): AuthState {
     checkAndRestoreAuth();
   }, []);
 
-  // Clear auth if wallet disconnected or handle reconnection
   useEffect(() => {
     if (!isConnected && isAuthenticated) {
-      // Only clear auth if user explicitly disconnected wallet
-      // You can comment this line if you want to keep auth even when wallet disconnects
-      // signOut();
       console.log("⚠️ Wallet disconnected but keeping authentication");
     } else if (isConnected && !isAuthenticated) {
-      // Check if we have stored auth when wallet reconnects
       const { token: storedToken } = getStoredAuth();
       if (storedToken) {
         console.log("🔄 Wallet reconnected, checking stored auth...");
-        // The auth check useEffect will handle restoration
       }
     }
   }, [isConnected, isAuthenticated]);
 
-  // Auto-refresh token before expiry
   useEffect(() => {
     if (!token) return;
 
@@ -104,14 +86,12 @@ export function useAuth(): AuthState {
         const currentTime = Date.now();
         const timeUntilExpiry = expiryTime - currentTime;
 
-        // If token expires in less than 5 minutes, we could implement refresh logic here
         if (timeUntilExpiry < 5 * 60 * 1000 && timeUntilExpiry > 0) {
           console.log(
-            "⚠️ Token expires soon, consider implementing refresh logic",
+            "⚠️ Token expires soon, consider implementing refresh logic"
           );
         }
 
-        // Set timer to clear auth when token expires
         const timeoutId = setTimeout(() => {
           console.log("⏰ Token expired, clearing auth");
           signOut();
@@ -153,14 +133,8 @@ export function useAuth(): AuthState {
         `I want to login\nNonce: ${nonceData.nonce}`, // Format 5: Want to login
       ];
 
-      const message = messageFormats[0]; // Try first format
+      const message = messageFormats[0];
 
-      console.log("📝 Message formats available:", messageFormats);
-      console.log("📝 Using message format:", message);
-      console.log("📝 Wallet address:", address);
-      console.log("📝 Nonce:", nonceData.nonce);
-
-      // Step 3: Request signature from wallet
       const signature = await signMessageAsync({
         message,
       });
@@ -168,7 +142,7 @@ export function useAuth(): AuthState {
       console.log("🔐 Wallet signature obtained:", signature);
       console.log(
         "⏱️ Time between nonce and signature:",
-        Date.now() - Date.parse(new Date().toISOString()),
+        Date.now() - Date.parse(new Date().toISOString())
       );
 
       // Step 4: Authenticate with backend immediately (no delay)
@@ -176,7 +150,7 @@ export function useAuth(): AuthState {
       const result = await signInWithWallet(
         address,
         signature,
-        nonceData.nonce,
+        nonceData.nonce
       );
 
       console.log("✅ Authentication successful:", result);
@@ -184,7 +158,7 @@ export function useAuth(): AuthState {
         "🎯 Access Token for deposit API calls:",
         result.access_token
           ? `${result.access_token.substring(0, 30)}...`
-          : "No access_token",
+          : "No access_token"
       );
 
       setToken(result.access_token); // Store access_token as token
@@ -196,10 +170,10 @@ export function useAuth(): AuthState {
       setIsAuthenticated(true);
 
       console.log(
-        "🔑 Authentication complete - Access token ready for deposit API calls!",
+        "🔑 Authentication complete - Access token ready for deposit API calls!"
       );
       console.log(
-        "📝 Access token will be used in Authorization: Bearer header",
+        "📝 Access token will be used in Authorization: Bearer header"
       );
     } catch (err) {
       console.error("❌ Authentication failed:", err);

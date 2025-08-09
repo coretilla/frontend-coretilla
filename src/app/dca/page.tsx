@@ -1394,10 +1394,10 @@ export default function DCAPage() {
                           {result.amountInvested.toLocaleString()}
                         </td>
                         <td className="text-right p-2 font-mono text-orange-500 font-medium">
-                          {result.btcPurchased.toFixed(8)}
+                          {result.btcPurchased.toFixed(1)}
                         </td>
                         <td className="text-right p-2 font-mono font-semibold text-blue-600">
-                          {result.totalBtc.toFixed(8)}
+                          {result.totalBtc.toFixed(1)}
                         </td>
                         <td className="text-right p-2 font-mono font-bold text-green-600">
                           {selectedCurrency?.symbol}

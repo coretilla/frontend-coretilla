@@ -409,7 +409,7 @@ export default function LendingPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono">
-                {parseFloat(lending.mBTCBalance).toFixed(8)}
+                {parseFloat(lending.mBTCBalance).toFixed(8).replace(/\.?0+$/, '')}
               </div>
               <p className="text-xs text-muted-foreground font-sans">
                 Available to deposit
@@ -445,7 +445,7 @@ export default function LendingPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono">
-                {parseFloat(lending.collateralBalance).toFixed(8)}
+                {parseFloat(lending.collateralBalance).toFixed(1)}
               </div>
               <p className="text-xs text-muted-foreground font-sans">
                 Bitcoin deposited
@@ -536,7 +536,7 @@ export default function LendingPage() {
               onValueChange={setActiveTab}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-7">
                 <TabsTrigger value="deposit" className="font-sans">
                   Deposit
                 </TabsTrigger>
@@ -549,8 +549,8 @@ export default function LendingPage() {
                 <TabsTrigger value="repay" className="font-sans">
                   Repay
                 </TabsTrigger>
-                {/* <TabsTrigger value="fund" className="font-sans">Fund Pool</TabsTrigger> */}
-                {/* <TabsTrigger value="mint" className="font-sans">Mint USDT</TabsTrigger> */}
+                <TabsTrigger value="fund" className="font-sans">Fund Pool</TabsTrigger>
+                <TabsTrigger value="mint" className="font-sans">Mint USDT</TabsTrigger>
                 <TabsTrigger value="history" className="font-sans">
                   History
                 </TabsTrigger>
@@ -595,7 +595,7 @@ export default function LendingPage() {
                       </Button>
                     </div>
                     <div className="text-sm text-muted-foreground font-sans">
-                      Available: {parseFloat(lending.mBTCBalance).toFixed(8)}{" "}
+                      Available: {parseFloat(lending.mBTCBalance).toFixed(8).replace(/\.?0+$/, '')}{" "}
                       Bitcoin
                     </div>
                   </div>
@@ -723,7 +723,7 @@ export default function LendingPage() {
                     </div>
                     <div className="text-sm text-muted-foreground font-sans">
                       Deposited:{" "}
-                      {parseFloat(lending.collateralBalance).toFixed(8)} Bitcoin
+                      {parseFloat(lending.collateralBalance).toFixed(1)} Bitcoin
                     </div>
                   </div>
 

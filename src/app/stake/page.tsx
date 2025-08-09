@@ -339,7 +339,7 @@ export default function StakePage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono text-foreground">
-                {parseFloat(mBTCBalance).toFixed(8)}
+                {parseFloat(mBTCBalance).toFixed(1)}
               </div>
               <div className="text-sm text-muted-foreground font-sans">
                 Available
@@ -356,7 +356,7 @@ export default function StakePage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono text-foreground">
-                {parseFloat(stakedAmount).toFixed(8)}
+                {parseFloat(stakedAmount).toFixed(1)}
               </div>
               <div className="text-sm text-muted-foreground font-sans">
                 Bitcoin Staked
@@ -373,7 +373,7 @@ export default function StakePage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono text-green-600">
-                {parseFloat(pendingRewards).toFixed(8)}
+                {parseFloat(pendingRewards).toFixed(1)}
               </div>
               <div className="text-sm text-muted-foreground font-sans">
                 <Button
@@ -410,7 +410,7 @@ export default function StakePage() {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-foreground font-mono">
-                  {parseFloat(stakedAmount).toFixed(8)}
+                  {parseFloat(stakedAmount).toFixed(1)}
                 </div>
                 <div className="text-sm text-muted-foreground font-sans">
                   Your Staked
@@ -418,7 +418,7 @@ export default function StakePage() {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600 font-mono">
-                  {parseFloat(pendingRewards).toFixed(8)}
+                  {parseFloat(pendingRewards).toFixed(1)}
                 </div>
                 <div className="text-sm text-muted-foreground font-sans">
                   Pending Rewards
@@ -507,7 +507,7 @@ export default function StakePage() {
                           </Button>
                         </div>
                         <div className="text-sm text-muted-foreground font-sans">
-                          Available: {parseFloat(mBTCBalance).toFixed(8)}{" "}
+                          Available: {parseFloat(mBTCBalance).toFixed(1)}{" "}
                           Bitcoin
                         </div>
                       </div>
@@ -520,7 +520,7 @@ export default function StakePage() {
                           </span>
                         </div>
                         <div className="text-lg font-bold text-green-600 font-mono">
-                          {parseFloat(yearlyRewards || "0").toFixed(8)} Bitcoin
+                          {parseFloat(yearlyRewards || "0").toFixed(1)} Bitcoin
                         </div>
                         <div className="text-sm text-muted-foreground font-sans">
                           APY: {(apy * 100).toFixed(1)}%
@@ -681,7 +681,7 @@ export default function StakePage() {
                             </div>
                             <div className="text-right">
                               <div className="font-bold font-mono flex items-center justify-center">
-                                {parseFloat(item.amount).toFixed(8)} BTC
+                                {parseFloat(item.amount).toFixed(1)} BTC
                                 <Image
                                   src="/image/btcLogo.png"
                                   alt="Bitcoin"
@@ -755,7 +755,7 @@ export default function StakePage() {
                   </Button>
                 </div>
                 <div className="text-sm text-muted-foreground font-sans">
-                  Staked: {parseFloat(stakedAmount).toFixed(8)} Bitcoin
+                  Staked: {parseFloat(stakedAmount).toFixed(1)} Bitcoin
                 </div>
               </div>
 

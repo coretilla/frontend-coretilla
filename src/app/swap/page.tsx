@@ -120,7 +120,7 @@ export default function SwapPage() {
     if (formData.amount) {
       const fiatAmount = parseFloat(formData.amount);
       const btcReceived = fiatAmount / btcPrice;
-      setBtcAmount(btcReceived.toFixed(8));
+      setBtcAmount(btcReceived.toFixed(1));
     } else {
       setBtcAmount("0.00000000");
     }
@@ -283,7 +283,7 @@ export default function SwapPage() {
               </div>
               <div className="text-center p-4 bg-muted rounded-lg">
                 <div className="text-2xl font-bold text-primary font-mono">
-                  {currentBalances.CORE.toLocaleString()}
+                  {currentBalances.CORE.toFixed(1).toLocaleString()}
                 </div>
                 <div className="text-sm text-muted-foreground font-sans flex items-center justify-center gap-1 mt-3">
                   <Image
@@ -301,7 +301,7 @@ export default function SwapPage() {
               </div>
               <div className="text-center p-4 bg-muted rounded-lg">
                 <div className="text-2xl font-bold text-primary font-mono">
-                  {currentBalances.WBTC.toFixed(6)}
+                  {currentBalances.WBTC.toFixed(1)}
                 </div>
                 <div className="text-sm text-muted-foreground font-sans flex items-center justify-center">
                   <Image
@@ -410,7 +410,7 @@ export default function SwapPage() {
                     value={btcAmount}
                     readOnly
                     className="pl-10 font-mono bg-muted"
-                    placeholder="0.00000000"
+                    placeholder="0.0"
                   />
                 </div>
                 <div className="text-sm text-muted-foreground font-sans">
@@ -516,7 +516,7 @@ export default function SwapPage() {
                   <div className="flex justify-between font-semibold">
                     <span className="font-sans">You'll Receive:</span>
                     <span className="font-mono text-primary">
-                      {(parseFloat(btcAmount) - networkFee).toFixed(8)} BTC
+                      {(parseFloat(btcAmount) - networkFee).toFixed(1)} BTC
                     </span>
                   </div>
                 </div>

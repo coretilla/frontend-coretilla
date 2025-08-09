@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://core-backend-production-0965.up.railway.app';
+const API_BASE_URL = "https://core-backend-production-0965.up.railway.app";
 
 interface CreateDepositRequest {
   amount: number;
@@ -79,70 +79,63 @@ export interface SwapResponse {
   };
 }
 
-import { getStoredAuth } from './auth';
+import { getStoredAuth } from "./auth";
 
 function getAuthToken(): string | null {
   const { token } = getStoredAuth();
-  localStorage.setItem('authToken', token || '');
-  console.log('🔑 Getting access_token for API call:', token ? `${token.substring(0, 30)}...` : 'null');
+  localStorage.setItem("authToken", token || "");
+  console.log(
+    "🔑 Getting access_token for API call:",
+    token ? `${token.substring(0, 30)}...` : "null"
+  );
   return token;
 }
 
-export async function createDeposit(data: CreateDepositRequest): Promise<CreateDepositResponse> {
-  console.log('🔄 Creating deposit with access_token Bearer auth:', data);
-  
-  const token = getAuthToken(); // Get access_token from /auth/signin
+export async function createDeposit(
+  data: CreateDepositRequest
+): Promise<CreateDepositResponse> {
+  const token = getAuthToken();
   if (!token) {
-    console.error('❌ No access_token found in localStorage');
-    throw new Error('Authentication required. Please login first.');
+    console.error("❌ No access_token found in localStorage");
+    throw new Error("Authentication required. Please login first.");
   }
-  
+
   const requestHeaders = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`, // Using access_token with Bearer prefix
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
   };
 
-  console.log('🔑 Using access_token:', token.substring(0, 40) + '...');
-  console.log('🔑 Full access_token for debugging:', token);
-  
   const requestBody = {
     amount: data.amount,
     currency: data.currency,
     description: data.description,
   };
-  
-  console.log('📡 Deposit API Request (Access Token Bearer Auth):');
-  console.log('- URL:', `${API_BASE_URL}/payments/deposits`);
-  console.log('- Headers:', requestHeaders);
-  console.log('- Body:', JSON.stringify(requestBody, null, 2));
-  
+
   const response = await fetch(`${API_BASE_URL}/payments/deposits`, {
-    method: 'POST',
+    method: "POST",
     headers: requestHeaders,
     body: JSON.stringify(requestBody),
   });
 
-  console.log('📡 API Response status:', response.status);
-  console.log('📡 API Response headers:', Object.fromEntries(response.headers.entries()));
-
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ API Error response:', errorText);
-    throw new Error(`Failed to create deposit (${response.status}): ${errorText}`);
+    console.error("❌ API Error response:", errorText);
+    throw new Error(
+      `Failed to create deposit (${response.status}): ${errorText}`
+    );
   }
 
   const result = await response.json();
-  console.log('✅ API Success response:', result);
   return result;
 }
 
-export async function confirmDeposit(data: ConfirmDepositRequest): Promise<ConfirmDepositResponse> {
-  console.log('🔄 Confirming deposit with access_token Bearer auth:', data);
-
+export async function confirmDeposit(
+  data: ConfirmDepositRequest
+): Promise<ConfirmDepositResponse> {
   const token = getAuthToken();
   if (!token) {
-    console.error('❌ No access_token found in localStorage');
-    throw new Error('Authentication required. Please login first.');
+    console.error("❌ No access_token found in localStorage");
+    throw new Error("Authentication required. Please login first.");
   }
 
   const requestBody = {
@@ -151,174 +144,152 @@ export async function confirmDeposit(data: ConfirmDepositRequest): Promise<Confi
   };
 
   const response = await fetch(`${API_BASE_URL}/payments/deposits/confirm`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`, // Using access_token with Bearer prefix
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(requestBody),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ Confirm API Error response:', errorText);
-    throw new Error(`Failed to confirm deposit (${response.status}): ${errorText}`);
+    console.error("❌ Confirm API Error response:", errorText);
+    throw new Error(
+      `Failed to confirm deposit (${response.status}): ${errorText}`
+    );
   }
 
   return response.json();
 }
 
 export async function getUserData(): Promise<UserMeResponse> {
-  console.log('👤 Fetching user data from /users/me...');
-  
   const token = getAuthToken();
   if (!token) {
-    console.error('❌ No access_token found in localStorage');
-    throw new Error('Authentication required. Please login first.');
+    console.error("❌ No access_token found in localStorage");
+    throw new Error("Authentication required. Please login first.");
   }
 
   const response = await fetch(`${API_BASE_URL}/users/me`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
   });
 
-  console.log('👤 /users/me response status:', response.status);
-
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ /users/me API Error response:', errorText);
-    throw new Error(`Failed to fetch user data (${response.status}): ${errorText}`);
+    console.error("❌ /users/me API Error response:", errorText);
+    throw new Error(
+      `Failed to fetch user data (${response.status}): ${errorText}`
+    );
   }
 
   const result = await response.json();
-  console.log('✅ User data response:', result);
   return result;
 }
 
 export function parseUserBalance(userData: UserMeResponse): UserBalance {
-  console.log('💰 Parsing user balance from userData:', userData);
-  console.log('💰 userData.balance type:', typeof userData.balance);
-  console.log('💰 userData.balance value:', userData.balance);
-  
-  // Try different possible balance formats
   let balances: UserBalance = {};
-  
-  if (userData.balance && typeof userData.balance === 'object' && !Array.isArray(userData.balance)) {
-    // Format 1: { balance: { USD: 100, IDR: 150000, EUR: 85 } }
+
+  if (
+    userData.balance &&
+    typeof userData.balance === "object" &&
+    !Array.isArray(userData.balance)
+  ) {
     balances = userData.balance as UserBalance;
-    console.log('💰 ✅ Using balance object field:', balances);
-  } else if (userData.balance && typeof userData.balance === 'number') {
-    // Format 2: { balance: 1000 } - single number, assume USD
+  } else if (userData.balance && typeof userData.balance === "number") {
     balances = {
       USD: userData.balance,
       IDR: 0,
       EUR: 0,
     };
-    console.log('💰 ✅ Using balance number field as USD:', balances);
-    console.log('💰 ✅ Converted balance:', userData.balance, '→ USD:', balances.USD);
   } else if (userData.balances) {
-    // Format 3: { balances: { USD: 100, IDR: 150000, EUR: 85 } }
     balances = userData.balances;
-    console.log('💰 ✅ Using balances field:', balances);
-  } else if (userData.usd_balance !== undefined || userData.idr_balance !== undefined || userData.eur_balance !== undefined) {
-    // Format 4: { usd_balance: 100, idr_balance: 150000, eur_balance: 85 }
+    console.log("💰 ✅ Using balances field:", balances);
+  } else if (
+    userData.usd_balance !== undefined ||
+    userData.idr_balance !== undefined ||
+    userData.eur_balance !== undefined
+  ) {
     balances = {
       USD: userData.usd_balance || 0,
       IDR: userData.idr_balance || 0,
       EUR: userData.eur_balance || 0,
     };
-    console.log('💰 ✅ Using individual balance fields:', balances);
   } else {
-    console.warn('⚠️ No balance found in userData, using defaults');
+    console.warn("⚠️ No balance found in userData, using defaults");
     balances = { USD: 0, IDR: 0, EUR: 0 };
   }
-  
-  // Ensure all currencies have default values
+
   const finalBalances: UserBalance = {
     USD: Number(balances.USD) || 0,
     IDR: Number(balances.IDR) || 0,
     EUR: Number(balances.EUR) || 0,
   };
-  
-  console.log('💰 ✅ Final parsed balances:', finalBalances);
+
   return finalBalances;
 }
 
 export async function getBtcPrice(): Promise<BtcPriceResponse> {
-  console.log('₿ Fetching BTC price from /finance/btc-price...');
-  
   const token = getAuthToken();
   if (!token) {
-    console.error('❌ No access_token found in localStorage');
-    throw new Error('Authentication required. Please login first.');
+    console.error("❌ No access_token found in localStorage");
+    throw new Error("Authentication required. Please login first.");
   }
 
   const response = await fetch(`${API_BASE_URL}/finance/btc-price`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
   });
 
-  console.log('₿ /finance/btc-price response status:', response.status);
-
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ /finance/btc-price API Error response:', errorText);
-    throw new Error(`Failed to fetch BTC price (${response.status}): ${errorText}`);
+    console.error("❌ /finance/btc-price API Error response:", errorText);
+    throw new Error(
+      `Failed to fetch BTC price (${response.status}): ${errorText}`
+    );
   }
 
   const result = await response.json();
-  console.log('✅ BTC price response:', result);
   return result;
 }
 
 export async function swapUsdToBtc(data: SwapRequest): Promise<SwapResponse> {
-  console.log('🔄 Swapping USD to BTC with access_token Bearer auth:', data);
-  
   const token = getAuthToken();
   if (!token) {
-    console.error('❌ No access_token found in localStorage');
-    throw new Error('Authentication required. Please login first.');
+    console.error("❌ No access_token found in localStorage");
+    throw new Error("Authentication required. Please login first.");
   }
-  
+
   const requestHeaders = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
   };
 
-  console.log('🔑 Using access_token for swap:', token.substring(0, 40) + '...');
-  
   const requestBody = {
     amount: data.amount,
   };
-  
-  console.log('📡 Swap API Request (Access Token Bearer Auth):');
-  console.log('- URL:', `${API_BASE_URL}/finance/swap`);
-  console.log('- Headers:', requestHeaders);
-  console.log('- Body:', JSON.stringify(requestBody, null, 2));
-  
+
   const response = await fetch(`${API_BASE_URL}/finance/swap`, {
-    method: 'POST',
+    method: "POST",
     headers: requestHeaders,
     body: JSON.stringify(requestBody),
   });
 
-  console.log('📡 Swap API Response status:', response.status);
-  console.log('📡 Swap API Response headers:', Object.fromEntries(response.headers.entries()));
-
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ Swap API Error response:', errorText);
-    throw new Error(`Failed to swap USD to BTC (${response.status}): ${errorText}`);
+    console.error("❌ Swap API Error response:", errorText);
+    throw new Error(
+      `Failed to swap USD to BTC (${response.status}): ${errorText}`
+    );
   }
 
   const result = await response.json();
-  console.log('✅ Swap API Success response:', result);
   return result;
 }
 
@@ -339,157 +310,131 @@ export interface LendingHistoryResponse {
 }
 
 export async function getStakeHistory(): Promise<StakeHistoryResponse> {
-  console.log('📊 Fetching stake history with access_token Bearer auth...');
-  
   const token = getAuthToken();
   if (!token) {
-    console.error('❌ No access_token found in localStorage');
-    throw new Error('Authentication required. Please login first.');
+    console.error("❌ No access_token found in localStorage");
+    throw new Error("Authentication required. Please login first.");
   }
-  
+
   const requestHeaders = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
   };
-  
-  console.log('🔑 Using access_token for stake history:', token.substring(0, 40) + '...');
-  
-  console.log('📡 Stake History API Request (Access Token Bearer Auth):');
-  console.log('- URL:', `${API_BASE_URL}/finance/stake-history`);
-  console.log('- Headers:', requestHeaders);
-  
+
   const response = await fetch(`${API_BASE_URL}/finance/stake-history`, {
-    method: 'GET',
+    method: "GET",
     headers: requestHeaders,
   });
 
-  console.log('📡 Stake History API Response status:', response.status);
-  console.log('📡 Stake History API Response headers:', Object.fromEntries(response.headers.entries()));
-
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ Stake History API Error response:', errorText);
-    
-    // Handle specific backend configuration errors
+    console.error("❌ Stake History API Error response:", errorText);
     if (response.status === 500) {
       try {
         const errorData = JSON.parse(errorText);
         if (errorData.message === "Staking vault address not configured") {
-          throw new Error('Backend configuration error: Staking vault address not configured. Please contact support.');
+          throw new Error(
+            "Backend configuration error: Staking vault address not configured. Please contact support."
+          );
         }
-      } catch (parseError) {
-        // If JSON parsing fails, use generic error
-      }
+      } catch (parseError) {}
     }
-    
-    throw new Error(`Failed to fetch stake history (${response.status}): ${errorText}`);
+
+    throw new Error(
+      `Failed to fetch stake history (${response.status}): ${errorText}`
+    );
   }
 
   const result = await response.json();
-  console.log('✅ Stake History API Success response:', result);
   return result;
 }
 
 export async function getLendingHistory(): Promise<LendingHistoryResponse> {
-  console.log('📊 Fetching Lending history with access_token Bearer auth...');
-  
   const token = getAuthToken();
   if (!token) {
-    console.error('❌ No access_token found in localStorage');
-    throw new Error('Authentication required. Please login first.');
+    console.error("❌ No access_token found in localStorage");
+    throw new Error("Authentication required. Please login first.");
   }
-  
-  const requestHeaders = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-  };
-  
-  console.log('🔑 Using access_token for stake history:', token.substring(0, 40) + '...');
-  
-  console.log('📡 Stake History API Request (Access Token Bearer Auth):');
-  console.log('- URL:', `${API_BASE_URL}/finance/collateral-deposit-history`);
-  console.log('- Headers:', requestHeaders);
-  
-  const response = await fetch(`${API_BASE_URL}/finance/collateral-deposit-history`, {
-    method: 'GET',
-    headers: requestHeaders,
-  });
 
-  console.log('📡 Lending History API Response status:', response.status);
-  console.log('📡 Lending History API Response headers:', Object.fromEntries(response.headers.entries()));
+  const requestHeaders = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+
+  const response = await fetch(
+    `${API_BASE_URL}/finance/collateral-deposit-history`,
+    {
+      method: "GET",
+      headers: requestHeaders,
+    }
+  );
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ Lending History API Error response:', errorText);
-    
-    // Handle specific backend configuration errors
+    console.error("❌ Lending History API Error response:", errorText);
+
     if (response.status === 500) {
       try {
         const errorData = JSON.parse(errorText);
         if (errorData.message === "Lending vault address not configured") {
-          throw new Error('Backend configuration error: Staking vault address not configured. Please contact support.');
+          throw new Error(
+            "Backend configuration error: Staking vault address not configured. Please contact support."
+          );
         }
-      } catch (parseError) {
-        // If JSON parsing fails, use generic error
-      }
+      } catch (parseError) {}
     }
-    
-    throw new Error(`Failed to fetch stake history (${response.status}): ${errorText}`);
+
+    throw new Error(
+      `Failed to fetch stake history (${response.status}): ${errorText}`
+    );
   }
 
   const result = await response.json();
-  console.log('✅ Lending History API Success response:', result);
   return result;
 }
 
 export async function getLoanHistory(): Promise<LendingHistoryResponse> {
-  console.log('📊 Fetching loan history with access_token Bearer auth...');
-  
   const token = getAuthToken();
   if (!token) {
-    console.error('❌ No access_token found in localStorage');
-    throw new Error('Authentication required. Please login first.');
+    console.error("❌ No access_token found in localStorage");
+    throw new Error("Authentication required. Please login first.");
   }
-  
+
   const requestHeaders = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
   };
-  
-  console.log('🔑 Using access_token for loan history:', token.substring(0, 40) + '...');
-  
-  console.log('📡 Stake History API Request (Access Token Bearer Auth):');
-  console.log('- URL:', `${API_BASE_URL}/finance/loan-history`);
-  console.log('- Headers:', requestHeaders);
-  
+
+  console.log(
+    "🔑 Using access_token for loan history:",
+    token.substring(0, 40) + "..."
+  );
+
   const response = await fetch(`${API_BASE_URL}/finance/loan-history`, {
-    method: 'GET',
+    method: "GET",
     headers: requestHeaders,
   });
 
-  console.log('📡 loan History API Response status:', response.status);
-  console.log('📡 loan History API Response headers:', Object.fromEntries(response.headers.entries()));
-
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('❌ loan History API Error response:', errorText);
-    
-    // Handle specific backend configuration errors
+    console.error("❌ loan History API Error response:", errorText);
+
     if (response.status === 500) {
       try {
         const errorData = JSON.parse(errorText);
         if (errorData.message === "Loan vault address not configured") {
-          throw new Error('Backend configuration error: Staking vault address not configured. Please contact support.');
+          throw new Error(
+            "Backend configuration error: Staking vault address not configured. Please contact support."
+          );
         }
-      } catch (parseError) {
-        // If JSON parsing fails, use generic error
-      }
+      } catch (parseError) {}
     }
-    
-    throw new Error(`Failed to fetch loan history (${response.status}): ${errorText}`);
+
+    throw new Error(
+      `Failed to fetch loan history (${response.status}): ${errorText}`
+    );
   }
 
   const result = await response.json();
-  console.log('✅ Lending History API Success response:', result);
   return result;
 }

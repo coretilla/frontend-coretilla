@@ -184,7 +184,7 @@ export default function DashboardPage() {
     },
     crypto: {
       BTC: {
-        amount: wbtcBalance.toFixed(8),
+        amount: wbtcBalance.toFixed(1),
         change: { value: 0, percentage: 0, period: "7D" },
         price: btcPrice,
         usdValue: wbtcBalanceInUsd,
