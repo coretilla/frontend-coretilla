@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +11,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -31,7 +29,6 @@ import {
 import Image from "next/image";
 import { toast } from "sonner";
 import PageWrapper from "@/components/layout/PageWrapper";
-import { motion } from "framer-motion";
 import { useWallet } from "@/hooks/useWallet";
 import { useAuth } from "@/hooks/useAuth";
 import { ConnectWallet } from "@/components/wallet/ConnectWallet";
@@ -65,7 +62,6 @@ export default function StakePage() {
     null
   );
 
-  // Use staking hook
   const {
     approve,
     stake,
@@ -85,10 +81,8 @@ export default function StakePage() {
     pendingRewards,
     canUnstake,
     cooldownEnd,
-    unstakeWindowEnd,
   } = useStaking();
 
-  // Use staking history hook
   const {
     history,
     isLoading: historyLoading,
@@ -96,20 +90,15 @@ export default function StakePage() {
     refetch: refetchHistory,
   } = useStakingHistory();
 
-  // Use yearly rewards hook with current input amount
   const { yearlyRewards } = useYearlyRewards(formData.mBtcAmount);
 
-  // Track previous hash to avoid loops
   const [processedHash, setProcessedHash] = useState<string | null>(null);
 
-  // Handle stake after approval is confirmed
   useEffect(() => {
     const handleStakeAfterApproval = async () => {
       if (isConfirmed && pendingStakeAmount && hash && hash !== processedHash) {
         try {
-          // Wait a bit for allowance to update
           await new Promise((resolve) => setTimeout(resolve, 1000));
-
           toast.success("Approval confirmed! Now staking...");
           await stake(pendingStakeAmount);
           setPendingStakeAmount(null);
@@ -122,11 +111,9 @@ export default function StakePage() {
         }
       }
     };
-
     handleStakeAfterApproval();
   }, [isConfirmed, pendingStakeAmount, hash, processedHash, stake]);
 
-  // Refresh data when transaction is confirmed (non-approval transactions)
   useEffect(() => {
     if (isConfirmed && hash && hash !== processedHash && !pendingStakeAmount) {
       refetchAll();
@@ -157,7 +144,6 @@ export default function StakePage() {
     }
 
     try {
-      // Check if approval is needed
       if (needsApproval(formData.mBtcAmount)) {
         toast.info("Step 1/2: Approving Bitcoin for staking...");
         setPendingStakeAmount(formData.mBtcAmount);
@@ -165,7 +151,6 @@ export default function StakePage() {
         return;
       }
 
-      // If already approved, stake directly
       toast.info("Staking Bitcoin...");
       await stake(formData.mBtcAmount);
     } catch (error) {
@@ -181,12 +166,10 @@ export default function StakePage() {
       toast.error("Please enter a valid unstake amount");
       return;
     }
-
     if (parseFloat(formData.unstakeAmount) > parseFloat(stakedAmount)) {
       toast.error("Insufficient staked amount");
       return;
     }
-
     try {
       if (!canUnstake) {
         await startCooldown();
@@ -196,7 +179,6 @@ export default function StakePage() {
         setShowUnstakeDialog(false);
         return;
       }
-
       await unstake(formData.unstakeAmount);
       toast.info("Unstaking transaction submitted...");
       setShowUnstakeDialog(false);
@@ -216,7 +198,6 @@ export default function StakePage() {
     }
   };
 
-  // Show connect wallet prompt if not connected
   if (!isConnected) {
     return (
       <PageWrapper
@@ -264,7 +245,6 @@ export default function StakePage() {
     );
   }
 
-  // Show authentication prompt if connected but not authenticated
   if (!isAuthenticated) {
     return (
       <PageWrapper
@@ -343,7 +323,6 @@ export default function StakePage() {
       className="bg-gradient-to-br from-orange-50 to-orange-100"
     >
       <div className="max-w-4xl mx-auto">
-        {/* Balance Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card>
             <CardHeader className="pb-3">
@@ -415,7 +394,6 @@ export default function StakePage() {
           </Card>
         </div>
 
-        {/* Staking Stats */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="font-sans">Staking Overview</CardTitle>
@@ -458,7 +436,6 @@ export default function StakePage() {
           </CardContent>
         </Card>
 
-        {/* Main Interface */}
         <Card>
           <CardHeader>
             <CardTitle className="font-sans">Staking & History</CardTitle>
@@ -478,10 +455,8 @@ export default function StakePage() {
                 </TabsTrigger>
               </TabsList>
 
-              {/* Staking Tab */}
               <TabsContent value="staking" className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Stake Section */}
                   <div className="space-y-4">
                     <div className="text-center">
                       <h3 className="text-lg font-semibold font-sans mb-2">
@@ -575,7 +550,6 @@ export default function StakePage() {
                     </form>
                   </div>
 
-                  {/* Unstake Section */}
                   <div className="space-y-4">
                     <div className="text-center">
                       <h3 className="text-lg font-semibold font-sans mb-2">
@@ -629,7 +603,6 @@ export default function StakePage() {
                 </div>
               </TabsContent>
 
-              {/* History Tab */}
               <TabsContent value="history" className="space-y-4">
                 <div className="text-center py-4">
                   <h3 className="text-lg font-semibold font-sans mb-2">
@@ -738,7 +711,6 @@ export default function StakePage() {
           </CardContent>
         </Card>
 
-        {/* Unstake Dialog */}
         <Dialog open={showUnstakeDialog} onOpenChange={setShowUnstakeDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>

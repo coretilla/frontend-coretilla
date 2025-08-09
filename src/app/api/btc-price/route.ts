@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // Try CoinGecko first
     try {
       const response = await fetch(
         'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true',
@@ -10,7 +9,7 @@ export async function GET() {
           headers: {
             'Accept': 'application/json',
           },
-          next: { revalidate: 60 }, // Cache for 1 minute
+          next: { revalidate: 60 },
         }
       );
 
@@ -33,7 +32,6 @@ export async function GET() {
       console.warn('CoinGecko API failed:', error);
     }
 
-    // Try Binance as fallback
     try {
       const response = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');
       
@@ -56,7 +54,6 @@ export async function GET() {
       console.warn('Binance API failed:', error);
     }
 
-    // Return mock data as final fallback
     return NextResponse.json({
       success: false,
       source: 'mock',
@@ -69,8 +66,6 @@ export async function GET() {
 
   } catch (error) {
     console.error('BTC Price API error:', error);
-    
-    // Return mock data on any error
     return NextResponse.json({
       success: false,
       source: 'mock',

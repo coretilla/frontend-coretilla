@@ -1,8 +1,13 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,16 +24,21 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getLendingHistory, getLoanHistory } from "@/lib/api";
 
 const formatHealthFactor = (value: number): string => {
-  if (!value || isNaN(value)) return '0.00';
-  if (value > 999999) return '999+';
+  if (!value || isNaN(value)) return "0.00";
+  if (value > 999999) return "999+";
   return value.toFixed(2);
 };
 
 export default function LendingPage() {
   const { isConnected } = useWallet();
-  const { isAuthenticated, signIn, isAuthenticating, error: authError } = useAuth();
+  const {
+    isAuthenticated,
+    signIn,
+    isAuthenticating,
+    error: authError,
+  } = useAuth();
   const lending = useLending();
-  
+
   const [collateralAmount, setCollateralAmount] = useState("");
   const [borrowAmount, setBorrowAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -42,89 +52,90 @@ export default function LendingPage() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [lastAction, setLastAction] = useState<string | null>(null);
 
-  // Auto refetch data when page loads or when transactions complete
   useEffect(() => {
     if (isConnected && isAuthenticated) {
       lending.refetchAll();
     }
   }, [isConnected, isAuthenticated, lending.isConfirmed]);
 
-  // Handle transaction completion success messages
   useEffect(() => {
     if (lending.isConfirmed && lastAction) {
       switch (lastAction) {
-        case 'deposit':
+        case "deposit":
           toast.success("Collateral deposited successfully!");
           setCollateralAmount("");
           break;
-        case 'borrow':
+        case "borrow":
           toast.success("USDT borrowed successfully!");
           setBorrowAmount("");
           break;
-        case 'withdraw':
+        case "withdraw":
           toast.success("Collateral withdrawn successfully!");
           setWithdrawAmount("");
           break;
-        case 'repay':
+        case "repay":
           toast.success("Loan repaid successfully!");
           setRepayAmount("");
           break;
         default:
           break;
       }
-      setLastAction(null); // Clear the action after showing success
+      setLastAction(null);
     }
   }, [lending.isConfirmed, lastAction]);
 
-  // Fetch both deposit and loan history
   const fetchHistory = async () => {
     if (!isConnected || !isAuthenticated) return;
-    
+
     setIsLoadingHistory(true);
     try {
-      // Fetch both histories in parallel
       const [depositResult, loanResult] = await Promise.all([
         getLendingHistory(),
-        getLoanHistory()
+        getLoanHistory(),
       ]);
-      
+
       if (depositResult.success) {
         setDepositHistory(depositResult.data);
       }
-      
+
       if (loanResult.success) {
         setLoanHistory(loanResult.data);
       }
-      
+
       if (!depositResult.success && !loanResult.success) {
-        toast.error('Failed to load transaction history');
+        toast.error("Failed to load transaction history");
       }
     } catch (error) {
-      console.error('Failed to fetch history:', error);
+      console.error("Failed to fetch history:", error);
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
-        toast.error('Failed to load transaction history');
+        toast.error("Failed to load transaction history");
       }
     } finally {
       setIsLoadingHistory(false);
     }
   };
 
-  // Fetch history when tab changes to history
   useEffect(() => {
-    if (activeTab === 'history') {
+    if (activeTab === "history") {
       fetchHistory();
     }
   }, [activeTab, isConnected, isAuthenticated]);
 
-  // Calculate current LTV ratio
   const currentLTV = () => {
-    if (!lending.collateralBalance || !lending.borrowedBalance || !lending.btcPriceInUSDT) return 0;
-    
-    const collateralValue = parseFloat(lending.collateralBalance) * parseFloat(lending.btcPriceInUSDT);
+    if (
+      !lending.collateralBalance ||
+      !lending.borrowedBalance ||
+      !lending.btcPriceInUSDT
+    )
+      return 0;
+
+    const collateralValue =
+      parseFloat(lending.collateralBalance) *
+      parseFloat(lending.btcPriceInUSDT);
     const borrowedValue = parseFloat(lending.borrowedBalance);
-    
+
     if (collateralValue === 0) return 0;
     return (borrowedValue / collateralValue) * 100;
   };
@@ -137,20 +148,20 @@ export default function LendingPage() {
     }
 
     if (parseFloat(collateralAmount) > parseFloat(lending.mBTCBalance)) {
-      toast.error("Insufficient mBTC balance");
+      toast.error("Insufficient Bitcoin balance");
       return;
     }
 
     try {
       if (lending.needsMBTCApproval(collateralAmount)) {
-        toast.info("Approving mBTC for lending pool...");
+        toast.info("Approving Bitcoin for lending pool...");
         await lending.approveMBTC(collateralAmount);
         return;
       }
 
       toast.info("Depositing collateral...");
       await lending.depositCollateral(collateralAmount);
-      setLastAction('deposit'); // Set action to track for success message
+      setLastAction("deposit");
     } catch (error) {
       toast.error("Transaction failed");
       console.error(error);
@@ -172,14 +183,14 @@ export default function LendingPage() {
 
     try {
       if (lending.needsMUSDTApproval(borrowAmount)) {
-        toast.info("Approving mUSDT for lending pool...");
+        toast.info("Approving USDT for lending pool...");
         await lending.approveMUSDT(borrowAmount);
         return;
       }
 
       toast.info("Borrowing USDT...");
       await lending.borrowUSDT(borrowAmount);
-      setLastAction('borrow'); // Set action to track for success message
+      setLastAction("borrow");
     } catch (error) {
       toast.error("Transaction failed");
       console.error(error);
@@ -201,7 +212,7 @@ export default function LendingPage() {
     try {
       toast.info("Withdrawing collateral...");
       await lending.withdrawCollateral(withdrawAmount);
-      setLastAction('withdraw'); // Set action to track for success message
+      setLastAction("withdraw");
     } catch (error) {
       toast.error("Transaction failed");
       console.error(error);
@@ -216,20 +227,20 @@ export default function LendingPage() {
     }
 
     if (parseFloat(repayAmount) > parseFloat(lending.mUSDTBalance)) {
-      toast.error("Insufficient mUSDT balance");
+      toast.error("Insufficient USDT balance");
       return;
     }
 
     try {
       if (lending.needsMUSDTApproval(repayAmount)) {
-        toast.info("Approving mUSDT for lending pool...");
+        toast.info("Approving USDT for lending pool...");
         await lending.approveMUSDT(repayAmount);
         return;
       }
 
       toast.info("Repaying loan...");
       await lending.repayUSDT(repayAmount);
-      setLastAction('repay'); // Set action to track for success message
+      setLastAction("repay");
     } catch (error) {
       toast.error("Transaction failed");
       console.error(error);
@@ -246,13 +257,13 @@ export default function LendingPage() {
     }
 
     if (parseFloat(fundPoolAmount) > parseFloat(lending.mUSDTBalance)) {
-      toast.error("Insufficient mUSDT balance");
+      toast.error("Insufficient USDT balance");
       return;
     }
 
     try {
       if (lending.needsMUSDTApproval(fundPoolAmount)) {
-        toast.info("Approving mUSDT for lending pool...");
+        toast.info("Approving USDT for lending pool...");
         await lending.approveMUSDT(fundPoolAmount);
         return;
       }
@@ -275,7 +286,7 @@ export default function LendingPage() {
 
     try {
       await lending.mintMUSDT(mintAddress, mintAmount);
-      toast.success("mUSDT minted successfully!");
+      toast.success("USDT minted successfully!");
       setMintAmount("");
       setMintAddress("");
     } catch (error) {
@@ -284,10 +295,9 @@ export default function LendingPage() {
     }
   };
 
-  // Show connect wallet prompt if not connected
   if (!isConnected) {
     return (
-      <PageWrapper 
+      <PageWrapper
         title="Lending & Borrowing"
         subtitle="Connect your wallet to start lending and borrowing assets."
         className="bg-gradient-to-br from-orange-50 to-orange-100"
@@ -295,21 +305,25 @@ export default function LendingPage() {
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="font-sans">Connect Wallet Required</CardTitle>
+              <CardTitle className="font-sans">
+                Connect Wallet Required
+              </CardTitle>
               <CardDescription className="font-sans">
-                Please connect your wallet to access lending and borrowing functionality.
+                Please connect your wallet to access lending and borrowing
+                functionality.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <ConnectWallet 
-                variant="default" 
-                size="lg" 
-                className="w-full max-w-sm mx-auto" 
+              <ConnectWallet
+                variant="default"
+                size="lg"
+                className="w-full max-w-sm mx-auto"
               />
               <Alert className="mt-4">
                 <Shield className="h-4 w-4" />
                 <AlertDescription className="font-sans">
-                  You need to connect your wallet first to lend or borrow assets.
+                  You need to connect your wallet first to lend or borrow
+                  assets.
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -319,10 +333,10 @@ export default function LendingPage() {
     );
   }
 
-  // Show authentication prompt if connected but not authenticated
+
   if (!isAuthenticated) {
     return (
-      <PageWrapper 
+      <PageWrapper
         title="Lending & Borrowing"
         subtitle="Sign in with your wallet to start lending and borrowing."
         className="bg-gradient-to-br from-orange-50 to-orange-100"
@@ -330,9 +344,12 @@ export default function LendingPage() {
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="font-sans">Authentication Required</CardTitle>
+              <CardTitle className="font-sans">
+                Authentication Required
+              </CardTitle>
               <CardDescription className="font-sans">
-                Please sign in with your wallet to access lending and borrowing functionality.
+                Please sign in with your wallet to access lending and borrowing
+                functionality.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -344,19 +361,20 @@ export default function LendingPage() {
                   </AlertDescription>
                 </Alert>
               )}
-              
-              <Button 
+
+              <Button
                 onClick={signIn}
                 disabled={isAuthenticating}
                 className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
               >
                 {isAuthenticating ? "Signing in..." : "Sign in with Wallet"}
               </Button>
-              
+
               <Alert>
                 <Shield className="h-4 w-4" />
                 <AlertDescription className="font-sans">
-                  You'll be asked to sign a message with your wallet to authenticate.
+                  You'll be asked to sign a message with your wallet to
+                  authenticate.
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -367,25 +385,35 @@ export default function LendingPage() {
   }
 
   return (
-    <PageWrapper 
+    <PageWrapper
       title="Lending & Borrowing"
-      subtitle="Use mBTC as collateral to borrow mUSDT"
+      subtitle="Use Bitcoin as collateral to borrow USDT"
       className="bg-gradient-to-br from-orange-50 to-orange-100"
     >
       <div className="max-w-6xl mx-auto">
-
-        {/* Asset Balances */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
-                <Image src="/image/btcLogo.png" alt="Bitcoin" width={20} height={20} className="object-contain" />
-                <CardTitle className="text-sm font-sans">mBTC Balance</CardTitle>
+                <Image
+                  src="/image/btcLogo.png"
+                  alt="Bitcoin"
+                  width={20}
+                  height={20}
+                  className="object-contain"
+                />
+                <CardTitle className="text-sm font-sans">
+                  Bitcoin Balance
+                </CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono">{parseFloat(lending.mBTCBalance).toFixed(8)}</div>
-              <p className="text-xs text-muted-foreground font-sans">Available to deposit</p>
+              <div className="text-2xl font-bold font-mono">
+                {parseFloat(lending.mBTCBalance).toFixed(8)}
+              </div>
+              <p className="text-xs text-muted-foreground font-sans">
+                Available to deposit
+              </p>
             </CardContent>
           </Card>
 
@@ -393,12 +421,18 @@ export default function LendingPage() {
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
                 <Coins className="h-5 w-5 text-green-600" />
-                <CardTitle className="text-sm font-sans">mUSDT Balance</CardTitle>
+                <CardTitle className="text-sm font-sans">
+                  USDT Balance
+                </CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono">{parseFloat(lending.mUSDTBalance).toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground font-sans">Available to repay</p>
+              <div className="text-2xl font-bold font-mono">
+                {parseFloat(lending.mUSDTBalance).toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground font-sans">
+                Available to repay
+              </p>
             </CardContent>
           </Card>
 
@@ -410,8 +444,12 @@ export default function LendingPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono">{parseFloat(lending.collateralBalance).toFixed(8)}</div>
-              <p className="text-xs text-muted-foreground font-sans">mBTC deposited</p>
+              <div className="text-2xl font-bold font-mono">
+                {parseFloat(lending.collateralBalance).toFixed(8)}
+              </div>
+              <p className="text-xs text-muted-foreground font-sans">
+                Bitcoin deposited
+              </p>
             </CardContent>
           </Card>
 
@@ -423,13 +461,16 @@ export default function LendingPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono">{parseFloat(lending.borrowedBalance).toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground font-sans">mUSDT borrowed</p>
+              <div className="text-2xl font-bold font-mono">
+                {parseFloat(lending.borrowedBalance).toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground font-sans">
+                USDT borrowed
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Health Factor & LTV */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Card>
             <CardHeader>
@@ -439,14 +480,21 @@ export default function LendingPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className={`text-3xl font-bold font-mono ${
-                lending.healthFactor < 1 ? 'text-red-600' : 
-                lending.healthFactor < 1.5 ? 'text-yellow-600' : 
-                'text-green-600'
-              }`}>
+              <div
+                className={`text-3xl font-bold font-mono ${
+                  lending.healthFactor < 1
+                    ? "text-red-600"
+                    : lending.healthFactor < 1.5
+                    ? "text-yellow-600"
+                    : "text-green-600"
+                }`}
+              >
                 {formatHealthFactor(lending.healthFactor)}
               </div>
-              <Progress value={Math.min(lending.healthFactor * 50, 100)} className="mt-2" />
+              <Progress
+                value={Math.min(lending.healthFactor * 50, 100)}
+                className="mt-2"
+              />
             </CardContent>
           </Card>
 
@@ -454,11 +502,20 @@ export default function LendingPage() {
             <CardHeader>
               <CardTitle className="font-sans">Loan-to-Value Ratio</CardTitle>
               <CardDescription className="font-sans">
-                Current: {ltvRatio.toFixed(1)}% | Max: {lending.loanToValueRatio}%
+                Current: {ltvRatio.toFixed(1)}% | Max:{" "}
+                {lending.loanToValueRatio}%
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className={`text-3xl font-bold font-mono ${ltvRatio > 80 ? 'text-red-600' : ltvRatio > 60 ? 'text-yellow-600' : 'text-green-600'}`}>
+              <div
+                className={`text-3xl font-bold font-mono ${
+                  ltvRatio > 80
+                    ? "text-red-600"
+                    : ltvRatio > 60
+                    ? "text-yellow-600"
+                    : "text-green-600"
+                }`}
+              >
                 {ltvRatio.toFixed(1)}%
               </div>
               <Progress value={ltvRatio} className="mt-2" />
@@ -466,37 +523,57 @@ export default function LendingPage() {
           </Card>
         </div>
 
-        {/* Main Interface */}
         <Card>
           <CardHeader>
             <CardTitle className="font-sans">Lending Operations</CardTitle>
             <CardDescription className="font-sans">
-              Deposit mBTC collateral, borrow mUSDT, or manage your positions
+              Deposit Bitcoin as collateral, borrow USDT, or manage your positions
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
               <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="deposit" className="font-sans">Deposit</TabsTrigger>
-                <TabsTrigger value="borrow" className="font-sans">Borrow</TabsTrigger>
-                <TabsTrigger value="withdraw" className="font-sans">Withdraw</TabsTrigger>
-                <TabsTrigger value="repay" className="font-sans">Repay</TabsTrigger>
+                <TabsTrigger value="deposit" className="font-sans">
+                  Deposit
+                </TabsTrigger>
+                <TabsTrigger value="borrow" className="font-sans">
+                  Borrow
+                </TabsTrigger>
+                <TabsTrigger value="withdraw" className="font-sans">
+                  Withdraw
+                </TabsTrigger>
+                <TabsTrigger value="repay" className="font-sans">
+                  Repay
+                </TabsTrigger>
                 {/* <TabsTrigger value="fund" className="font-sans">Fund Pool</TabsTrigger> */}
                 {/* <TabsTrigger value="mint" className="font-sans">Mint USDT</TabsTrigger> */}
-                <TabsTrigger value="history" className="font-sans">History</TabsTrigger>
+                <TabsTrigger value="history" className="font-sans">
+                  History
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="deposit" className="space-y-6">
                 <div className="text-center py-4">
-                  <h3 className="text-lg font-semibold font-sans mb-2">Deposit mBTC Collateral</h3>
+                  <h3 className="text-lg font-semibold font-sans mb-2">
+                    Deposit Bitcoin Collateral
+                  </h3>
                   <p className="text-muted-foreground font-sans text-sm">
-                    Deposit mBTC to use as collateral for borrowing
+                    Deposit Bitcoin to use as collateral for borrowing
                   </p>
                 </div>
 
                 <form onSubmit={handleDepositCollateral} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="collateral-amount" className="font-sans font-medium">mBTC Amount</Label>
+                    <Label
+                      htmlFor="collateral-amount"
+                      className="font-sans font-medium"
+                    >
+                      Bitcoin Amount
+                    </Label>
                     <div className="relative">
                       <Input
                         id="collateral-amount"
@@ -518,35 +595,49 @@ export default function LendingPage() {
                       </Button>
                     </div>
                     <div className="text-sm text-muted-foreground font-sans">
-                      Available: {parseFloat(lending.mBTCBalance).toFixed(8)} mBTC
+                      Available: {parseFloat(lending.mBTCBalance).toFixed(8)}{" "}
+                      Bitcoin
                     </div>
                   </div>
 
                   <Button
                     type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-700 font-sans font-semibold"
-                    disabled={lending.isPending || lending.isConfirming || !collateralAmount}
+                    disabled={
+                      lending.isPending ||
+                      lending.isConfirming ||
+                      !collateralAmount
+                    }
                   >
-                    {lending.isPending || lending.isConfirming ? (
-                      lending.needsMBTCApproval(collateralAmount) ? "Approving..." : "Depositing..."
-                    ) : (
-                      lending.needsMBTCApproval(collateralAmount) ? "Approve mBTC" : "Deposit Collateral"
-                    )}
+                    {lending.isPending || lending.isConfirming
+                      ? lending.needsMBTCApproval(collateralAmount)
+                        ? "Approving..."
+                        : "Depositing..."
+                      : lending.needsMBTCApproval(collateralAmount)
+                      ? "Approve Bitcoin"
+                      : "Deposit Collateral"}
                   </Button>
                 </form>
               </TabsContent>
 
               <TabsContent value="borrow" className="space-y-6">
                 <div className="text-center py-4">
-                  <h3 className="text-lg font-semibold font-sans mb-2">Borrow mUSDT</h3>
+                  <h3 className="text-lg font-semibold font-sans mb-2">
+                    Borrow USDT
+                  </h3>
                   <p className="text-muted-foreground font-sans text-sm">
-                    Borrow mUSDT against your collateral
+                    Borrow USDT against your collateral
                   </p>
                 </div>
 
                 <form onSubmit={handleBorrow} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="borrow-amount" className="font-sans font-medium">mUSDT Amount</Label>
+                    <Label
+                      htmlFor="borrow-amount"
+                      className="font-sans font-medium"
+                    >
+                      USDT Amount
+                    </Label>
                     <div className="relative">
                       <Input
                         id="borrow-amount"
@@ -568,31 +659,46 @@ export default function LendingPage() {
                       </Button>
                     </div>
                     <div className="text-sm text-muted-foreground font-sans">
-                      Max borrowable: {parseFloat(lending.maxBorrowAmount).toFixed(2)} mUSDT
+                      Max borrowable:{" "}
+                      {parseFloat(lending.maxBorrowAmount).toFixed(2)} USDT
                     </div>
                   </div>
 
                   <Button
                     type="submit"
                     className="w-full bg-yellow-600 hover:bg-yellow-700 font-sans font-semibold"
-                    disabled={lending.isPending || lending.isConfirming || !borrowAmount || parseFloat(lending.collateralBalance) === 0}
+                    disabled={
+                      lending.isPending ||
+                      lending.isConfirming ||
+                      !borrowAmount ||
+                      parseFloat(lending.collateralBalance) === 0
+                    }
                   >
-                    {lending.isPending || lending.isConfirming ? "Borrowing..." : "Borrow USDT"}
+                    {lending.isPending || lending.isConfirming
+                      ? "Borrowing..."
+                      : "Borrow USDT"}
                   </Button>
                 </form>
               </TabsContent>
 
               <TabsContent value="withdraw" className="space-y-6">
                 <div className="text-center py-4">
-                  <h3 className="text-lg font-semibold font-sans mb-2">Withdraw Collateral</h3>
+                  <h3 className="text-lg font-semibold font-sans mb-2">
+                    Withdraw Collateral
+                  </h3>
                   <p className="text-muted-foreground font-sans text-sm">
-                    Withdraw your mBTC collateral
+                    Withdraw your Bitcoin collateral
                   </p>
                 </div>
 
                 <form onSubmit={handleWithdraw} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="withdraw-amount" className="font-sans font-medium">mBTC Amount</Label>
+                    <Label
+                      htmlFor="withdraw-amount"
+                      className="font-sans font-medium"
+                    >
+                      Bitcoin Amount
+                    </Label>
                     <div className="relative">
                       <Input
                         id="withdraw-amount"
@@ -608,37 +714,54 @@ export default function LendingPage() {
                         variant="ghost"
                         size="sm"
                         className="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary font-sans"
-                        onClick={() => setWithdrawAmount(lending.collateralBalance)}
+                        onClick={() =>
+                          setWithdrawAmount(lending.collateralBalance)
+                        }
                       >
                         Max
                       </Button>
                     </div>
                     <div className="text-sm text-muted-foreground font-sans">
-                      Deposited: {parseFloat(lending.collateralBalance).toFixed(8)} mBTC
+                      Deposited:{" "}
+                      {parseFloat(lending.collateralBalance).toFixed(8)} Bitcoin
                     </div>
                   </div>
 
                   <Button
                     type="submit"
                     className="w-full bg-purple-600 hover:bg-purple-700 font-sans font-semibold"
-                    disabled={lending.isPending || lending.isConfirming || !withdrawAmount || parseFloat(lending.collateralBalance) === 0}
+                    disabled={
+                      lending.isPending ||
+                      lending.isConfirming ||
+                      !withdrawAmount ||
+                      parseFloat(lending.collateralBalance) === 0
+                    }
                   >
-                    {lending.isPending || lending.isConfirming ? "Withdrawing..." : "Withdraw Collateral"}
+                    {lending.isPending || lending.isConfirming
+                      ? "Withdrawing..."
+                      : "Withdraw Collateral"}
                   </Button>
                 </form>
               </TabsContent>
 
               <TabsContent value="repay" className="space-y-6">
                 <div className="text-center py-4">
-                  <h3 className="text-lg font-semibold font-sans mb-2">Repay Loan</h3>
+                  <h3 className="text-lg font-semibold font-sans mb-2">
+                    Repay Loan
+                  </h3>
                   <p className="text-muted-foreground font-sans text-sm">
-                    Repay your mUSDT loan to reduce debt
+                    Repay your USDT loan to reduce debt
                   </p>
                 </div>
 
                 <form onSubmit={handleRepay} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="repay-amount" className="font-sans font-medium">mUSDT Amount</Label>
+                    <Label
+                      htmlFor="repay-amount"
+                      className="font-sans font-medium"
+                    >
+                      USDT Amount
+                    </Label>
                     <div className="relative">
                       <Input
                         id="repay-amount"
@@ -660,35 +783,50 @@ export default function LendingPage() {
                       </Button>
                     </div>
                     <div className="text-sm text-muted-foreground font-sans">
-                      Borrowed: {parseFloat(lending.borrowedBalance).toFixed(2)} mUSDT
+                      Borrowed: {parseFloat(lending.borrowedBalance).toFixed(2)}{" "}
+                      USDT
                     </div>
                   </div>
 
                   <Button
                     type="submit"
                     className="w-full bg-green-600 hover:bg-green-700 font-sans font-semibold"
-                    disabled={lending.isPending || lending.isConfirming || !repayAmount || parseFloat(lending.borrowedBalance) === 0}
+                    disabled={
+                      lending.isPending ||
+                      lending.isConfirming ||
+                      !repayAmount ||
+                      parseFloat(lending.borrowedBalance) === 0
+                    }
                   >
-                    {lending.isPending || lending.isConfirming ? (
-                      lending.needsMUSDTApproval(repayAmount) ? "Approving..." : "Repaying..."
-                    ) : (
-                      lending.needsMUSDTApproval(repayAmount) ? "Approve mUSDT" : "Repay Loan"
-                    )}
+                    {lending.isPending || lending.isConfirming
+                      ? lending.needsMUSDTApproval(repayAmount)
+                        ? "Approving..."
+                        : "Repaying..."
+                      : lending.needsMUSDTApproval(repayAmount)
+                      ? "Approve USDT"
+                      : "Repay Loan"}
                   </Button>
                 </form>
               </TabsContent>
 
               <TabsContent value="fund" className="space-y-6">
                 <div className="text-center py-4">
-                  <h3 className="text-lg font-semibold font-sans mb-2">Fund Pool</h3>
+                  <h3 className="text-lg font-semibold font-sans mb-2">
+                    Fund Pool
+                  </h3>
                   <p className="text-muted-foreground font-sans text-sm">
-                    Add mUSDT liquidity to the lending pool
+                    Add USDT liquidity to the lending pool
                   </p>
                 </div>
 
                 <form onSubmit={handleFundPool} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fund-amount" className="font-sans font-medium">mUSDT Amount</Label>
+                    <Label
+                      htmlFor="fund-amount"
+                      className="font-sans font-medium"
+                    >
+                      USDT Amount
+                    </Label>
                     <div className="relative">
                       <Input
                         id="fund-amount"
@@ -710,35 +848,49 @@ export default function LendingPage() {
                       </Button>
                     </div>
                     <div className="text-sm text-muted-foreground font-sans">
-                      Available: {parseFloat(lending.mUSDTBalance).toFixed(2)} mUSDT
+                      Available: {parseFloat(lending.mUSDTBalance).toFixed(2)}{" "}
+                      USDT
                     </div>
                   </div>
 
                   <Button
                     type="submit"
                     className="w-full bg-indigo-600 hover:bg-indigo-700 font-sans font-semibold"
-                    disabled={lending.isPending || lending.isConfirming || !fundPoolAmount}
+                    disabled={
+                      lending.isPending ||
+                      lending.isConfirming ||
+                      !fundPoolAmount
+                    }
                   >
-                    {lending.isPending || lending.isConfirming ? (
-                      lending.needsMUSDTApproval(fundPoolAmount) ? "Approving..." : "Funding Pool..."
-                    ) : (
-                      lending.needsMUSDTApproval(fundPoolAmount) ? "Approve mUSDT" : "Fund Pool"
-                    )}
+                    {lending.isPending || lending.isConfirming
+                      ? lending.needsMUSDTApproval(fundPoolAmount)
+                        ? "Approving..."
+                        : "Funding Pool..."
+                      : lending.needsMUSDTApproval(fundPoolAmount)
+                      ? "Approve USDT"
+                      : "Fund Pool"}
                   </Button>
                 </form>
               </TabsContent>
 
               <TabsContent value="mint" className="space-y-6">
                 <div className="text-center py-4">
-                  <h3 className="text-lg font-semibold font-sans mb-2">Mint mUSDT</h3>
+                  <h3 className="text-lg font-semibold font-sans mb-2">
+                    Mint USDT
+                  </h3>
                   <p className="text-muted-foreground font-sans text-sm">
-                    Mint new mUSDT tokens to an address
+                    Mint new USDT tokens to an address
                   </p>
                 </div>
 
                 <form onSubmit={handleMintMUSDT} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="mint-address" className="font-sans font-medium">Recipient Address</Label>
+                    <Label
+                      htmlFor="mint-address"
+                      className="font-sans font-medium"
+                    >
+                      Recipient Address
+                    </Label>
                     <Input
                       id="mint-address"
                       type="text"
@@ -748,12 +900,17 @@ export default function LendingPage() {
                       className="font-mono"
                     />
                     <div className="text-sm text-muted-foreground font-sans">
-                      Enter the address to mint mUSDT to
+                      Enter the address to mint USDT to
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="mint-amount" className="font-sans font-medium">mUSDT Amount</Label>
+                    <Label
+                      htmlFor="mint-amount"
+                      className="font-sans font-medium"
+                    >
+                      USDT Amount
+                    </Label>
                     <Input
                       id="mint-amount"
                       type="number"
@@ -764,23 +921,32 @@ export default function LendingPage() {
                       step="0.01"
                     />
                     <div className="text-sm text-muted-foreground font-sans">
-                      Amount of mUSDT to mint
+                      Amount of USDT to mint
                     </div>
                   </div>
 
                   <Button
                     type="submit"
                     className="w-full bg-teal-600 hover:bg-teal-700 font-sans font-semibold"
-                    disabled={lending.isPending || lending.isConfirming || !mintAmount || !mintAddress}
+                    disabled={
+                      lending.isPending ||
+                      lending.isConfirming ||
+                      !mintAmount ||
+                      !mintAddress
+                    }
                   >
-                    {lending.isPending || lending.isConfirming ? "Minting..." : "Mint mUSDT"}
+                    {lending.isPending || lending.isConfirming
+                      ? "Minting..."
+                      : "Mint USDT"}
                   </Button>
                 </form>
               </TabsContent>
 
               <TabsContent value="history" className="space-y-6">
                 <div className="text-center py-4">
-                  <h3 className="text-lg font-semibold font-sans mb-2">Transaction History</h3>
+                  <h3 className="text-lg font-semibold font-sans mb-2">
+                    Transaction History
+                  </h3>
                   <p className="text-muted-foreground font-sans text-sm">
                     View your lending and borrowing transaction history
                   </p>
@@ -791,25 +957,30 @@ export default function LendingPage() {
                     <div className="text-center py-8">
                       <div className="inline-flex items-center gap-2">
                         <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        <span className="font-sans">Loading transaction history...</span>
+                        <span className="font-sans">
+                          Loading transaction history...
+                        </span>
                       </div>
                     </div>
-                  ) : (depositHistory.length > 0 || loanHistory.length > 0) ? (
+                  ) : depositHistory.length > 0 || loanHistory.length > 0 ? (
                     <div className="space-y-3">
-                      {/* Deposit History */}
                       {depositHistory.map((deposit, index) => (
                         <Card key={`deposit-${index}`}>
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start">
                               <div className="space-y-1">
                                 <div className="font-semibold font-mono text-lg">
-                                  {parseFloat(deposit.btcAmount || deposit.amount).toFixed(8)} mBTC
+                                  {parseFloat(
+                                    deposit.btcAmount || deposit.amount
+                                  ).toFixed(8)}{" "}
+                                  Bitcoin
                                 </div>
                                 <div className="text-sm text-muted-foreground font-sans">
                                   Block: {deposit.blockNumber}
                                 </div>
                                 <div className="text-xs text-muted-foreground font-mono">
-                                  {deposit.transactionHash.slice(0, 10)}...{deposit.transactionHash.slice(-8)}
+                                  {deposit.transactionHash.slice(0, 10)}...
+                                  {deposit.transactionHash.slice(-8)}
                                 </div>
                               </div>
                               <div className="text-right">
@@ -821,7 +992,10 @@ export default function LendingPage() {
                                   size="sm"
                                   className="mt-2"
                                   onClick={() => {
-                                    window.open(`https://scan.test2.btcs.network/tx/${deposit.transactionHash}`, '_blank');
+                                    window.open(
+                                      `https://scan.test2.btcs.network/tx/${deposit.transactionHash}`,
+                                      "_blank"
+                                    );
                                   }}
                                 >
                                   View on Explorer
@@ -831,33 +1005,36 @@ export default function LendingPage() {
                           </CardContent>
                         </Card>
                       ))}
-                      
-                      {/* Loan History */}
+
                       {loanHistory.map((loan, index) => (
                         <Card key={`loan-${index}`}>
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start">
                               <div className="space-y-1">
                                 <div className="font-semibold font-mono text-lg">
-                                  {parseFloat(loan.amount).toFixed(2)} mUSDT
+                                  {parseFloat(loan.amount).toFixed(2)} USDT
                                 </div>
                                 <div className="text-sm text-muted-foreground font-sans">
                                   Block: {loan.blockNumber}
                                 </div>
                                 <div className="text-xs text-muted-foreground font-mono">
-                                  {loan.transactionHash.slice(0, 10)}...{loan.transactionHash.slice(-8)}
+                                  {loan.transactionHash.slice(0, 10)}...
+                                  {loan.transactionHash.slice(-8)}
                                 </div>
                               </div>
                               <div className="text-right">
                                 <div className="text-sm font-sans text-yellow-600">
-                                  Loan mUSDT
+                                  Loan USDT
                                 </div>
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   className="mt-2"
                                   onClick={() => {
-                                    window.open(`https://scan.test2.btcs.network/tx/${loan.transactionHash}`, '_blank');
+                                    window.open(
+                                      `https://scan.test2.btcs.network/tx/${loan.transactionHash}`,
+                                      "_blank"
+                                    );
                                   }}
                                 >
                                   View on Explorer
@@ -884,7 +1061,6 @@ export default function LendingPage() {
           </CardContent>
         </Card>
 
-        {/* Transaction Status */}
         {lending.isPending && (
           <Alert className="mt-4">
             <AlertTriangle className="h-4 w-4" />

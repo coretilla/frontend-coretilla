@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -70,7 +69,6 @@ export default function SwapPage() {
     { code: "USD", name: "US Dollar", symbol: "$", rate: btcPrice },
   ];
 
-  // Fetch user info and BTC price from API
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -98,7 +96,6 @@ export default function SwapPage() {
 
     fetchUserInfo();
     fetchBtcPrice();
-    // Refresh price every 30 seconds
     const interval = setInterval(fetchBtcPrice, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -116,10 +113,9 @@ export default function SwapPage() {
     WBTC_USD: wbtcBalanceInUsd,
   };
 
-  const networkFee = 0.0001; // BTC
+  const networkFee = 0.0001;
   const estimatedTime = "2-5 minutes";
 
-  // Calculate BTC amount based on USD input
   useEffect(() => {
     if (formData.amount) {
       const fiatAmount = parseFloat(formData.amount);
@@ -141,8 +137,6 @@ export default function SwapPage() {
       toast.error("Insufficient balance");
       return;
     }
-
-    // Show confirmation dialog directly
     setShowConfirmation(true);
   };
 
@@ -161,7 +155,6 @@ export default function SwapPage() {
           "Swap completed successfully! Bitcoin has been added to your wallet."
         );
 
-        // Reset form
         setFormData({
           fromCurrency: "USD",
           amount: "",
@@ -179,7 +172,6 @@ export default function SwapPage() {
 
   const selectedCurrency = currencies[0];
 
-  // Show connect wallet prompt if not connected
   if (!isConnected) {
     return (
       <PageWrapper
@@ -216,7 +208,6 @@ export default function SwapPage() {
     );
   }
 
-  // Show authentication prompt if connected but not authenticated
   if (!isAuthenticated) {
     return (
       <PageWrapper
@@ -273,7 +264,6 @@ export default function SwapPage() {
       className="bg-gradient-to-br from-orange-50 to-orange-100"
     >
       <div className="max-w-2xl mx-auto">
-        {/* Current Balances */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="font-sans">Available Balances</CardTitle>
@@ -295,7 +285,7 @@ export default function SwapPage() {
                 <div className="text-2xl font-bold text-primary font-mono">
                   {currentBalances.CORE.toLocaleString()}
                 </div>
-                   <div className="text-sm text-muted-foreground font-sans flex items-center justify-center gap-1 mt-3">
+                <div className="text-sm text-muted-foreground font-sans flex items-center justify-center gap-1 mt-3">
                   <Image
                     src="/image/coreDaoLogo.png"
                     alt="Bitcoin"
@@ -331,7 +321,6 @@ export default function SwapPage() {
           </CardContent>
         </Card>
 
-        {/* Swap Form */}
         <Card>
           <CardHeader>
             <CardTitle className="font-sans">Swap Details</CardTitle>
@@ -341,7 +330,6 @@ export default function SwapPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* From Currency */}
               <div className="space-y-2">
                 <Label htmlFor="fromCurrency" className="font-sans font-medium">
                   From
@@ -369,7 +357,6 @@ export default function SwapPage() {
                 </Select>
               </div>
 
-              {/* Amount Input */}
               <div className="space-y-2">
                 <Label htmlFor="amount" className="font-sans font-medium">
                   Amount
@@ -401,14 +388,12 @@ export default function SwapPage() {
                 )}
               </div>
 
-              {/* Swap Arrow */}
               <div className="flex justify-center">
                 <div className="p-2 bg-muted rounded-full">
                   <ArrowRightLeft className="h-5 w-5 text-primary" />
                 </div>
               </div>
 
-              {/* To Bitcoin */}
               <div className="space-y-2">
                 <Label className="font-sans font-medium">Bitcoin Amount</Label>
                 <div className="relative">
@@ -433,7 +418,6 @@ export default function SwapPage() {
                 </div>
               </div>
 
-              {/* Exchange Rate */}
               {selectedCurrency && (
                 <div className="p-4 bg-muted rounded-lg">
                   <div className="flex justify-between items-center mb-2">
@@ -452,7 +436,6 @@ export default function SwapPage() {
                 </div>
               )}
 
-              {/* Network Info */}
               <Alert>
                 <Network className="h-4 w-4" />
                 <AlertDescription className="font-sans">
@@ -470,7 +453,6 @@ export default function SwapPage() {
                 </AlertDescription>
               </Alert>
 
-              {/* Submit Button */}
               <Button
                 type="submit"
                 className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
@@ -484,7 +466,6 @@ export default function SwapPage() {
           </CardContent>
         </Card>
 
-        {/* Confirmation Modal */}
         <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>

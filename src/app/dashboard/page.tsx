@@ -1,13 +1,31 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import BalanceCard from "@/components/balance-card";
 import PageWrapper from "@/components/layout/PageWrapper";
-import { DollarSign, TrendingUp, Zap, BarChart3, Calendar, RefreshCw, Bitcoin } from "lucide-react";
+import {
+  DollarSign,
+  TrendingUp,
+  Zap,
+  BarChart3,
+  Calendar,
+  RefreshCw,
+  Bitcoin,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getUserData, parseUserBalance, UserBalance, getBtcPrice, BtcPriceResponse } from "@/lib/api";
+import {
+  getUserData,
+  parseUserBalance,
+  UserBalance,
+  getBtcPrice,
+  BtcPriceResponse,
+} from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useWallet } from "@/hooks/useWallet";
 import { ConnectWallet } from "@/components/wallet/ConnectWallet";
@@ -16,7 +34,7 @@ import { Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { 
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -91,7 +109,9 @@ function AssetCard({
                   </Tooltip>
                 </TooltipProvider>
               ) : (
-                <span className="text-xs text-muted-foreground font-mono">&nbsp;</span>
+                <span className="text-xs text-muted-foreground font-mono">
+                  &nbsp;
+                </span>
               )}
             </div>
           )}
@@ -102,38 +122,42 @@ function AssetCard({
 }
 
 export default function DashboardPage() {
-  const { isAuthenticated, signIn, isAuthenticating, error: authError } = useAuth();
+  const {
+    isAuthenticated,
+    signIn,
+    isAuthenticating,
+    error: authError,
+  } = useAuth();
   const { isConnected } = useWallet();
   const [selectedPeriod, setSelectedPeriod] = useState("7D");
   const [balanceData, setBalanceData] = useState<UserBalance>({ USD: 0 });
   const [apiData, setApiData] = useState<any>(null);
-  const [btcPriceData, setBtcPriceData] = useState<BtcPriceResponse | null>(null);
+  const [btcPriceData, setBtcPriceData] = useState<BtcPriceResponse | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch user data from API
   const fetchUserData = async () => {
     if (!isAuthenticated) return;
-    
     setIsLoading(true);
     try {
-      // Fetch user data and BTC price in parallel
       const [userData, btcPrice] = await Promise.all([
         getUserData(),
-        getBtcPrice()
+        getBtcPrice(),
       ]);
-      
+
       const balances = parseUserBalance(userData);
       setBalanceData(balances);
       setApiData(userData);
       setBtcPriceData(btcPrice);
-      
-      console.log('✅ Dashboard data loaded:', { 
-        userData, 
+
+      console.log("✅ Dashboard data loaded:", {
+        userData,
         btcPriceResponse: btcPrice,
-        btcPriceValue: btcPrice.data?.price 
+        btcPriceValue: btcPrice.data?.price,
       });
     } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
+      console.error("Failed to fetch dashboard data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -143,7 +167,6 @@ export default function DashboardPage() {
     fetchUserData();
   }, [isAuthenticated]);
 
-  // Calculate derived values
   const wbtcBalance = apiData?.wbtcBalance || 0;
   const coreBalance = apiData?.coreBalance || 0;
   const wbtcBalanceInUsd = apiData?.wbtcBalanceInUsd || 0;
@@ -152,31 +175,29 @@ export default function DashboardPage() {
   const corePrice = coreBalance > 0 ? coreBalanceInUsd / coreBalance : 1.2; // fallback price
   const btcPrice = btcPriceData?.data?.price || 0; // Get BTC price from API
 
-  // Balance data structure
   const balances = {
     fiat: {
-      USD: { 
-        amount: balanceData.USD?.toFixed(2) || "0.00", 
-        change: { value: 0, percentage: 0, period: "7D" } 
+      USD: {
+        amount: balanceData.USD?.toFixed(2) || "0.00",
+        change: { value: 0, percentage: 0, period: "7D" },
       },
     },
     crypto: {
-      BTC: { 
-        amount: wbtcBalance.toFixed(8), 
+      BTC: {
+        amount: wbtcBalance.toFixed(8),
         change: { value: 0, percentage: 0, period: "7D" },
         price: btcPrice,
-        usdValue: wbtcBalanceInUsd
+        usdValue: wbtcBalanceInUsd,
       },
-      CORE: { 
-        amount: coreBalance.toFixed(2), 
+      CORE: {
+        amount: coreBalance.toFixed(2),
         change: { value: 0, percentage: 0, period: "7D" },
         price: corePrice,
-        usdValue: coreBalanceInUsd
+        usdValue: coreBalanceInUsd,
       },
-    }
+    },
   };
 
-  // Mock chart data
   const chartData = {
     "7D": [
       { day: "Mon", value: 0 },
@@ -193,7 +214,7 @@ export default function DashboardPage() {
       { day: "Week 3", value: 0 },
       { day: "Week 4", value: 0 },
     ],
-    "All": [
+    All: [
       { day: "Jan", value: 0 },
       { day: "Feb", value: 0 },
       { day: "Mar", value: 0 },
@@ -204,13 +225,12 @@ export default function DashboardPage() {
     ],
   };
 
-  const totalPortfolioValue = totalAssetInUsd; // USD from API
+  const totalPortfolioValue = totalAssetInUsd;
   const totalChange = { value: 0, percentage: 0 };
 
-  // Show connect wallet prompt if not connected
   if (!isConnected) {
     return (
-      <PageWrapper 
+      <PageWrapper
         title="Portfolio Dashboard"
         subtitle="Connect your wallet to view your portfolio analytics."
         className="bg-gradient-to-br from-orange-50 to-orange-100"
@@ -218,16 +238,18 @@ export default function DashboardPage() {
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="font-sans">Connect Wallet Required</CardTitle>
+              <CardTitle className="font-sans">
+                Connect Wallet Required
+              </CardTitle>
               <CardDescription className="font-sans">
                 Please connect your wallet to access your portfolio dashboard.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <ConnectWallet 
-                variant="default" 
-                size="lg" 
-                className="w-full max-w-sm mx-auto" 
+              <ConnectWallet
+                variant="default"
+                size="lg"
+                className="w-full max-w-sm mx-auto"
               />
               <Alert className="mt-4">
                 <Info className="h-4 w-4" />
@@ -242,10 +264,9 @@ export default function DashboardPage() {
     );
   }
 
-  // Show loading or auth required state
   if (!isAuthenticated) {
     return (
-      <PageWrapper 
+      <PageWrapper
         title="Portfolio Dashboard"
         subtitle="Please sign in to view your portfolio"
         className="bg-gradient-to-br from-orange-50 to-orange-100"
@@ -253,9 +274,12 @@ export default function DashboardPage() {
         <div className="max-w-6xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle className="font-sans">Authentication Required</CardTitle>
+              <CardTitle className="font-sans">
+                Authentication Required
+              </CardTitle>
               <CardDescription className="font-sans">
-                Please sign in with your wallet to view your portfolio dashboard.
+                Please sign in with your wallet to view your portfolio
+                dashboard.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -267,19 +291,20 @@ export default function DashboardPage() {
                   </AlertDescription>
                 </Alert>
               )}
-              
-              <Button 
+
+              <Button
                 onClick={signIn}
                 disabled={isAuthenticating}
                 className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
               >
                 {isAuthenticating ? "Signing in..." : "Sign in with Wallet"}
               </Button>
-              
+
               <Alert>
                 <Info className="h-4 w-4" />
                 <AlertDescription className="font-sans">
-                  You'll be asked to sign a message with your wallet to authenticate.
+                  You'll be asked to sign a message with your wallet to
+                  authenticate.
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -290,14 +315,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <PageWrapper 
+    <PageWrapper
       title="Portfolio Dashboard"
       subtitle="Track your fiat and crypto balances with detailed analytics"
       className="bg-gradient-to-br from-orange-50 to-orange-100"
     >
       <div className="max-w-6xl mx-auto">
-
-        {/* Total Portfolio Value */}
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -312,7 +335,9 @@ export default function DashboardPage() {
                 size="sm"
                 className="font-sans"
               >
-                <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`h-4 w-4 mr-1 ${isLoading ? "animate-spin" : ""}`}
+                />
                 Refresh
               </Button>
             </div>
@@ -332,7 +357,9 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center gap-2 text-sm font-sans text-muted-foreground">
                   <TrendingUp className="h-4 w-4" />
-                  <span className="font-mono">${totalChange.value.toFixed(2)}</span>
+                  <span className="font-mono">
+                    ${totalChange.value.toFixed(2)}
+                  </span>
                   <span>({totalChange.percentage}%)</span>
                   <span className="text-muted-foreground">7D</span>
                 </div>
@@ -341,7 +368,9 @@ export default function DashboardPage() {
                 {["7D", "1M", "All"].map((period) => (
                   <Badge
                     key={period}
-                    variant={selectedPeriod === period ? "default" : "secondary"}
+                    variant={
+                      selectedPeriod === period ? "default" : "secondary"
+                    }
                     className="cursor-pointer font-sans"
                     onClick={() => setSelectedPeriod(period)}
                   >
@@ -351,24 +380,25 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Mock Chart */}
             <div className="h-48 bg-muted rounded-lg flex items-end justify-center gap-2 p-4">
-              {chartData[selectedPeriod as keyof typeof chartData].map((item, index) => (
-                <div key={index} className="flex flex-col items-center gap-2">
-                  <div
-                    className="bg-primary rounded-t-sm w-8 transition-all duration-300"
-                    style={{ height: `${(item.value / 10000) * 100}%` }}
-                  />
-                  <div className="text-xs text-muted-foreground font-sans">{item.day}</div>
-                </div>
-              ))}
+              {chartData[selectedPeriod as keyof typeof chartData].map(
+                (item, index) => (
+                  <div key={index} className="flex flex-col items-center gap-2">
+                    <div
+                      className="bg-primary rounded-t-sm w-8 transition-all duration-300"
+                      style={{ height: `${(item.value / 10000) * 100}%` }}
+                    />
+                    <div className="text-xs text-muted-foreground font-sans">
+                      {item.day}
+                    </div>
+                  </div>
+                )
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Combined Asset Balances */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-          {/* USD */}
           <AssetCard
             title="US Dollar Balance"
             icon={<DollarSign className="h-4 w-4" />}
@@ -377,7 +407,6 @@ export default function DashboardPage() {
             delay={0.1}
           />
 
-          {/* BTC */}
           <AssetCard
             title="Bitcoin"
             logoSrc="/image/btcLogo.png"
@@ -386,14 +415,15 @@ export default function DashboardPage() {
             usdValueText={`$${balances.crypto.BTC.usdValue.toLocaleString()}`}
             priceText={
               balances.crypto.BTC.price > 0
-                ? `$${Math.floor(balances.crypto.BTC.price).toLocaleString()}/BTC`
+                ? `$${Math.floor(
+                    balances.crypto.BTC.price
+                  ).toLocaleString()}/BTC`
                 : "Loading..."
             }
             priceTooltip="Spot price (approx.)"
             delay={0.2}
           />
 
-          {/* CORE */}
           <AssetCard
             title="Core Balance"
             logoSrc="/image/coreDaoLogo.png"
@@ -406,7 +436,6 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Quick Actions */}
         <Card className="mt-8">
           <CardHeader>
             <CardTitle className="font-sans">Quick Actions</CardTitle>
@@ -416,25 +445,51 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Link href="/deposit" className="p-4 border rounded-lg hover:border-primary transition-colors text-center">
+              <Link
+                href="/deposit"
+                className="p-4 border rounded-lg hover:border-primary transition-colors text-center"
+              >
                 <DollarSign className="h-8 w-8 text-primary mx-auto mb-2" />
                 <div className="font-medium font-sans">Deposit</div>
-                <div className="text-sm text-muted-foreground font-sans">Add funds</div>
+                <div className="text-sm text-muted-foreground font-sans">
+                  Add funds
+                </div>
               </Link>
-              <Link href="/swap" className="p-4 border rounded-lg hover:border-primary transition-colors text-center">
-                <Image src="/image/btcLogo.png" alt="Bitcoin" width={32} height={32} className="object-contain mx-auto mb-2" />
+              <Link
+                href="/swap"
+                className="p-4 border rounded-lg hover:border-primary transition-colors text-center"
+              >
+                <Image
+                  src="/image/btcLogo.png"
+                  alt="Bitcoin"
+                  width={32}
+                  height={32}
+                  className="object-contain mx-auto mb-2"
+                />
                 <div className="font-medium font-sans">Swap</div>
-                <div className="text-sm text-muted-foreground font-sans">Trade assets</div>
+                <div className="text-sm text-muted-foreground font-sans">
+                  Trade assets
+                </div>
               </Link>
-              <Link href="/stake" className="p-4 border rounded-lg hover:border-primary transition-colors text-center">
+              <Link
+                href="/stake"
+                className="p-4 border rounded-lg hover:border-primary transition-colors text-center"
+              >
                 <TrendingUp className="h-8 w-8 text-green-500 mx-auto mb-2" />
                 <div className="font-medium font-sans">Stake</div>
-                <div className="text-sm text-muted-foreground font-sans">Earn rewards</div>
+                <div className="text-sm text-muted-foreground font-sans">
+                  Earn rewards
+                </div>
               </Link>
-              <Link href="/dca" className="p-4 border rounded-lg hover:border-primary transition-colors text-center">
+              <Link
+                href="/dca"
+                className="p-4 border rounded-lg hover:border-primary transition-colors text-center"
+              >
                 <Calendar className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                 <div className="font-medium font-sans">DCA</div>
-                <div className="text-sm text-muted-foreground font-sans">DCA Simulation</div>
+                <div className="text-sm text-muted-foreground font-sans">
+                  DCA Simulation
+                </div>
               </Link>
             </div>
           </CardContent>
