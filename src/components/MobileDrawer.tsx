@@ -25,7 +25,7 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "Transactions": true,
     "Investing": true,
-    "Tools": true,
+    "Dashboard": true,
   });
 
   const handleLinkClick = (href: string) => {
@@ -56,9 +56,8 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
         <div className="flex flex-col h-full">
           {/* Header */}
           <SheetHeader className="p-6 pb-4">
-            <SheetTitle className="flex items-center gap-2 text-xl font-bold font-sans">
-              <Image src="/image/btcLogo.png" alt="Bitcoin" width={24} height={24} className="object-contain" />
-              Bitcoin Neobank
+            <SheetTitle className="flex items-center justify-center">
+              <Image src="/image/coretillaLogo.png" alt="Coretilla" width={120} height={32} className="object-contain" />
             </SheetTitle>
             <div className="mt-4">
               <BTCPrice showDropdown={false} />
@@ -79,6 +78,42 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
                 const isGroupOpen = openGroups[group.name];
                 const hasActiveItem = group.items.some(item => activeRoute === item.href);
                 
+                // If group has only one item, render as direct link instead of collapsible
+                if (group.items.length === 1) {
+                  const item = group.items[0];
+                  const isActive = activeRoute === item.href;
+                  
+                  return (
+                    <motion.div
+                      key={group.name}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 + groupIndex * 0.1 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <button
+                        onClick={() => handleLinkClick(item.href)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 w-full text-left ${
+                          isActive 
+                            ? "bg-primary text-primary-foreground" 
+                            : "hover:bg-muted text-foreground"
+                        }`}
+                      >
+                        <item.icon className={`h-5 w-5 ${
+                          isActive ? "text-primary-foreground" : "text-primary"
+                        }`} />
+                        <span className={`font-semibold font-sans ${
+                          isActive ? "text-primary-foreground" : "text-foreground"
+                        }`}>
+                          {item.name}
+                        </span>
+                      </button>
+                    </motion.div>
+                  );
+                }
+                
+                // Otherwise render as collapsible for groups with multiple items
                 return (
                   <motion.div
                     key={group.name}

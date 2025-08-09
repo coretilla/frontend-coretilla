@@ -83,6 +83,7 @@ import { getStoredAuth } from './auth';
 
 function getAuthToken(): string | null {
   const { token } = getStoredAuth();
+  localStorage.setItem('authToken', token || '');
   console.log('🔑 Getting access_token for API call:', token ? `${token.substring(0, 30)}...` : 'null');
   return token;
 }
@@ -332,6 +333,11 @@ export interface StakeHistoryResponse {
   data: StakeHistoryItem[];
 }
 
+export interface LendingHistoryResponse {
+  success: boolean;
+  data: StakeHistoryItem[];
+}
+
 export async function getStakeHistory(): Promise<StakeHistoryResponse> {
   console.log('📊 Fetching stake history with access_token Bearer auth...');
   
@@ -381,5 +387,109 @@ export async function getStakeHistory(): Promise<StakeHistoryResponse> {
 
   const result = await response.json();
   console.log('✅ Stake History API Success response:', result);
+  return result;
+}
+
+export async function getLendingHistory(): Promise<LendingHistoryResponse> {
+  console.log('📊 Fetching Lending history with access_token Bearer auth...');
+  
+  const token = getAuthToken();
+  if (!token) {
+    console.error('❌ No access_token found in localStorage');
+    throw new Error('Authentication required. Please login first.');
+  }
+  
+  const requestHeaders = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  };
+  
+  console.log('🔑 Using access_token for stake history:', token.substring(0, 40) + '...');
+  
+  console.log('📡 Stake History API Request (Access Token Bearer Auth):');
+  console.log('- URL:', `${API_BASE_URL}/finance/collateral-deposit-history`);
+  console.log('- Headers:', requestHeaders);
+  
+  const response = await fetch(`${API_BASE_URL}/finance/collateral-deposit-history`, {
+    method: 'GET',
+    headers: requestHeaders,
+  });
+
+  console.log('📡 Lending History API Response status:', response.status);
+  console.log('📡 Lending History API Response headers:', Object.fromEntries(response.headers.entries()));
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ Lending History API Error response:', errorText);
+    
+    // Handle specific backend configuration errors
+    if (response.status === 500) {
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.message === "Lending vault address not configured") {
+          throw new Error('Backend configuration error: Staking vault address not configured. Please contact support.');
+        }
+      } catch (parseError) {
+        // If JSON parsing fails, use generic error
+      }
+    }
+    
+    throw new Error(`Failed to fetch stake history (${response.status}): ${errorText}`);
+  }
+
+  const result = await response.json();
+  console.log('✅ Lending History API Success response:', result);
+  return result;
+}
+
+export async function getLoanHistory(): Promise<LendingHistoryResponse> {
+  console.log('📊 Fetching loan history with access_token Bearer auth...');
+  
+  const token = getAuthToken();
+  if (!token) {
+    console.error('❌ No access_token found in localStorage');
+    throw new Error('Authentication required. Please login first.');
+  }
+  
+  const requestHeaders = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  };
+  
+  console.log('🔑 Using access_token for loan history:', token.substring(0, 40) + '...');
+  
+  console.log('📡 Stake History API Request (Access Token Bearer Auth):');
+  console.log('- URL:', `${API_BASE_URL}/finance/loan-history`);
+  console.log('- Headers:', requestHeaders);
+  
+  const response = await fetch(`${API_BASE_URL}/finance/loan-history`, {
+    method: 'GET',
+    headers: requestHeaders,
+  });
+
+  console.log('📡 loan History API Response status:', response.status);
+  console.log('📡 loan History API Response headers:', Object.fromEntries(response.headers.entries()));
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('❌ loan History API Error response:', errorText);
+    
+    // Handle specific backend configuration errors
+    if (response.status === 500) {
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.message === "Loan vault address not configured") {
+          throw new Error('Backend configuration error: Staking vault address not configured. Please contact support.');
+        }
+      } catch (parseError) {
+        // If JSON parsing fails, use generic error
+      }
+    }
+    
+    throw new Error(`Failed to fetch loan history (${response.status}): ${errorText}`);
+  }
+
+  const result = await response.json();
+  console.log('✅ Lending History API Success response:', result);
   return result;
 }

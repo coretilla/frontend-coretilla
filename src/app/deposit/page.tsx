@@ -480,8 +480,8 @@ export default function DepositPage() {
       
       // Reset form
       setFormData({
-        currency: "USD",
         amount: "",
+        currency: "USD",
         paymentMethod: "credit_card",
       });
       

@@ -42,16 +42,13 @@ export default function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
+            <Link href="/" className="flex items-center flex-shrink-0">
               <motion.div
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.6 }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.3 }}
               >
-                <Image src="/image/btcLogo.png" alt="Bitcoin" width={32} height={32} className="object-contain" />
+                <Image src="/image/coretillaLogo.png" alt="Coretilla" width={150} height={50} className="object-contain" />
               </motion.div>
-              <span className="text-xl font-bold text-foreground font-sans">
-            Coretilla
-              </span>
             </Link>
           </motion.div>
 
@@ -65,6 +62,36 @@ export default function Navbar() {
             {navGroups.map((group, groupIndex) => {
               const hasActiveItem = group.items.some(item => activeRoute === item.href);
               
+              // If group has only one item, render as direct link instead of dropdown
+              if (group.items.length === 1) {
+                const item = group.items[0];
+                const isActive = activeRoute === item.href;
+                
+                return (
+                  <motion.div
+                    key={group.name}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.5 + groupIndex * 0.1 }}
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <Button
+                      variant="ghost"
+                      onClick={() => navigateWithLoader(item.href)}
+                      className={`flex items-center gap-2 px-3 py-2 h-auto font-sans font-medium text-sm ${
+                        isActive
+                          ? "bg-primary/10 text-primary"
+                          : "text-foreground hover:bg-primary/5 hover:text-primary"
+                      }`}
+                    >
+                      <item.icon className="h-6 w-6" />
+                      {item.name}
+                    </Button>
+                  </motion.div>
+                );
+              }
+              
+              // Otherwise render as dropdown for groups with multiple items
               return (
                 <motion.div
                   key={group.name}

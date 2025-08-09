@@ -1,7 +1,9 @@
 // Contract addresses
 export const CONTRACTS = {
   MBTC: '0xf96c5C189a949C73745a277A4Acf071B1B9f6DF5',
-  STAKING_VAULT: '0x3EF7d600DB474F1a544602Bd7dA33c53d98B7B1b'
+  STAKING_VAULT: '0x3EF7d600DB474F1a544602Bd7dA33c53d98B7B1b',
+  LENDING_POOL: '0x478AE04E752e47c5b1F597101CeF74f01F0386e6',
+  MUSDT: '0x4dABf45C8cF333Ef1e874c3FDFC3C86799af80c8'
 } as const;
 
 // mBTC Token ABI
@@ -191,6 +193,465 @@ export const MBTC_ABI = [
       {"name": "value", "internalType": "uint256", "type": "uint256"}
     ],
     "name": "transferFrom",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+] as const;
+
+// mUSDT Token ABI (same as mBTC since they're ERC20)
+export const MUSDT_ABI = [
+  {
+    "inputs": [
+      {"name": "initialOwner", "internalType": "address", "type": "address"}
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {"name": "spender", "internalType": "address", "type": "address"},
+      {"name": "allowance", "internalType": "uint256", "type": "uint256"},
+      {"name": "needed", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "ERC20InsufficientAllowance",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {"name": "sender", "internalType": "address", "type": "address"},
+      {"name": "balance", "internalType": "uint256", "type": "uint256"},
+      {"name": "needed", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "ERC20InsufficientBalance",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {"name": "approver", "internalType": "address", "type": "address"}
+    ],
+    "name": "ERC20InvalidApprover",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {"name": "receiver", "internalType": "address", "type": "address"}
+    ],
+    "name": "ERC20InvalidReceiver",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {"name": "sender", "internalType": "address", "type": "address"}
+    ],
+    "name": "ERC20InvalidSender",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {"name": "spender", "internalType": "address", "type": "address"}
+    ],
+    "name": "ERC20InvalidSpender",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {"indexed": true, "name": "owner", "internalType": "address", "type": "address"},
+      {"indexed": true, "name": "spender", "internalType": "address", "type": "address"},
+      {"indexed": false, "name": "value", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "Approval",
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"indexed": true, "name": "from", "internalType": "address", "type": "address"},
+      {"indexed": true, "name": "to", "internalType": "address", "type": "address"},
+      {"indexed": false, "name": "value", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "Transfer",
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "uint256", "type": "uint256"}
+    ],
+    "inputs": [
+      {"name": "owner", "internalType": "address", "type": "address"},
+      {"name": "spender", "internalType": "address", "type": "address"}
+    ],
+    "name": "allowance",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "bool", "type": "bool"}
+    ],
+    "inputs": [
+      {"name": "spender", "internalType": "address", "type": "address"},
+      {"name": "value", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "approve",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "uint256", "type": "uint256"}
+    ],
+    "inputs": [
+      {"name": "account", "internalType": "address", "type": "address"}
+    ],
+    "name": "balanceOf",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "amount", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "burn",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "uint8", "type": "uint8"}
+    ],
+    "inputs": [],
+    "name": "decimals",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "to", "internalType": "address", "type": "address"},
+      {"name": "amount", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "mint",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "string", "type": "string"}
+    ],
+    "inputs": [],
+    "name": "name",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "string", "type": "string"}
+    ],
+    "inputs": [],
+    "name": "symbol",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "uint256", "type": "uint256"}
+    ],
+    "inputs": [],
+    "name": "totalSupply",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "bool", "type": "bool"}
+    ],
+    "inputs": [
+      {"name": "to", "internalType": "address", "type": "address"},
+      {"name": "value", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "transfer",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "bool", "type": "bool"}
+    ],
+    "inputs": [
+      {"name": "from", "internalType": "address", "type": "address"},
+      {"name": "to", "internalType": "address", "type": "address"},
+      {"name": "value", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "transferFrom",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+] as const;
+
+// LendingPool ABI
+export const LENDING_POOL_ABI = [
+  {
+    "inputs": [
+      {"name": "_mockBTCTokenAddress", "internalType": "address", "type": "address"},
+      {"name": "_mockUSDTTokenAddress", "internalType": "address", "type": "address"},
+      {"name": "_initialBTCPriceInUSDT", "internalType": "uint256", "type": "uint256"},
+      {"name": "_initialLTVPercent", "internalType": "uint256", "type": "uint256"},
+      {"name": "initialOwner", "internalType": "address", "type": "address"}
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {"name": "owner", "internalType": "address", "type": "address"}
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {"name": "account", "internalType": "address", "type": "address"}
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {"indexed": true, "name": "user", "internalType": "address", "type": "address"},
+      {"indexed": false, "name": "btcAmount", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "CollateralDeposited",
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"indexed": true, "name": "user", "internalType": "address", "type": "address"},
+      {"indexed": false, "name": "btcAmount", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "CollateralWithdrawn",
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"indexed": false, "name": "newLTV", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "LTVUpdated",
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"indexed": true, "name": "borrower", "internalType": "address", "type": "address"},
+      {"indexed": true, "name": "liquidator", "internalType": "address", "type": "address"},
+      {"indexed": false, "name": "seizedCollateral", "internalType": "uint256", "type": "uint256"},
+      {"indexed": false, "name": "debtRepaid", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "Liquidated",
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"indexed": true, "name": "user", "internalType": "address", "type": "address"},
+      {"indexed": false, "name": "usdtAmount", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "LoanRepaid",
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"indexed": true, "name": "user", "internalType": "address", "type": "address"},
+      {"indexed": false, "name": "usdtAmount", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "LoanTaken",
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"indexed": true, "name": "previousOwner", "internalType": "address", "type": "address"},
+      {"indexed": true, "name": "newOwner", "internalType": "address", "type": "address"}
+    ],
+    "name": "OwnershipTransferred",
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {"indexed": false, "name": "newPrice", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "PriceUpdated",
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "_amountUSDTToBorrow", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "borrowUSDT",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "uint256", "type": "uint256"}
+    ],
+    "inputs": [
+      {"name": "", "internalType": "address", "type": "address"}
+    ],
+    "name": "borrowedBalancesUSDT",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "uint256", "type": "uint256"}
+    ],
+    "inputs": [],
+    "name": "btcPriceInUSDT",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "uint256", "type": "uint256"}
+    ],
+    "inputs": [
+      {"name": "", "internalType": "address", "type": "address"}
+    ],
+    "name": "collateralBalancesBTC",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "_amountBTC", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "depositCollateral",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "_amountUSDT", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "fundPool",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "healthFactor", "internalType": "uint256", "type": "uint256"}
+    ],
+    "inputs": [
+      {"name": "_user", "internalType": "address", "type": "address"}
+    ],
+    "name": "getAccountHealth",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "_borrower", "internalType": "address", "type": "address"}
+    ],
+    "name": "liquidatePosition",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "uint256", "type": "uint256"}
+    ],
+    "inputs": [],
+    "name": "loanToValueRatioPercent",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "contract IERC20", "type": "address"}
+    ],
+    "inputs": [],
+    "name": "mockBTCToken",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "contract IERC20", "type": "address"}
+    ],
+    "inputs": [],
+    "name": "mockUSDTToken",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [
+      {"name": "", "internalType": "address", "type": "address"}
+    ],
+    "inputs": [],
+    "name": "owner",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [],
+    "name": "renounceOwnership",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "_amountUSDTToRepay", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "repayUSDT",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "_newPrice", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "setBTCPrice",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "_newLTVPercent", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "setLoanToValueRatio",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "newOwner", "internalType": "address", "type": "address"}
+    ],
+    "name": "transferOwnership",
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "outputs": [],
+    "inputs": [
+      {"name": "_amountBTCToWithdraw", "internalType": "uint256", "type": "uint256"}
+    ],
+    "name": "withdrawCollateral",
     "stateMutability": "nonpayable",
     "type": "function"
   }

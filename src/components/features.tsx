@@ -1,17 +1,24 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  Wallet, 
-  ArrowUpDown, 
-  TrendingUp, 
-  CreditCard, 
+import {
+  Wallet,
+  ArrowUpDown,
+  TrendingUp,
+  CreditCard,
   BarChart3,
   DollarSign,
   Percent,
   Activity,
   UserCheck,
-  Zap
+  Zap,
 } from "lucide-react";
+import Link from "next/link";
 
 const features = [
   {
@@ -19,78 +26,89 @@ const features = [
     title: "Deposit Fiat",
     description: "Easily deposit USD directly to your account",
     color: "bg-blue-100 text-blue-600",
-    comingSoon: false
+    comingSoon: false,
   },
   {
     icon: ArrowUpDown,
     title: "Swap Fiat to BTC",
-    description: "Convert your fiat currency to Bitcoin on the Core network with competitive rates",
+    description:
+      "Convert your fiat currency to Bitcoin on the Core network with competitive rates",
     color: "bg-orange-100 text-orange-600",
-    comingSoon: false
+    comingSoon: false,
   },
   {
     icon: TrendingUp,
     title: "mBTC Staking",
-    description: "Convert BTC → lstBTC → Stake to earn istBTC rewards automatically",
+    description:
+      "Convert BTC → lstBTC → Stake to earn istBTC rewards automatically",
     color: "bg-green-100 text-green-600",
-    comingSoon: false
+    comingSoon: false,
   },
   {
     icon: Wallet,
     title: "Lending & Borrowing",
-    description: "Lend your Bitcoin to earn interest or borrow against your crypto holdings",
+    description:
+      "Lend your Bitcoin to earn interest or borrow against your crypto holdings",
     color: "bg-purple-100 text-purple-600",
-    comingSoon: true
+    comingSoon: false,
   },
   {
     icon: BarChart3,
     title: "Balance Tracking",
-    description: "Real-time portfolio tracking with detailed analytics and insights",
+    description:
+      "Real-time portfolio tracking with detailed analytics and insights",
     color: "bg-red-100 text-red-600",
-    comingSoon: false
+    comingSoon: false,
   },
   {
     icon: DollarSign,
     title: "DCA Investment",
-    description: "Dollar-Cost Averaging strategy for automated Bitcoin investments",
+    description:
+      "Dollar-Cost Averaging strategy for automated Bitcoin investments",
     color: "bg-teal-100 text-teal-600",
-    comingSoon: false
+    comingSoon: true,
   },
   {
     icon: Percent,
     title: "Interest Rate Model",
-    description: "Flexible APY with adjustable interest rates based on market conditions",
+    description:
+      "Flexible APY with adjustable interest rates based on market conditions",
     color: "bg-pink-100 text-pink-600",
-    comingSoon: true
+    comingSoon: true,
   },
   {
     icon: UserCheck,
     title: "Gmail Login",
-    description: "Account Abstraction: Login with Gmail and auto-create wallet using Reown SDK",
+    description:
+      "Account Abstraction: Login with Gmail and auto-create wallet using Reown SDK",
     color: "bg-green-100 text-green-600",
-    comingSoon: true
+    comingSoon: false,
   },
   {
     icon: Zap,
     title: "Gasless Transactions",
-    description: "Execute transactions without worrying about gas fees - we handle it for you",
+    description:
+      "Execute transactions without worrying about gas fees - we handle it for you",
     color: "bg-yellow-100 text-yellow-600",
-    comingSoon: true
-  }
+    comingSoon: false,
+  },
 ];
 
 export default function Features() {
   return (
-    <div id="features" className="py-20 bg-gradient-to-b from-white to-orange-50">
+    <div
+      id="features"
+      className="py-20 bg-gradient-to-b from-white to-orange-50"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 font-sans">
-            Everything you need for 
+            Everything you need for
             <span className="text-primary"> Bitcoin banking</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-sans font-normal">
-            Comprehensive suite of financial tools designed to make Bitcoin accessible 
-            and easy to use for everyone
+            Comprehensive suite of financial tools designed to make Bitcoin
+            accessible and easy to use for everyone
           </p>
         </div>
 
@@ -98,14 +116,19 @@ export default function Features() {
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
             return (
-              <Card key={index} className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <Card
+                key={index}
+                className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              >
                 {feature.comingSoon && (
                   <div className="absolute top-4 right-4 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
                     Coming Soon
                   </div>
                 )}
                 <CardHeader className="pb-4">
-                  <div className={`w-12 h-12 rounded-lg ${feature.color} flex items-center justify-center mb-4`}>
+                  <div
+                    className={`w-12 h-12 rounded-lg ${feature.color} flex items-center justify-center mb-4`}
+                  >
                     <IconComponent className="h-6 w-6" />
                   </div>
                   <CardTitle className="text-xl font-semibold text-foreground font-sans">
@@ -116,7 +139,7 @@ export default function Features() {
                   <CardDescription className="text-muted-foreground mb-4 font-sans font-normal">
                     {feature.description}
                   </CardDescription>
-                  <Button 
+                  <Button
                     variant={feature.comingSoon ? "secondary" : "outline"}
                     className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors font-sans font-medium"
                     disabled={feature.comingSoon}
@@ -136,12 +159,19 @@ export default function Features() {
               Ready to start your Bitcoin journey?
             </h3>
             <p className="text-orange-100 mb-6 max-w-2xl mx-auto font-sans font-normal">
-              Join thousands of users who trust Bitcoin Neobank for their digital banking needs. 
-              Get started in minutes with our simple onboarding process.
+              Join thousands of users who trust Bitcoin Neobank for their
+              digital banking needs. Get started in minutes with our simple
+              onboarding process.
             </p>
-            <Button size="lg" className="bg-white text-orange-600 hover:bg-orange-50 font-sans font-semibold">
-              Open Account Today
+            <Link href='/swap'>
+            <Button
+              size="lg"
+              className="bg-white text-orange-600 hover:bg-orange-50 font-sans font-semibold cursor-pointer"
+            >
+              Buy your first Bitcoin
             </Button>
+            </Link>
+            
           </div>
         </div>
       </div>

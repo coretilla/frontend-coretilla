@@ -8,6 +8,7 @@ import { useBTCPrice } from "@/hooks";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserData } from "@/lib/api";
+import Link from "next/link";
 
 export default function Hero() {
   const { priceData, isLoading, error } = useBTCPrice();
@@ -223,13 +224,14 @@ export default function Hero() {
               className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8"
             >
               {/* Primary CTA - Get Started */}
+              <Link href='/deposit'>
               <motion.button
                 whileHover={{ 
                   scale: 1.02,
                   boxShadow: "0 8px 25px -8px rgba(249, 115, 22, 0.5)"
                 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative overflow-hidden bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-lg font-medium text-base transition-all duration-300 hover:from-orange-600 hover:to-orange-700 flex items-center justify-center gap-2 min-w-[140px]"
+                className="cursor-pointer group relative overflow-hidden bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-lg font-medium text-base transition-all duration-300 hover:from-orange-600 hover:to-orange-700 flex items-center justify-center gap-2 min-w-[140px]"
               >
                 <span className="relative z-10">Get Started</span>
                 <ArrowRight className="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-0.5 duration-300" />
@@ -237,22 +239,25 @@ export default function Hero() {
                 {/* Subtle shine effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
               </motion.button>
+              </Link>
 
-              {/* Secondary CTA - Try Demo */}
-              <motion.button
+              <Link href='#features'>
+               <motion.button
                 whileHover={{ 
                   scale: 1.02,
                   backgroundColor: "rgba(249, 115, 22, 0.05)"
                 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative bg-transparent border border-orange-200 text-orange-700 hover:text-orange-800 px-6 py-3 rounded-lg font-medium text-base transition-all duration-300 flex items-center justify-center gap-2 hover:border-orange-300 min-w-[120px]"
+                className="cursor-pointer group relative bg-transparent border border-orange-200 text-orange-700 hover:text-orange-800 px-6 py-3 rounded-lg font-medium text-base transition-all duration-300 flex items-center justify-center gap-2 hover:border-orange-300 min-w-[120px]"
               >
                 <Play className="w-3.5 h-3.5 transition-colors group-hover:text-orange-600 duration-300" />
-                <span>Try Demo</span>
+                <span>Bitcoin Neobank Features</span>
                 
                 {/* Subtle background on hover */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-50/0 via-orange-50/50 to-orange-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
               </motion.button>
+              </Link>
+             
             </motion.div>
 
             {/* Enhanced Feature Pills - Web3 Native */}

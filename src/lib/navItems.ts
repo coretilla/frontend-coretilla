@@ -37,12 +37,12 @@ export const navGroups: NavGroup[] = [
     icon: TrendingUp,
     items: [
       { name: "Stake", href: "/stake", icon: Percent },
-      { name: "DCA", href: "/dca", icon: CalendarDays },
+      { name: "DCA Simulation", href: "/dca", icon: CalendarDays },
       { name: "Lending", href: "/lending", icon: PiggyBank },
     ]
   },
   {
-    name: "Tools",
+    name: "Dashboard",
     icon: Settings, 
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },

@@ -269,7 +269,7 @@ export default function SwapPage() {
                 </div>
                 <div className="text-sm text-muted-foreground font-sans flex items-center justify-center">
                   <Image src="/image/btcLogo.png" alt="Bitcoin" width={40} height={12} className="object-contain" />
-                  <span className="mr-5">wBTC</span>
+                  <span className="mr-5">mBTC</span>
                 </div>
                 <div className="text-xs text-muted-foreground font-sans mt-1">
                   ${currentBalances.WBTC_USD.toLocaleString()}

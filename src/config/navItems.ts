@@ -74,7 +74,7 @@ export const navGroups: NavGroup[] = [
     ]
   },
   {
-    title: "Tools",
+    title: "Dashboard",
     items: [
       {
         name: "Dashboard",

@@ -7,16 +7,16 @@ export function useYearlyRewards(amount: string) {
   const [yearlyRewards, setYearlyRewards] = useState('0');
 
   // Convert amount to wei for contract call
-  const amountWei = amount && amount !== '0' ? parseEther(amount) : 0n;
+  const amountWei = amount && amount !== '0' ? parseEther(amount) : BigInt(0);
 
   // Call calculateYearlyRewards from contract
   const { data: contractRewards, refetch } = useReadContract({
     address: CONTRACTS.STAKING_VAULT,
     abi: STAKING_VAULT_ABI,
     functionName: 'calculateYearlyRewards',
-    args: amountWei > 0n ? [amountWei] : undefined,
+    args: amountWei > BigInt(0) ? [amountWei] : undefined,
     query: {
-      enabled: amountWei > 0n, // Only call when amount > 0
+      enabled: amountWei > BigInt(0), // Only call when amount > 0
     },
   });
 
