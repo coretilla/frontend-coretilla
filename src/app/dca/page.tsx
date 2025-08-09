@@ -100,7 +100,7 @@ export default function DCAPage() {
           }
 
           setCurrentBtcPrice(newPrice);
-          toast.success(`BTC price updated: ${formatPrice(newPrice)}`);
+          // toast.success(`BTC price updated: ${formatPrice(newPrice)}`);
         }
       } catch (error) {
         console.error("Failed to fetch BTC price:", error);
@@ -702,7 +702,7 @@ export default function DCAPage() {
                       setDcaData({ ...dcaData, frequency: value })
                     }
                   >
-                    <SelectTrigger className="font-sans">
+                    <SelectTrigger className="font-sans cursor-pointer">
                       <SelectValue placeholder="Select frequency" />
                     </SelectTrigger>
                     <SelectContent>
@@ -710,7 +710,7 @@ export default function DCAPage() {
                         <SelectItem
                           key={freq.value}
                           value={freq.value}
-                          className="font-sans"
+                          className="font-sans cursor-pointer"
                         >
                           {freq.name} - {freq.description}
                         </SelectItem>
@@ -721,7 +721,7 @@ export default function DCAPage() {
 
                 <div className="space-y-2">
                   <Label className="font-sans font-medium">Duration</Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2 ">
                     {durations.map((duration) => (
                       <Button
                         key={duration.value}
@@ -733,11 +733,11 @@ export default function DCAPage() {
                             : "outline"
                         }
                         size="sm"
-                        className={`font-sans text-xs ${
+                        className={`font-sans text-xs cursor-pointer ${
                           !isCustomDuration &&
                           dcaData.duration === duration.value
-                            ? "bg-blue-600 hover:bg-blue-700"
-                            : "hover:bg-blue-50 hover:border-blue-300"
+                            ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                            : "hover:bg-blue-50 hover:border-blue-300 cursor-pointer"
                         }`}
                         onClick={() => {
                           setDcaData({ ...dcaData, duration: duration.value });
@@ -756,7 +756,7 @@ export default function DCAPage() {
                         type="button"
                         variant={isCustomDuration ? "default" : "outline"}
                         size="sm"
-                        className={`font-sans text-xs ${
+                        className={`font-sans text-xs cursor-pointer ${
                           isCustomDuration
                             ? "bg-blue-600 hover:bg-blue-700"
                             : "hover:bg-blue-50 hover:border-blue-300"
@@ -874,7 +874,7 @@ export default function DCAPage() {
                             : "outline"
                         }
                         size="sm"
-                        className={`font-sans text-xs ${
+                        className={`font-sans text-xs cursor-pointer ${
                           !isCustomGrowth && yearlyGrowthPrediction === growth
                             ? "bg-orange-600 hover:bg-orange-700"
                             : "hover:bg-orange-50 hover:border-orange-300"
@@ -896,7 +896,7 @@ export default function DCAPage() {
                         type="button"
                         variant={isCustomGrowth ? "default" : "outline"}
                         size="sm"
-                        className={`font-sans text-xs ${
+                        className={`font-sans text-xs cursor-pointer ${
                           isCustomGrowth
                             ? "bg-orange-600 hover:bg-orange-700"
                             : "hover:bg-orange-50 hover:border-orange-300"
@@ -1151,7 +1151,7 @@ export default function DCAPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
+                  className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold cursor-pointer"
                   disabled={isLoading}
                 >
                   {isLoading ? "Running Simulation..." : "Run DCA Simulation"}

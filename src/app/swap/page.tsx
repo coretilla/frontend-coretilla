@@ -455,7 +455,7 @@ export default function SwapPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold"
+                className="w-full bg-primary hover:bg-primary/90 font-sans font-semibold cursor-pointer"
                 disabled={
                   isLoading || !formData.amount || !formData.fromCurrency
                 }
@@ -526,13 +526,13 @@ export default function SwapPage() {
                 <Button
                   variant="outline"
                   onClick={() => setShowConfirmation(false)}
-                  className="flex-1 font-sans font-medium"
+                  className="flex-1 font-sans font-medium cursor-pointer"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleConfirmSwap}
-                  className="flex-1 bg-primary hover:bg-primary/90 font-sans font-semibold"
+                  className="flex-1 bg-primary hover:bg-primary/90 font-sans font-semibold cursor-pointer"
                 >
                   Confirm Swap
                 </Button>

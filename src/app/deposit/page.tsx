@@ -291,14 +291,14 @@ function DepositForm({
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger
             value="deposit"
-            className="font-sans flex items-center gap-2"
+            className="font-sans flex items-center gap-2 cursor-pointer"
           >
             <CreditCard className="h-6 w-6" />
             Make Deposit
           </TabsTrigger>
           <TabsTrigger
             value="transactions"
-            className="font-sans flex items-center gap-2"
+            className="font-sans flex items-center gap-2 cursor-pointer"
           >
             <BarChart3 className="h-6 w-6" />
             Transaction History

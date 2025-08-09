@@ -359,7 +359,7 @@ export default function Hero() {
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground font-sans">
-                        {isAuthenticated ? "Your WBTC Balance" : "Your Balance"}
+                        {isAuthenticated ? "Your Bitcoin Balance" : "Your Balance"}
                       </div>
                     </motion.div>
                   </div>

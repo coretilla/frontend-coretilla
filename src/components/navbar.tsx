@@ -52,7 +52,6 @@ export default function Navbar() {
             </Link>
           </motion.div>
 
-          {/* Desktop Navigation - Grouped Dropdowns */}
           <motion.div 
             className="hidden lg:flex items-center space-x-1"
             initial={{ opacity: 0, y: -20 }}
@@ -62,7 +61,6 @@ export default function Navbar() {
             {navGroups.map((group, groupIndex) => {
               const hasActiveItem = group.items.some(item => activeRoute === item.href);
               
-              // If group has only one item, render as direct link instead of dropdown
               if (group.items.length === 1) {
                 const item = group.items[0];
                 const isActive = activeRoute === item.href;
@@ -91,7 +89,6 @@ export default function Navbar() {
                 );
               }
               
-              // Otherwise render as dropdown for groups with multiple items
               return (
                 <motion.div
                   key={group.name}

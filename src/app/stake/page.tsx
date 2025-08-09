@@ -443,12 +443,12 @@ export default function StakePage() {
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="staking" className="font-sans">
+                <TabsTrigger value="staking" className="font-sans cursor-pointer">
                   Staking
                 </TabsTrigger>
                 <TabsTrigger
                   value="history"
-                  className="font-sans flex items-center gap-2"
+                  className="font-sans flex items-center gap-2 cursor-pointer"
                 >
                   <History className="h-4 w-4" />
                   Staking History
@@ -532,7 +532,7 @@ export default function StakePage() {
 
                       <Button
                         type="submit"
-                        className="w-full bg-green-600 hover:bg-green-700 font-sans font-semibold"
+                        className="w-full bg-green-600 hover:bg-green-700 font-sans font-semibold cursor-pointer"
                         disabled={isPending || isConfirming}
                       >
                         {isPending
@@ -589,7 +589,7 @@ export default function StakePage() {
 
                       <Button
                         onClick={() => setShowUnstakeDialog(true)}
-                        className="w-full bg-orange-600 hover:bg-orange-700 font-sans font-semibold"
+                        className="w-full bg-orange-600 hover:bg-orange-700 font-sans font-semibold cursor-pointer"
                         disabled={
                           isPending ||
                           isConfirming ||
@@ -775,13 +775,13 @@ export default function StakePage() {
                   type="button"
                   variant="outline"
                   onClick={() => setShowUnstakeDialog(false)}
-                  className="flex-1 font-sans font-medium"
+                  className="flex-1 font-sans font-medium cursor-pointer"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 bg-orange-600 hover:bg-orange-700 font-sans font-semibold"
+                  className="flex-1 bg-orange-600 hover:bg-orange-700 font-sans font-semibold cursor-pointer"
                   disabled={isPending || isConfirming}
                 >
                   {canUnstake ? "Unstake" : "Start Cooldown"}
