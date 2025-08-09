@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Coretilla - Your Digital Bank for CoreDAO",
   description:
     "Simple, secure, and designed for everyone - from crypto beginners to CoreDAO veterans.",
-    icons: {
+  icons: {
     icon: `/favicon.ico?v=${Date.now()}`,
     shortcut: `/favicon.ico?v=${Date.now()}`,
     apple: `/favicon.ico?v=${Date.now()}`,
