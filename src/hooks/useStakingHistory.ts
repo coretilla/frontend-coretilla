@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getStakeHistory, StakeHistoryItem } from "@/lib/api";
+import { getStakeHistory, StakeHistoryItem } from "@/app/api/api";
 
 export function useStakingHistory() {
   const [history, setHistory] = useState<StakeHistoryItem[]>([]);

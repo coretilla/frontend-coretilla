@@ -12,7 +12,7 @@ import {
 
 const API_BASE_URL = "https://core-backend-production-0965.up.railway.app";
 
-import { getStoredAuth } from "./auth";
+import { getStoredAuth } from "../../lib/auth";
 
 function getAuthToken(): string | null {
   const { token } = getStoredAuth();

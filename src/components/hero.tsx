@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import { useBTCPrice } from "@/hooks";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { getUserData } from "@/lib/api";
+import { getUserData } from "@/app/api/api";
 import { formatToken } from "@/hooks/useFormatToken";
 import Link from "next/link";
 
