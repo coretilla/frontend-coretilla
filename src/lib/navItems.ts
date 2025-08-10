@@ -1,15 +1,13 @@
-import { 
-  LayoutDashboard, 
-  CreditCard, 
-  ArrowRightLeft, 
-  Percent, 
-  PiggyBank, 
-  DollarSign, 
-  CalendarDays, 
-  BarChart3,
+import {
+  LayoutDashboard,
+  CreditCard,
+  ArrowRightLeft,
+  Percent,
+  PiggyBank,
+  CalendarDays,
   TrendingUp,
   Settings,
-  House
+  House,
 } from "lucide-react";
 
 export interface NavItem {
@@ -28,9 +26,7 @@ export const navGroups: NavGroup[] = [
   {
     name: "Home",
     icon: House,
-    items: [
-      { name: "Home", href: "/", icon: House },
-    ]
+    items: [{ name: "Home", href: "/", icon: House }],
   },
 
   {
@@ -39,25 +35,22 @@ export const navGroups: NavGroup[] = [
     items: [
       { name: "Deposit", href: "/deposit", icon: CreditCard },
       { name: "Buy Bitcoin", href: "/swap", icon: ArrowRightLeft },
-    ]
+    ],
   },
   {
-    name: "Investing", 
+    name: "Investing",
     icon: TrendingUp,
     items: [
       { name: "Stake", href: "/stake", icon: Percent },
       { name: "DCA Simulation", href: "/dca", icon: CalendarDays },
       { name: "Lending", href: "/lending", icon: PiggyBank },
-    ]
+    ],
   },
   {
     name: "Dashboard",
-    icon: Settings, 
-    items: [
-      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    ]
-  }
+    icon: Settings,
+    items: [{ name: "Dashboard", href: "/dashboard", icon: LayoutDashboard }],
+  },
 ];
 
-// Flattened version for easy access
-export const allNavItems: NavItem[] = navGroups.flatMap(group => group.items);
+export const allNavItems: NavItem[] = navGroups.flatMap((group) => group.items);

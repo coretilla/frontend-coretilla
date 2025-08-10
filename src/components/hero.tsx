@@ -1,20 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
-  Shield,
-  Zap,
-  Globe,
   TrendingUp,
-  Key,
   Lock,
   Rocket,
   Award,
   Star,
-  Users,
   Play,
-  Sparkles,
 } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -31,7 +24,6 @@ export default function Hero() {
   const [wbtcBalance, setWbtcBalance] = useState<number>(0);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 
-  // Fetch WBTC balance from API
   const fetchWbtcBalance = async () => {
     if (!isAuthenticated) return;
 
@@ -61,7 +53,6 @@ export default function Hero() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* Animated Background */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -74,8 +65,6 @@ export default function Hero() {
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF6A00' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}
         ></div>
-
-        {/* Floating Bitcoin Icons */}
 
         <motion.div
           initial={{ opacity: 0, scale: 0 }}
@@ -109,12 +98,9 @@ export default function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Content */}
           <div className="text-center lg:text-left">
-            {/* Enhanced Hero Title */}
             <div className="relative">
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
@@ -122,9 +108,7 @@ export default function Hero() {
                 transition={{ delay: 0.3, duration: 0.6 }}
                 className="relative mb-8"
               >
-                {/* Main Title with Enhanced Styling */}
                 <h1 className="relative text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-foreground font-sans leading-[0.9] tracking-tight">
-                  {/* Bitcoin Text with Subtle Glow */}
                   <span className="relative inline-block">
                     <span className="relative z-10 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
                       Bitcoin
@@ -141,12 +125,10 @@ export default function Hero() {
                   </span>
                 </h1>
 
-                {/* Decorative Elements */}
                 <div className="absolute -top-4 -right-4 w-16 h-16 bg-orange-400/10 rounded-full blur-xl hidden lg:block"></div>
                 <div className="absolute top-1/2 -left-8 w-24 h-24 bg-orange-300/5 rounded-full blur-2xl hidden lg:block"></div>
               </motion.div>
 
-              {/* Enhanced Description */}
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -154,7 +136,6 @@ export default function Hero() {
                 className="relative mb-8"
               >
                 <div className="max-w-2xl mx-auto lg:mx-0">
-                  {/* Main Description */}
                   <p className="text-lg sm:text-xl md:text-2xl lg:text-2xl text-muted-foreground font-sans font-normal leading-relaxed mb-4">
                     Your{" "}
                     <span className="text-orange-600 font-semibold">
@@ -163,14 +144,12 @@ export default function Hero() {
                     for the Bitcoin economy.
                   </p>
 
-                  {/* Enhanced User Type Pills */}
                   <div className="flex flex-col gap-4">
                     <p className="text-base sm:text-lg text-muted-foreground/80 font-medium">
                       Simple, secure, and designed for everyone:
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                      {/* Crypto Beginners Card */}
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -197,7 +176,6 @@ export default function Hero() {
                         </div>
                       </motion.div>
 
-                      {/* Connector */}
                       <div className="hidden sm:flex items-center justify-center px-2">
                         <div className="flex items-center gap-1">
                           <div className="w-1 h-1 bg-orange-300 rounded-full"></div>
@@ -206,7 +184,6 @@ export default function Hero() {
                         </div>
                       </div>
 
-                      {/* Bitcoin Veterans Card */}
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -236,19 +213,16 @@ export default function Hero() {
                   </div>
                 </div>
 
-                {/* Background Accent */}
                 <div className="absolute inset-0 -z-10 bg-gradient-to-br from-orange-50/30 via-transparent to-transparent rounded-2xl blur-3xl"></div>
               </motion.div>
             </div>
 
-            {/* Minimalist CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.5 }}
               className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8"
             >
-              {/* Primary CTA - Get Started */}
               <Link href="/deposit">
                 <motion.button
                   whileHover={{
@@ -261,7 +235,6 @@ export default function Hero() {
                   <span className="relative z-10">Get Started</span>
                   <ArrowRight className="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-0.5 duration-300" />
 
-                  {/* Subtle shine effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 </motion.button>
               </Link>
@@ -278,13 +251,11 @@ export default function Hero() {
                   <Play className="w-3.5 h-3.5 transition-colors group-hover:text-orange-600 duration-300" />
                   <span>Neobank Features</span>
 
-                  {/* Subtle background on hover */}
                   <div className="absolute inset-0 bg-gradient-to-r from-orange-50/0 via-orange-50/50 to-orange-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
                 </motion.button>
               </Link>
             </motion.div>
 
-            {/* Enhanced Feature Pills - Web3 Native */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -293,7 +264,6 @@ export default function Hero() {
             ></motion.div>
           </div>
 
-          {/* Right Content - Bitcoin Graphics */}
           <div className="relative lg:order-last">
             <motion.div
               initial={{ opacity: 0, x: 50 }}
@@ -301,7 +271,6 @@ export default function Hero() {
               transition={{ delay: 0.6, duration: 0.6 }}
               className="relative max-w-lg mx-auto"
             >
-              {/* Main Bitcoin Card */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -310,7 +279,6 @@ export default function Hero() {
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-400/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
 
-                {/* Bitcoin Logo */}
                 <div className="flex justify-center mb-6">
                   <div className="relative">
                     <div>
@@ -326,7 +294,6 @@ export default function Hero() {
                   </div>
                 </div>
 
-                {/* Bitcoin Stats */}
                 <div className="grid grid-cols-1 gap-6">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -408,7 +375,6 @@ export default function Hero() {
                   </div>
                 </div>
 
-                {/* Quick Actions */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -432,7 +398,6 @@ export default function Hero() {
                 </motion.div>
               </motion.div>
 
-              {/* Floating Cards */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}

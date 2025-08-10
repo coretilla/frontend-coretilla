@@ -37,13 +37,11 @@ export interface UserMeResponse {
   id: number;
   name?: string;
   wallet_address: string;
-  balance?: UserBalance | number; // Support both object and number format
+  balance?: UserBalance | number;
   balances?: UserBalance;
-  // Support different field names
   usd_balance?: number;
   idr_balance?: number;
   eur_balance?: number;
-  // Additional balance fields
   coreBalance?: number;
   wbtcBalance?: number;
   wbtcBalanceInUsd?: number;
@@ -84,10 +82,6 @@ import { getStoredAuth } from "./auth";
 function getAuthToken(): string | null {
   const { token } = getStoredAuth();
   localStorage.setItem("authToken", token || "");
-  console.log(
-    "🔑 Getting access_token for API call:",
-    token ? `${token.substring(0, 30)}...` : "null"
-  );
   return token;
 }
 

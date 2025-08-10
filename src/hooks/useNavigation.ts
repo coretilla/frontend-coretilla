@@ -8,12 +8,10 @@ export const useNavigation = () => {
   const [activeRoute, setActiveRoute] = useAtom(activeRouteAtom);
   const pathname = usePathname();
 
-  // Update active route when pathname changes
   useEffect(() => {
     setActiveRoute(pathname);
   }, [pathname, setActiveRoute]);
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname, setMobileMenuOpen]);

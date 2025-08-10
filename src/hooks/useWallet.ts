@@ -11,31 +11,22 @@ import { useAppKit } from "@reown/appkit/react";
 import { useCallback, useEffect, useState } from "react";
 
 export interface WalletState {
-  // Connection state
   isConnected: boolean;
   isConnecting: boolean;
   isReconnecting: boolean;
-
-  // Account info
   address?: string;
-  smartAccountAddress?: string; // Add smart account address
+  smartAccountAddress?: string;
   chainId?: number;
   connector?: any;
-
-  // Balance
   balance?: {
     decimals: number;
     formatted: string;
     symbol: string;
     value: bigint;
   };
-
-  // Methods
   connect: () => void;
   disconnect: () => void;
   openModal: () => void;
-
-  // Session management
   saveSession: () => void;
   clearSession: () => void;
   hasStoredSession: boolean;
@@ -59,15 +50,12 @@ export function useWallet(): WalletState {
     string | undefined
   >();
 
-  // Get connector client to access smart account address
   const { data: connectorClient } = useConnectorClient();
 
-  // Get balance for the connected address
   const { data: balance } = useBalance({
     address: address,
   });
 
-  // Check for stored session on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedSession = localStorage.getItem(WALLET_SESSION_KEY);
@@ -75,19 +63,16 @@ export function useWallet(): WalletState {
     }
   }, []);
 
-  // Save session when connected
   useEffect(() => {
     if (isConnected && address) {
       saveSession();
     }
   }, [isConnected, address]);
 
-  // Get smart account address for AA wallets
   useEffect(() => {
     const getSmartAccountAddress = async () => {
       if (isConnected && connectorClient && connector) {
         try {
-          // Check if this is a smart wallet connector
           const isSmartWallet =
             connector.name?.toLowerCase().includes("smart") ||
             connector.name?.toLowerCase().includes("social") ||
@@ -95,7 +80,6 @@ export function useWallet(): WalletState {
             connector.id?.includes("w3mEmail");
 
           if (isSmartWallet && connectorClient) {
-            // Try different methods to get smart account address
             const client = connectorClient as any;
 
             if (client.getAccountAddress) {
@@ -163,33 +147,23 @@ export function useWallet(): WalletState {
     }
   }, [disconnect, clearSession]);
 
-  // Format address for display
   const formatAddress = (addr: string) => {
     if (!addr) return "";
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
   return {
-    // Connection state
     isConnected,
     isConnecting,
     isReconnecting,
-
-    // Account info
     address,
     smartAccountAddress,
     chainId,
     connector,
-
-    // Balance
     balance,
-
-    // Methods
     connect: handleConnect,
     disconnect: handleDisconnect,
     openModal: open,
-
-    // Session management
     saveSession,
     clearSession,
     hasStoredSession,

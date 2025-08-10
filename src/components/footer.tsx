@@ -3,20 +3,18 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { 
-  Twitter, 
-  Github, 
-  Linkedin, 
-  Mail, 
-  Shield, 
-  Clock, 
-  Globe, 
+import {
+  Twitter,
+  Github,
+  Linkedin,
+  Mail,
+  Shield,
+  Clock,
+  Globe,
   ChevronUp,
   Phone,
-  MapPin
+  MapPin,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 
 const footerLinks = {
@@ -72,40 +70,40 @@ const trustFeatures = [
   {
     icon: Shield,
     title: "Bank-Grade Security",
-    description: "Your funds are protected by institutional-grade security measures"
+    description:
+      "Your funds are protected by institutional-grade security measures",
   },
   {
     icon: Clock,
     title: "24/7 Support",
-    description: "Round-the-clock customer support for all your Bitcoin needs"
+    description: "Round-the-clock customer support for all your Bitcoin needs",
   },
   {
     icon: Globe,
     title: "Global Access",
-    description: "Access your Bitcoin from anywhere in the world, anytime"
+    description: "Access your Bitcoin from anywhere in the world, anytime",
   },
 ];
 
 export default function Footer() {
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <footer className="bg-gradient-to-b from-gray-50 to-white border-t border-gray-200 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-30" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF6A00' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-      }}></div>
+      <div
+        className="absolute inset-0 opacity-30"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF6A00' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }}
+      ></div>
 
       <div className="relative z-10">
-
-        {/* Main Footer Content */}
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-              {/* Brand Section */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
@@ -113,17 +111,23 @@ export default function Footer() {
                 className="col-span-2 md:col-span-3 lg:col-span-2"
               >
                 <Link href="/" className="flex items-center space-x-2 mb-6">
-                  <Image src="/image/btcLogo.png" alt="Bitcoin" width={32} height={32} className="object-contain" />
+                  <Image
+                    src="/image/btcLogo.png"
+                    alt="Bitcoin"
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                  />
                   <span className="text-xl font-bold text-foreground font-sans">
                     Bitcoin Neobank
                   </span>
                 </Link>
-                
+
                 <p className="text-muted-foreground mb-6 font-sans max-w-xs">
-                  The future of banking is here. Simple, secure, and designed for the Bitcoin economy.
+                  The future of banking is here. Simple, secure, and designed
+                  for the Bitcoin economy.
                 </p>
 
-                {/* Contact Info */}
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center gap-3 text-sm text-muted-foreground font-sans">
                     <Phone className="w-4 h-4 text-primary" />
@@ -139,7 +143,6 @@ export default function Footer() {
                   </div>
                 </div>
 
-                {/* Social Links */}
                 <div className="flex space-x-4">
                   {socialLinks.map((social) => (
                     <motion.a
@@ -156,18 +159,19 @@ export default function Footer() {
                 </div>
               </motion.div>
 
-              {/* Products */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.6 }}
                 viewport={{ once: true }}
               >
-                <h3 className="font-semibold text-foreground mb-4 font-sans">Products</h3>
+                <h3 className="font-semibold text-foreground mb-4 font-sans">
+                  Products
+                </h3>
                 <ul className="space-y-2">
                   {footerLinks.products.map((link) => (
                     <li key={link.name}>
-                      <Link 
+                      <Link
                         href={link.href}
                         className="text-sm text-muted-foreground hover:text-primary transition-colors font-sans"
                       >
@@ -178,18 +182,19 @@ export default function Footer() {
                 </ul>
               </motion.div>
 
-              {/* Tools */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
                 viewport={{ once: true }}
               >
-                <h3 className="font-semibold text-foreground mb-4 font-sans">Tools</h3>
+                <h3 className="font-semibold text-foreground mb-4 font-sans">
+                  Tools
+                </h3>
                 <ul className="space-y-2">
                   {footerLinks.tools.map((link) => (
                     <li key={link.name}>
-                      <Link 
+                      <Link
                         href={link.href}
                         className="text-sm text-muted-foreground hover:text-primary transition-colors font-sans"
                       >
@@ -200,18 +205,19 @@ export default function Footer() {
                 </ul>
               </motion.div>
 
-              {/* Company */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
                 viewport={{ once: true }}
               >
-                <h3 className="font-semibold text-foreground mb-4 font-sans">Company</h3>
+                <h3 className="font-semibold text-foreground mb-4 font-sans">
+                  Company
+                </h3>
                 <ul className="space-y-2">
                   {footerLinks.company.map((link) => (
                     <li key={link.name}>
-                      <Link 
+                      <Link
                         href={link.href}
                         className="text-sm text-muted-foreground hover:text-primary transition-colors font-sans"
                       >
@@ -222,18 +228,19 @@ export default function Footer() {
                 </ul>
               </motion.div>
 
-              {/* Support */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
                 viewport={{ once: true }}
               >
-                <h3 className="font-semibold text-foreground mb-4 font-sans">Support</h3>
+                <h3 className="font-semibold text-foreground mb-4 font-sans">
+                  Support
+                </h3>
                 <ul className="space-y-2">
                   {footerLinks.support.map((link) => (
                     <li key={link.name}>
-                      <Link 
+                      <Link
                         href={link.href}
                         className="text-sm text-muted-foreground hover:text-primary transition-colors font-sans"
                       >
@@ -249,8 +256,7 @@ export default function Footer() {
 
         <Separator />
 
-        {/* Bottom Section */}
-        <motion.section 
+        <motion.section
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -264,19 +270,20 @@ export default function Footer() {
                 <div className="flex items-center gap-4">
                   {footerLinks.legal.slice(0, 3).map((link, index) => (
                     <span key={link.name} className="flex items-center">
-                      <Link 
+                      <Link
                         href={link.href}
                         className="hover:text-primary transition-colors"
                       >
                         {link.name}
                       </Link>
-                      {index < 2 && <span className="ml-4 text-gray-300">|</span>}
+                      {index < 2 && (
+                        <span className="ml-4 text-gray-300">|</span>
+                      )}
                     </span>
                   ))}
                 </div>
               </div>
 
-              {/* Back to Top */}
               <motion.button
                 onClick={scrollToTop}
                 whileHover={{ scale: 1.1 }}

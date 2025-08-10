@@ -13,7 +13,6 @@ interface MainLayoutProps {
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Persistent Navbar */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -23,14 +22,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <Navbar />
       </motion.div>
 
-      {/* Main Content with Page Transitions */}
       <main className="flex-1 relative overflow-hidden">
         <PageTransition>
           {children}
         </PageTransition>
       </main>
 
-      {/* Persistent Footer */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

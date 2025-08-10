@@ -12,7 +12,6 @@ export function useRouteLoader() {
     setIsLoading(true);
     startTransition(() => {
       router.push(href);
-      // Reset loading state after a short delay to allow page to render
       setTimeout(() => {
         setIsLoading(false);
       }, 100);
@@ -25,6 +24,6 @@ export function useRouteLoader() {
     navigateWithLoader,
     isNavigating,
     isPending,
-    isLoading
+    isLoading,
   };
 }

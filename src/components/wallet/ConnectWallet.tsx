@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -50,19 +50,16 @@ export function ConnectWallet({
     chainId,
   } = useWallet();
 
-  // Get additional account info including connector details
   const { connector } = useAccount();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Format address for display
   const formatAddress = (addr: string) => {
     if (!addr) return "";
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
-  // Copy address to clipboard
   const copyAddress = async () => {
     if (!address) return;
 
@@ -76,21 +73,18 @@ export function ConnectWallet({
     }
   };
 
-  // Check if this is a smart wallet (social login)
   const isSmartWallet =
     connector?.name?.toLowerCase().includes("smart") ||
     connector?.name?.toLowerCase().includes("social") ||
     connector?.id?.includes("coinbaseWallet") ||
     connector?.id?.includes("w3mEmail");
 
-  // Handle disconnect
   const handleDisconnect = async () => {
     await disconnect();
     setIsModalOpen(false);
     toast.success("Wallet disconnected");
   };
 
-  // If connected, show wallet info
   if (isConnected && address) {
     return (
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -126,7 +120,6 @@ export function ConnectWallet({
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            {/* Wallet Type & Address */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">
@@ -195,7 +188,6 @@ export function ConnectWallet({
                 </Button>
               </div>
 
-              {/* Address Info */}
               {isSmartWallet &&
                 smartAccountAddress &&
                 smartAccountAddress !== address && (
@@ -214,7 +206,6 @@ export function ConnectWallet({
                   </div>
                 )}
 
-              {/* Connector Info */}
               {connector && (
                 <div className="text-xs text-muted-foreground">
                   Connected via:{" "}
@@ -223,7 +214,6 @@ export function ConnectWallet({
               )}
             </div>
 
-            {/* Balance */}
             {balance && (
               <div className="space-y-2">
                 <span className="text-sm font-medium text-muted-foreground">
@@ -237,7 +227,6 @@ export function ConnectWallet({
               </div>
             )}
 
-            {/* Actions */}
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -266,7 +255,6 @@ export function ConnectWallet({
               </Button>
             </div>
 
-            {/* Disconnect */}
             <Button
               variant="destructive"
               onClick={handleDisconnect}
@@ -281,7 +269,6 @@ export function ConnectWallet({
     );
   }
 
-  // If not connected, show connect options
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
       <DialogTrigger asChild>
@@ -316,7 +303,6 @@ export function ConnectWallet({
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
-          {/* Main Connect Button */}
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button
               onClick={() => {
@@ -335,7 +321,6 @@ export function ConnectWallet({
             </Button>
           </motion.div>
 
-          {/* Features */}
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Shield className="w-4 h-4 text-green-500" />
@@ -351,7 +336,6 @@ export function ConnectWallet({
             </div>
           </div>
 
-          {/* Alternative */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-muted" />
@@ -378,7 +362,6 @@ export function ConnectWallet({
             </Button>
           </motion.div>
 
-          {/* Security Note */}
           <div className="text-xs text-center text-muted-foreground px-4">
             Your wallet is secured by bank-grade security and Account
             Abstraction technology. We never store your private keys.

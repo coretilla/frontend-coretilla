@@ -1,9 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { mobileNavSections } from "@/config/navItems";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
@@ -15,7 +20,10 @@ interface MobileDrawerProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps) {
+export default function MobileDrawer({
+  isOpen,
+  onOpenChange,
+}: MobileDrawerProps) {
   const handleLinkClick = () => {
     onOpenChange(false);
   };
@@ -34,11 +42,16 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
       </SheetTrigger>
       <SheetContent side="left" className="w-80 p-0">
         <div className="flex flex-col h-full">
-          {/* Header */}
           <SheetHeader className="p-6 pb-4">
             <div className="flex items-center justify-between">
               <SheetTitle className="flex items-center gap-2 text-xl font-bold font-sans">
-                <Image src="/image/btcLogo.png" alt="Bitcoin" width={24} height={24} className="object-contain" />
+                <Image
+                  src="/image/btcLogo.png"
+                  alt="Bitcoin"
+                  width={24}
+                  height={24}
+                  className="object-contain"
+                />
                 Bitcoin Neobank
               </SheetTitle>
             </div>
@@ -49,7 +62,6 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
 
           <Separator />
 
-          {/* Navigation Sections */}
           <div className="flex-1 overflow-y-auto p-6">
             <nav className="space-y-6">
               {mobileNavSections.map((section) => (
@@ -89,9 +101,7 @@ export default function MobileDrawer({ isOpen, onOpenChange }: MobileDrawerProps
               ))}
             </nav>
           </div>
-
           <Separator />
-
         </div>
       </SheetContent>
     </Sheet>

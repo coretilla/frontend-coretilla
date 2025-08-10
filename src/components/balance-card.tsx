@@ -1,5 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 interface BalanceCardProps {
@@ -15,13 +14,13 @@ interface BalanceCardProps {
   className?: string;
 }
 
-export default function BalanceCard({ 
-  title, 
-  amount, 
-  symbol, 
-  change, 
+export default function BalanceCard({
+  title,
+  amount,
+  symbol,
+  change,
   icon,
-  className = ""
+  className = "",
 }: BalanceCardProps) {
   const getChangeColor = (value: number) => {
     if (value > 0) return "text-green-600";
@@ -46,15 +45,24 @@ export default function BalanceCard({
       <CardContent>
         <div className="space-y-2">
           <div className="text-2xl font-bold font-mono text-foreground">
-            {symbol}{amount}
+            {symbol}
+            {amount}
           </div>
           {change && (
-            <div className={`flex items-center gap-1 text-sm font-sans ${getChangeColor(change.value)}`}>
+            <div
+              className={`flex items-center gap-1 text-sm font-sans ${getChangeColor(
+                change.value
+              )}`}
+            >
               {getChangeIcon(change.value)}
               <span className="font-mono">
-                {change.value > 0 ? '+' : ''}{change.value.toFixed(2)}
+                {change.value > 0 ? "+" : ""}
+                {change.value.toFixed(2)}
               </span>
-              <span>({change.percentage > 0 ? '+' : ''}{change.percentage.toFixed(1)}%)</span>
+              <span>
+                ({change.percentage > 0 ? "+" : ""}
+                {change.percentage.toFixed(1)}%)
+              </span>
               <span className="text-muted-foreground">{change.period}</span>
             </div>
           )}

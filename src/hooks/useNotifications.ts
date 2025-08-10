@@ -1,5 +1,9 @@
-import { useAtom } from 'jotai';
-import { notificationsAtom, addNotificationAtom, removeNotificationAtom, Notification } from './atoms';
+import { useAtom } from "jotai";
+import {
+  notificationsAtom,
+  addNotificationAtom,
+  removeNotificationAtom,
+} from "./atoms";
 
 export const useNotifications = () => {
   const [notifications] = useAtom(notificationsAtom);
@@ -7,19 +11,19 @@ export const useNotifications = () => {
   const [, removeNotification] = useAtom(removeNotificationAtom);
 
   const addSuccess = (title: string, message: string) => {
-    addNotification({ type: 'success', title, message });
+    addNotification({ type: "success", title, message });
   };
 
   const addError = (title: string, message: string) => {
-    addNotification({ type: 'error', title, message });
+    addNotification({ type: "error", title, message });
   };
 
   const addWarning = (title: string, message: string) => {
-    addNotification({ type: 'warning', title, message });
+    addNotification({ type: "warning", title, message });
   };
 
   const addInfo = (title: string, message: string) => {
-    addNotification({ type: 'info', title, message });
+    addNotification({ type: "info", title, message });
   };
 
   const removeNotificationById = (id: string) => {
@@ -27,7 +31,7 @@ export const useNotifications = () => {
   };
 
   const clearAll = () => {
-    notifications.forEach(notification => {
+    notifications.forEach((notification) => {
       removeNotification(notification.id);
     });
   };

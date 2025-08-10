@@ -13,7 +13,7 @@ export interface AuthState {
   isAuthenticating: boolean;
   token: string | null;
   user: any;
-  signature: string | null; // Store signature for API calls
+  signature: string | null;
   signIn: () => Promise<void>;
   signOut: () => void;
   error: string | null;
@@ -46,10 +46,14 @@ export function useAuth(): AuthState {
             return;
           }
 
-          // Check if stored wallet address matches current connected wallet
-          if (address && storedUser.wallet_address && 
-              storedUser.wallet_address.toLowerCase() !== address.toLowerCase()) {
-            console.log("⚠️ Different wallet connected, clearing auth and requiring new sign");
+          if (
+            address &&
+            storedUser.wallet_address &&
+            storedUser.wallet_address.toLowerCase() !== address.toLowerCase()
+          ) {
+            console.log(
+              "⚠️ Different wallet connected, clearing auth and requiring new sign"
+            );
             clearAuth();
             setIsAuthenticated(false);
             return;
@@ -123,23 +127,13 @@ export function useAuth(): AuthState {
     setError(null);
 
     try {
-      // Step 1: Get fresh nonce from backend
-      console.log("🔄 Getting fresh nonce for wallet:", address);
       const nonceData = await getNonce(address);
-      console.log("✅ Fresh nonce obtained:", nonceData.nonce);
-      console.log("⏰ Nonce timestamp:", new Date().toISOString());
-
-      // Check if this is a fallback nonce (client-generated)
-      const isFallbackNonce = nonceData.nonce.includes("-");
-
-      // Step 2: Create a message to sign with nonce
-      // Let's try different message formats to find the correct one
       const messageFormats = [
-        nonceData.nonce, // Format 1: Just nonce
-        `${address}:${nonceData.nonce}`, // Format 2: address:nonce
-        `Please sign this message to authenticate.\nNonce: ${nonceData.nonce}`, // Format 3: Simple auth message
-        `Login to app with nonce ${nonceData.nonce}`, // Format 4: Login message
-        `I want to login\nNonce: ${nonceData.nonce}`, // Format 5: Want to login
+        nonceData.nonce,
+        `${address}:${nonceData.nonce}`,
+        `Please sign this message to authenticate.\nNonce: ${nonceData.nonce}`,
+        `Login to app with nonce ${nonceData.nonce}`,
+        `I want to login\nNonce: ${nonceData.nonce}`,
       ];
 
       const message = messageFormats[0];
@@ -148,42 +142,19 @@ export function useAuth(): AuthState {
         message,
       });
 
-      console.log("🔐 Wallet signature obtained:", signature);
-      console.log(
-        "⏱️ Time between nonce and signature:",
-        Date.now() - Date.parse(new Date().toISOString())
-      );
-
-      // Step 4: Authenticate with backend immediately (no delay)
-      console.log("🚀 Attempting authentication...");
       const result = await signInWithWallet(
         address,
         signature,
         nonceData.nonce
       );
 
-      console.log("✅ Authentication successful:", result);
-      console.log(
-        "🎯 Access Token for deposit API calls:",
-        result.access_token
-          ? `${result.access_token.substring(0, 30)}...`
-          : "No access_token"
-      );
-
-      setToken(result.access_token); // Store access_token as token
+      setToken(result.access_token);
       setUser({
         wallet_address: result.wallet_address,
         message: result.message,
       });
-      setSignature(signature); // Keep signature for reference
+      setSignature(signature);
       setIsAuthenticated(true);
-
-      console.log(
-        "🔑 Authentication complete - Access token ready for deposit API calls!"
-      );
-      console.log(
-        "📝 Access token will be used in Authorization: Bearer header"
-      );
     } catch (err) {
       console.error("❌ Authentication failed:", err);
       setError(err instanceof Error ? err.message : "Authentication failed");

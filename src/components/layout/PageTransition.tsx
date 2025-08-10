@@ -8,7 +8,6 @@ interface PageTransitionProps {
   children: ReactNode;
 }
 
-// Animation variants
 const pageVariants = {
   initial: {
     opacity: 0,
@@ -56,8 +55,6 @@ const slideTransition = {
 
 export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
-
-  // Use different animations for different page types
   const isHomePage = pathname === "/";
   const variants = isHomePage ? pageVariants : slideVariants;
   const transition = isHomePage ? pageTransition : slideTransition;

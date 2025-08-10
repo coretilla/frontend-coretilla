@@ -1,45 +1,42 @@
-import { useState, useEffect, useCallback } from 'react';
-import { parseEther, formatEther } from 'viem';
-import { useReadContract } from 'wagmi';
-import { CONTRACTS, STAKING_VAULT_ABI } from '@/lib/contracts/abi';
+import { useState, useEffect, useCallback } from "react";
+import { parseEther, formatEther } from "viem";
+import { useReadContract } from "wagmi";
+import { CONTRACTS, STAKING_VAULT_ABI } from "@/lib/contracts/abi";
 
 export function useYearlyRewards(amount: string) {
-  const [yearlyRewards, setYearlyRewards] = useState('0');
+  const [yearlyRewards, setYearlyRewards] = useState("0");
 
-  // Convert amount to wei for contract call
-  const amountWei = amount && amount !== '0' ? parseEther(amount) : BigInt(0);
+  const amountWei = amount && amount !== "0" ? parseEther(amount) : BigInt(0);
 
-  // Call calculateYearlyRewards from contract
   const { data: contractRewards, refetch } = useReadContract({
     address: CONTRACTS.STAKING_VAULT,
     abi: STAKING_VAULT_ABI,
-    functionName: 'calculateYearlyRewards',
+    functionName: "calculateYearlyRewards",
     args: amountWei > BigInt(0) ? [amountWei] : undefined,
     query: {
-      enabled: amountWei > BigInt(0), // Only call when amount > 0
+      enabled: amountWei > BigInt(0),
     },
   });
 
-  // Update yearly rewards when contract data changes
   useEffect(() => {
     if (contractRewards) {
       const formatted = formatEther(contractRewards as bigint);
       setYearlyRewards(formatted);
-    } else if (!amount || amount === '0') {
-      setYearlyRewards('0');
+    } else if (!amount || amount === "0") {
+      setYearlyRewards("0");
     }
   }, [contractRewards, amount]);
 
-  const calculateYearlyRewards = useCallback((newAmount: string) => {
-    if (!newAmount || newAmount === '0') {
-      setYearlyRewards('0');
-      return '0';
-    }
-    
-    // For immediate response, we'll use the current cached value
-    // The useReadContract will update automatically when amount changes
-    return yearlyRewards;
-  }, [yearlyRewards]);
+  const calculateYearlyRewards = useCallback(
+    (newAmount: string) => {
+      if (!newAmount || newAmount === "0") {
+        setYearlyRewards("0");
+        return "0";
+      }
+      return yearlyRewards;
+    },
+    [yearlyRewards]
+  );
 
   return {
     yearlyRewards,

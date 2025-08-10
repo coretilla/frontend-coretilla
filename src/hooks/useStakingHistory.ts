@@ -15,7 +15,6 @@ export function useStakingHistory() {
       
       if (result.success) {
         setHistory(result.data);
-        console.log('📊 Staking history loaded:', result.data.length, 'items');
       } else {
         throw new Error('Failed to fetch staking history');
       }
