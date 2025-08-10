@@ -46,6 +46,15 @@ export function useAuth(): AuthState {
             return;
           }
 
+          // Check if stored wallet address matches current connected wallet
+          if (address && storedUser.wallet_address && 
+              storedUser.wallet_address.toLowerCase() !== address.toLowerCase()) {
+            console.log("⚠️ Different wallet connected, clearing auth and requiring new sign");
+            clearAuth();
+            setIsAuthenticated(false);
+            return;
+          }
+
           setToken(storedToken);
           setUser(storedUser);
           setIsAuthenticated(true);
@@ -63,7 +72,7 @@ export function useAuth(): AuthState {
     };
 
     checkAndRestoreAuth();
-  }, []);
+  }, [address]);
 
   useEffect(() => {
     if (!isConnected && isAuthenticated) {

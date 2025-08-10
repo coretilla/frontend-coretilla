@@ -34,6 +34,7 @@ import { Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { formatToken } from "@/hooks/useFormatToken";
 import {
   Tooltip,
   TooltipContent,
@@ -184,13 +185,13 @@ export default function DashboardPage() {
     },
     crypto: {
       BTC: {
-        amount: wbtcBalance.toFixed(1),
+        amount: formatToken(wbtcBalance),
         change: { value: 0, percentage: 0, period: "7D" },
         price: btcPrice,
         usdValue: wbtcBalanceInUsd,
       },
       CORE: {
-        amount: coreBalance.toFixed(2),
+        amount: formatToken(coreBalance),
         change: { value: 0, percentage: 0, period: "7D" },
         price: corePrice,
         usdValue: coreBalanceInUsd,

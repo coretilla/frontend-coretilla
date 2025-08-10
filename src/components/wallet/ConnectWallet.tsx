@@ -1,98 +1,118 @@
 "use client";
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
-import { 
-  Wallet, 
-  Mail, 
-  Copy, 
-  ExternalLink, 
-  LogOut, 
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import {
+  Wallet,
+  Mail,
+  Copy,
+  ExternalLink,
+  LogOut,
   CheckCircle,
   Loader2,
   Shield,
   Zap,
   Chrome,
-  Smartphone
-} from 'lucide-react'
-import { useWallet } from '@/hooks/useWallet'
-import { toast } from 'sonner'
+  Smartphone,
+} from "lucide-react";
+import { useWallet } from "@/hooks/useWallet";
+import { useAccount } from "wagmi";
+import { toast } from "sonner";
 
 interface ConnectWalletProps {
-  variant?: 'default' | 'outline' | 'ghost'
-  size?: 'default' | 'sm' | 'lg'
-  className?: string
+  variant?: "default" | "outline" | "ghost";
+  size?: "default" | "sm" | "lg";
+  className?: string;
 }
 
-export function ConnectWallet({ 
-  variant = 'default', 
-  size = 'default',
-  className = '' 
+export function ConnectWallet({
+  variant = "default",
+  size = "default",
+  className = "",
 }: ConnectWalletProps) {
-  const { 
-    isConnected, 
-    isConnecting, 
-    address, 
-    balance, 
-    connect, 
+  const {
+    isConnected,
+    isConnecting,
+    address,
+    smartAccountAddress,
+    balance,
+    connect,
     disconnect,
-    chainId 
-  } = useWallet()
-  
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
+    chainId,
+  } = useWallet();
+
+  // Get additional account info including connector details
+  const { connector } = useAccount();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Format address for display
   const formatAddress = (addr: string) => {
-    if (!addr) return ''
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`
-  }
+    if (!addr) return "";
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  };
 
   // Copy address to clipboard
   const copyAddress = async () => {
-    if (!address) return
-    
+    if (!address) return;
+
     try {
-      await navigator.clipboard.writeText(address)
-      setCopied(true)
-      toast.success('Address copied to clipboard!')
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      toast.success("Address copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      toast.error('Failed to copy address')
+      toast.error("Failed to copy address");
     }
-  }
+  };
+
+  // Check if this is a smart wallet (social login)
+  const isSmartWallet =
+    connector?.name?.toLowerCase().includes("smart") ||
+    connector?.name?.toLowerCase().includes("social") ||
+    connector?.id?.includes("coinbaseWallet") ||
+    connector?.id?.includes("w3mEmail");
 
   // Handle disconnect
   const handleDisconnect = async () => {
-    await disconnect()
-    setIsModalOpen(false)
-    toast.success('Wallet disconnected')
-  }
+    await disconnect();
+    setIsModalOpen(false);
+    toast.success("Wallet disconnected");
+  };
 
   // If connected, show wallet info
   if (isConnected && address) {
     return (
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogTrigger asChild>
-          <Button 
-            variant={variant} 
+          <Button
+            variant={variant}
             size={size}
             className={`relative overflow-hidden ${className}`}
           >
-            <motion.div 
+            <motion.div
               className="flex items-center gap-2"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="font-mono text-sm">{formatAddress(address)}</span>
+              <span className="font-mono text-sm">
+                {formatAddress(smartAccountAddress || address || "")}
+              </span>
             </motion.div>
           </Button>
         </DialogTrigger>
-        
+
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -100,29 +120,71 @@ export function ConnectWallet({
               Connected Wallet
             </DialogTitle>
           </DialogHeader>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            {/* Wallet Address */}
+            {/* Wallet Type & Address */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-muted-foreground">Address</span>
-                <Badge variant="secondary" className="text-xs">
-                  Chain ID: {chainId}
-                </Badge>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {isSmartWallet ? "Smart Account Address" : "Wallet Address"}
+                </span>
+                <div className="flex items-center gap-2">
+                  {isSmartWallet && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                    >
+                      <Shield className="w-3 h-3 mr-1" />
+                      Smart Wallet
+                    </Badge>
+                  )}
+                  <Badge variant="secondary" className="text-xs">
+                    Chain ID: {chainId}
+                  </Badge>
+                </div>
               </div>
-              
+
+              {isSmartWallet && (
+                <div className="text-xs text-muted-foreground bg-blue-50 p-2 rounded-lg border-l-2 border-blue-200">
+                  <div className="flex items-center gap-1 mb-1">
+                    <Mail className="w-3 h-3 text-blue-500" />
+                    <span>
+                      This is your smart contract wallet address created from
+                      your Gmail/social login
+                    </span>
+                  </div>
+                  <div className="text-xs text-orange-600 font-medium">
+                    ⚠️ Make sure you have CORE tokens for transaction gas fees
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
                 <code className="flex-1 text-sm font-mono break-all">
-                  {address}
+                  {smartAccountAddress || address}
                 </code>
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={copyAddress}
+                  onClick={() => {
+                    const addressToCopy = smartAccountAddress || address;
+                    if (!addressToCopy) return;
+
+                    navigator.clipboard
+                      .writeText(addressToCopy)
+                      .then(() => {
+                        setCopied(true);
+                        toast.success("Smart Account Address copied!");
+                        setTimeout(() => setCopied(false), 2000);
+                      })
+                      .catch(() => {
+                        toast.error("Failed to copy address");
+                      });
+                  }}
                   className="p-2 h-8 w-8"
                 >
                   {copied ? (
@@ -132,12 +194,41 @@ export function ConnectWallet({
                   )}
                 </Button>
               </div>
+
+              {/* Address Info */}
+              {isSmartWallet &&
+                smartAccountAddress &&
+                smartAccountAddress !== address && (
+                  <div className="text-xs text-muted-foreground bg-gray-50 p-2 rounded border-l-2 border-gray-200">
+                    <div className="font-medium text-gray-700 mb-1">
+                      Address Details:
+                    </div>
+                    <div>
+                      <span className="font-mono text-xs">Smart Account:</span>{" "}
+                      {smartAccountAddress}
+                    </div>
+                    <div>
+                      <span className="font-mono text-xs">EOA (Owner):</span>{" "}
+                      {address}
+                    </div>
+                  </div>
+                )}
+
+              {/* Connector Info */}
+              {connector && (
+                <div className="text-xs text-muted-foreground">
+                  Connected via:{" "}
+                  <span className="font-mono">{connector.name}</span>
+                </div>
+              )}
             </div>
 
             {/* Balance */}
             {balance && (
               <div className="space-y-2">
-                <span className="text-sm font-medium text-muted-foreground">Balance</span>
+                <span className="text-sm font-medium text-muted-foreground">
+                  Balance
+                </span>
                 <div className="p-3 bg-muted rounded-lg">
                   <div className="text-2xl font-bold font-mono">
                     {parseFloat(balance.formatted).toFixed(4)} {balance.symbol}
@@ -157,11 +248,17 @@ export function ConnectWallet({
                 <Copy className="w-4 h-4 mr-2" />
                 Copy Address
               </Button>
-              
+
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.open(`https://scan.coredao.org/address/${address}`, '_blank')}
+                onClick={() => {
+                  const explorerAddress = smartAccountAddress || address;
+                  window.open(
+                    `https://scan.coredao.org/address/${explorerAddress}`,
+                    "_blank"
+                  );
+                }}
                 className="flex-1"
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
@@ -181,20 +278,20 @@ export function ConnectWallet({
           </motion.div>
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   // If not connected, show connect options
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
       <DialogTrigger asChild>
-        <Button 
-          variant={variant} 
+        <Button
+          variant={variant}
           size={size}
           className={`relative overflow-hidden ${className}`}
           disabled={isConnecting}
         >
-          <motion.div 
+          <motion.div
             className="flex items-center gap-2"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -204,30 +301,27 @@ export function ConnectWallet({
             ) : (
               <Wallet className="w-4 h-4" />
             )}
-            {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+            {isConnecting ? "Connecting..." : "Connect Wallet"}
           </motion.div>
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">Connect Your Wallet</DialogTitle>
         </DialogHeader>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6"
         >
           {/* Main Connect Button */}
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button
               onClick={() => {
-                connect()
-                setIsModalOpen(false)
+                connect();
+                setIsModalOpen(false);
               }}
               className="w-full h-14 text-base bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-600/90"
               disabled={isConnecting}
@@ -269,15 +363,12 @@ export function ConnectWallet({
             </div>
           </div>
 
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button
               variant="outline"
               onClick={() => {
-                connect()
-                setIsModalOpen(false)
+                connect();
+                setIsModalOpen(false);
               }}
               className="w-full h-12"
               disabled={isConnecting}
@@ -289,11 +380,11 @@ export function ConnectWallet({
 
           {/* Security Note */}
           <div className="text-xs text-center text-muted-foreground px-4">
-            Your wallet is secured by bank-grade security and Account Abstraction technology. 
-            We never store your private keys.
+            Your wallet is secured by bank-grade security and Account
+            Abstraction technology. We never store your private keys.
           </div>
         </motion.div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

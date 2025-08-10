@@ -54,6 +54,7 @@ export const modal = createAppKit({
     email: true,
     socials: ["google", "github", "apple"],
     emailShowWallets: true,
+    smartSessions: true, // Enable smart sessions for better UX
   },
 });
 

@@ -22,6 +22,7 @@ import { useBTCPrice } from "@/hooks";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserData } from "@/lib/api";
+import { formatToken } from "@/hooks/useFormatToken";
 import Link from "next/link";
 
 export default function Hero() {
@@ -135,7 +136,7 @@ export default function Hero() {
                     <span className="relative z-10 bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent font-extrabold">
                       Neobank
                     </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-400/30 via-orange-500/30 to-orange-600/30 blur-2xl"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-400/30 via-orange-500/30 to-orange-600/30 blur-2xl sm:blur-xl"></div>
                     <div className="absolute -bottom-2 left-0 w-40 ml-[6.2rem] md:ml-0 md:w-40 lg:w-48 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full"></div>
                   </span>
                 </h1>
@@ -393,7 +394,7 @@ export default function Hero() {
                         {isLoadingBalance ? (
                           <div className="animate-pulse bg-muted rounded w-20 h-6 mx-auto" />
                         ) : isAuthenticated ? (
-                          Number(wbtcBalance.toFixed(1))
+                          formatToken(wbtcBalance)
                         ) : (
                           "0.0"
                         )}

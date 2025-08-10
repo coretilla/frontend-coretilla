@@ -66,12 +66,23 @@ export function useStaking() {
     
     const amountWei = parseEther(amount);
     
-    writeContract({
-      address: CONTRACTS.MBTC,
-      abi: MBTC_ABI,
-      functionName: 'approve',
-      args: [CONTRACTS.STAKING_VAULT, amountWei],
-    });
+    try {
+      writeContract({
+        address: CONTRACTS.MBTC,
+        abi: MBTC_ABI,
+        functionName: 'approve',
+        args: [CONTRACTS.STAKING_VAULT, amountWei],
+        // Remove fixed gas limit to let wallet estimate properly for smart accounts
+      });
+    } catch (error: any) {
+      console.error('❌ Approve transaction failed:', error);
+      // Add more specific error handling for smart wallets
+      if (error?.message?.includes('insufficient funds') || 
+          error?.message?.includes('insufficient balance')) {
+        throw new Error('Insufficient CORE balance for transaction fees. Smart wallets need CORE for gas fees.');
+      }
+      throw error;
+    }
   };
 
   // Stake mBTC
@@ -80,12 +91,22 @@ export function useStaking() {
     
     const amountWei = parseEther(amount);
     
-    writeContract({
-      address: CONTRACTS.STAKING_VAULT,
-      abi: STAKING_VAULT_ABI,
-      functionName: 'stake',
-      args: [amountWei],
-    });
+    try {
+      writeContract({
+        address: CONTRACTS.STAKING_VAULT,
+        abi: STAKING_VAULT_ABI,
+        functionName: 'stake',
+        args: [amountWei],
+        // Remove fixed gas limit to let wallet estimate properly for smart accounts
+      });
+    } catch (error: any) {
+      console.error('❌ Stake transaction failed:', error);
+      if (error?.message?.includes('insufficient funds') || 
+          error?.message?.includes('insufficient balance')) {
+        throw new Error('Insufficient CORE balance for transaction fees. Smart wallets need CORE for gas fees.');
+      }
+      throw error;
+    }
   };
 
   // Start cooldown for unstaking

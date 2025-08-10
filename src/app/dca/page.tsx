@@ -34,6 +34,7 @@ import {
   parseUserBalance,
   UserBalance,
 } from "@/lib/api";
+import { formatToken } from "@/hooks/useFormatToken";
 
 interface DCAData {
   fiatSource: string;
@@ -1195,7 +1196,7 @@ export default function DCAPage() {
                     </div>
                     <div className="text-center p-4 bg-muted rounded-lg">
                       <div className="text-lg font-bold text-orange-500 font-mono">
-                        {projection.totalBTC.toFixed(8)}
+                        {formatToken(projection.totalBTC)}
                       </div>
                       <div className="text-sm text-muted-foreground font-sans">
                         Total BTC
@@ -1394,10 +1395,10 @@ export default function DCAPage() {
                           {result.amountInvested.toLocaleString()}
                         </td>
                         <td className="text-right p-2 font-mono text-orange-500 font-medium">
-                          {result.btcPurchased.toFixed(1)}
+                          {formatToken(result.btcPurchased)}
                         </td>
                         <td className="text-right p-2 font-mono font-semibold text-blue-600">
-                          {result.totalBtc.toFixed(1)}
+                          {formatToken(result.totalBtc)}
                         </td>
                         <td className="text-right p-2 font-mono font-bold text-green-600">
                           {selectedCurrency?.symbol}

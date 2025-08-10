@@ -120,7 +120,7 @@ export default function SwapPage() {
     if (formData.amount) {
       const fiatAmount = parseFloat(formData.amount);
       const btcReceived = fiatAmount / btcPrice;
-      setBtcAmount(btcReceived.toFixed(1));
+      setBtcAmount(btcReceived.toFixed(8));
     } else {
       setBtcAmount("0.00000000");
     }
@@ -368,7 +368,7 @@ export default function SwapPage() {
                   <Input
                     id="amount"
                     type="number"
-                    placeholder="0.00"
+                    placeholder="0.000000"
                     value={formData.amount}
                     onChange={(e) =>
                       setFormData({ ...formData, amount: e.target.value })
@@ -410,7 +410,7 @@ export default function SwapPage() {
                     value={btcAmount}
                     readOnly
                     className="pl-10 font-mono bg-muted"
-                    placeholder="0.0"
+                    placeholder="0.00000"
                   />
                 </div>
                 <div className="text-sm text-muted-foreground font-sans">
@@ -516,7 +516,7 @@ export default function SwapPage() {
                   <div className="flex justify-between font-semibold">
                     <span className="font-sans">You'll Receive:</span>
                     <span className="font-mono text-primary">
-                      {(parseFloat(btcAmount) - networkFee).toFixed(1)} BTC
+                      {(parseFloat(btcAmount) - networkFee).toFixed(8)} BTC
                     </span>
                   </div>
                 </div>

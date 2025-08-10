@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Copy, ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
+import { formatToken } from '@/hooks/useFormatToken'
 
 /**
  * Example component showing how to use the wallet throughout the app
@@ -92,7 +93,7 @@ export function WalletInfo() {
             <p className="text-sm font-medium text-muted-foreground mb-2">Balance</p>
             <div className="p-2 bg-muted rounded-md">
               <p className="text-lg font-mono font-semibold">
-                {parseFloat(balance.formatted).toFixed(4)} {balance.symbol}
+                {formatToken(parseFloat(balance.formatted))} {balance.symbol}
               </p>
             </div>
           </div>

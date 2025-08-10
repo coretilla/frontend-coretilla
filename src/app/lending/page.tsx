@@ -22,6 +22,7 @@ import { useLending } from "@/hooks/useLending";
 import { ConnectWallet } from "@/components/wallet/ConnectWallet";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getLendingHistory, getLoanHistory } from "@/lib/api";
+import { formatToken } from "@/hooks/useFormatToken";
 
 const formatHealthFactor = (value: number): string => {
   if (!value || isNaN(value)) return "0.00";
@@ -409,7 +410,7 @@ export default function LendingPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono">
-                {parseFloat(lending.mBTCBalance).toFixed(8).replace(/\.?0+$/, '')}
+                {formatToken(parseFloat(lending.mBTCBalance))}
               </div>
               <p className="text-xs text-muted-foreground font-sans">
                 Available to deposit
@@ -445,7 +446,7 @@ export default function LendingPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold font-mono">
-                {parseFloat(lending.collateralBalance).toFixed(1)}
+                {formatToken(parseFloat(lending.collateralBalance))}
               </div>
               <p className="text-xs text-muted-foreground font-sans">
                 Bitcoin deposited
@@ -595,7 +596,7 @@ export default function LendingPage() {
                       </Button>
                     </div>
                     <div className="text-sm text-muted-foreground font-sans">
-                      Available: {parseFloat(lending.mBTCBalance).toFixed(8).replace(/\.?0+$/, '')}{" "}
+                      Available: {formatToken(parseFloat(lending.mBTCBalance))}{" "}
                       Bitcoin
                     </div>
                   </div>
@@ -723,7 +724,7 @@ export default function LendingPage() {
                     </div>
                     <div className="text-sm text-muted-foreground font-sans">
                       Deposited:{" "}
-                      {parseFloat(lending.collateralBalance).toFixed(1)} Bitcoin
+                      {formatToken(parseFloat(lending.collateralBalance))} Bitcoin
                     </div>
                   </div>
 
@@ -972,7 +973,7 @@ export default function LendingPage() {
                                 <div className="font-semibold font-mono text-lg">
                                   {parseFloat(
                                     deposit.btcAmount || deposit.amount
-                                  ).toFixed(8)}{" "}
+                                  )}{" "}
                                   Bitcoin
                                 </div>
                                 <div className="text-sm text-muted-foreground font-sans">
