@@ -14,11 +14,7 @@ import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import BTCPriceViewer from "./btc-price-viewer";
-
-interface MobileDrawerProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+import { MobileDrawerProps } from "@/app/types/navbar-types";
 
 export default function MobileDrawer({
   isOpen,

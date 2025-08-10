@@ -37,11 +37,7 @@ import {
 import { useWallet } from "@/hooks/useWallet";
 import { ConnectWallet } from "@/components/wallet/ConnectWallet";
 import { useAuth } from "@/hooks/useAuth";
-
-interface SwapFormData {
-  fromCurrency: string;
-  amount: string;
-}
+import { SwapFormData } from "../types/swap-types";
 
 export default function SwapPage() {
   const { isConnected } = useWallet();

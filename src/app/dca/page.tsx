@@ -28,30 +28,10 @@ import { useWallet } from "@/hooks/useWallet";
 import { useAuth } from "@/hooks/useAuth";
 import { ConnectWallet } from "@/components/wallet/ConnectWallet";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  getBtcPrice,
-  getUserData,
-  parseUserBalance,
-  UserBalance,
-} from "@/lib/api";
+import { getBtcPrice, getUserData, parseUserBalance } from "@/lib/api";
 import { formatToken } from "@/hooks/useFormatToken";
-
-interface DCAData {
-  fiatSource: string;
-  amount: string;
-  frequency: string;
-  duration: string;
-}
-
-interface SimulationResult {
-  month: number;
-  btcPrice: number;
-  amountInvested: number;
-  btcPurchased: number;
-  totalBtc: number;
-  totalInvested: number;
-  currentValue: number;
-}
+import { DCAData, SimulationResult } from "../types/dca-types";
+import { UserBalance } from "../types/api-types";
 
 export default function DCAPage() {
   const { isConnected } = useWallet();
@@ -78,7 +58,7 @@ export default function DCAPage() {
   const [priceChange, setPriceChange] = useState<number | null>(null);
   const [userBalance, setUserBalance] = useState<UserBalance>({ USD: 0 });
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
-  const [yearlyGrowthPrediction, setYearlyGrowthPrediction] = useState(25); // Default 25% annual growth
+  const [yearlyGrowthPrediction, setYearlyGrowthPrediction] = useState(25);
   const [customGrowth, setCustomGrowth] = useState("");
   const [isCustomGrowth, setIsCustomGrowth] = useState(false);
   const [customDuration, setCustomDuration] = useState("");
@@ -244,7 +224,7 @@ export default function DCAPage() {
     if (results.length > 0 && yearlyGrowthPrediction > 0) {
       const finalResult = results[results.length - 1];
       const expectedMinimumValue =
-        finalResult.totalInvested * (1 + (yearlyGrowthPrediction / 100) * 0.5); // At least 50% of predicted growth
+        finalResult.totalInvested * (1 + (yearlyGrowthPrediction / 100) * 0.5);
 
       if (finalResult.currentValue < expectedMinimumValue) {
         const adjustedFinalPrice = expectedMinimumValue / finalResult.totalBtc;

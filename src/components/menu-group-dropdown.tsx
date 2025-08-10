@@ -12,12 +12,8 @@ import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { NavGroup } from "@/config/navItems";
 import { dropdownVariants } from "@/lib/motion/variants";
-
-interface MenuGroupDropdownProps {
-  group: NavGroup;
-}
+import { MenuGroupDropdownProps } from "@/app/types/navbar-types";
 
 export default function MenuGroupDropdown({ group }: MenuGroupDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);

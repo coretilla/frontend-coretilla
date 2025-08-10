@@ -12,7 +12,6 @@ import PageWrapper from "@/components/layout/PageWrapper";
 import {
   DollarSign,
   TrendingUp,
-  Zap,
   BarChart3,
   Calendar,
   RefreshCw,
@@ -173,8 +172,8 @@ export default function DashboardPage() {
   const wbtcBalanceInUsd = apiData?.wbtcBalanceInUsd || 0;
   const coreBalanceInUsd = apiData?.coreBalanceInUsd || 0;
   const totalAssetInUsd = apiData?.totalAssetInUsd || 0;
-  const corePrice = coreBalance > 0 ? coreBalanceInUsd / coreBalance : 1.2; // fallback price
-  const btcPrice = btcPriceData?.data?.price || 0; // Get BTC price from API
+  const corePrice = coreBalance > 0 ? coreBalanceInUsd / coreBalance : 1.2;
+  const btcPrice = btcPriceData?.data?.price || 0;
 
   const balances = {
     fiat: {

@@ -10,14 +10,9 @@ import {
   Wallet,
   ArrowUpDown,
   TrendingUp,
-  CreditCard,
   BarChart3,
   DollarSign,
-  Percent,
-  Activity,
-  UserCheck,
-  Zap,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -106,7 +101,9 @@ export default function Features() {
                       >
                         <feature.icon className="w-6 h-6 text-white" />
                       </div>
-                      <CardTitle className="font-sans">{feature.title}</CardTitle>
+                      <CardTitle className="font-sans">
+                        {feature.title}
+                      </CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>

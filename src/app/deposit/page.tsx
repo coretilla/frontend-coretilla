@@ -45,37 +45,17 @@ import {
   confirmDeposit,
   getUserData,
   parseUserBalance,
-  UserBalance,
 } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useWallet } from "@/hooks/useWallet";
 import { ConnectWallet } from "@/components/wallet/ConnectWallet";
 import { Badge } from "@/components/ui/badge";
-
-interface DepositFormData {
-  currency: string;
-  amount: string;
-  paymentMethod: string;
-}
-
-interface Transaction {
-  id: number;
-  amount: number;
-  type: "DEPOSIT" | "WITHDRAWAL";
-  description: string;
-  createdAt: string;
-}
-
-interface TransactionResponse {
-  success?: boolean;
-  data?: Transaction[];
-  pagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
+import {
+  DepositFormData,
+  Transaction,
+  TransactionResponse,
+} from "../types/deposit-types";
+import { UserBalance } from "../types/api-types";
 
 function DepositForm({
   isAuthenticated,

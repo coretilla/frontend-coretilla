@@ -9,28 +9,7 @@ import {
 } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { useCallback, useEffect, useState } from "react";
-
-export interface WalletState {
-  isConnected: boolean;
-  isConnecting: boolean;
-  isReconnecting: boolean;
-  address?: string;
-  smartAccountAddress?: string;
-  chainId?: number;
-  connector?: any;
-  balance?: {
-    decimals: number;
-    formatted: string;
-    symbol: string;
-    value: bigint;
-  };
-  connect: () => void;
-  disconnect: () => void;
-  openModal: () => void;
-  saveSession: () => void;
-  clearSession: () => void;
-  hasStoredSession: boolean;
-}
+import { WalletState } from "@/app/types/connect-wallet-types";
 
 const WALLET_SESSION_KEY = "bitcoin-neobank-wallet-session";
 

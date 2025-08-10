@@ -9,20 +9,9 @@ import {
   Settings,
   House,
 } from "lucide-react";
+import { NavItem, NavigatorGroup } from "@/app/types/navbar-types";
 
-export interface NavItem {
-  name: string;
-  href: string;
-  icon: any;
-}
-
-export interface NavGroup {
-  name: string;
-  icon: any;
-  items: NavItem[];
-}
-
-export const navGroups: NavGroup[] = [
+export const navGroups: NavigatorGroup[] = [
   {
     name: "Home",
     icon: House,

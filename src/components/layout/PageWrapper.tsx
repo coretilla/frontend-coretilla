@@ -1,14 +1,7 @@
 "use client";
 
-import { ReactNode } from "react";
 import { motion } from "framer-motion";
-
-interface PageWrapperProps {
-  children: ReactNode;
-  title?: string | ReactNode;
-  subtitle?: string;
-  className?: string;
-}
+import { PageWrapperProps } from "@/app/types/main-layout-types";
 
 export default function PageWrapper({ 
   children, 

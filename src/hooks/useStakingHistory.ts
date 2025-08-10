@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getStakeHistory, StakeHistoryItem } from '@/lib/api';
+import { useState, useEffect, useCallback } from "react";
+import { getStakeHistory, StakeHistoryItem } from "@/lib/api";
 
 export function useStakingHistory() {
   const [history, setHistory] = useState<StakeHistoryItem[]>([]);
@@ -12,16 +12,17 @@ export function useStakingHistory() {
 
     try {
       const result = await getStakeHistory();
-      
+
       if (result.success) {
         setHistory(result.data);
       } else {
-        throw new Error('Failed to fetch staking history');
+        throw new Error("Failed to fetch staking history");
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error occurred";
       setError(errorMessage);
-      console.error('❌ Error fetching staking history:', err);
+      console.error("❌ Error fetching staking history:", err);
     } finally {
       setIsLoading(false);
     }

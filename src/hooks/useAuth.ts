@@ -7,17 +7,7 @@ import {
   clearAuth,
   getNonce,
 } from "@/lib/auth";
-
-export interface AuthState {
-  isAuthenticated: boolean;
-  isAuthenticating: boolean;
-  token: string | null;
-  user: any;
-  signature: string | null;
-  signIn: () => Promise<void>;
-  signOut: () => void;
-  error: string | null;
-}
+import { AuthState } from "@/app/types/auth-types";
 
 export function useAuth(): AuthState {
   const { address, isConnected } = useWallet();

@@ -27,12 +27,7 @@ import {
 import { useWallet } from "@/hooks/useWallet";
 import { useAccount } from "wagmi";
 import { toast } from "sonner";
-
-interface ConnectWalletProps {
-  variant?: "default" | "outline" | "ghost";
-  size?: "default" | "sm" | "lg";
-  className?: string;
-}
+import { ConnectWalletProps } from "@/app/types/connect-wallet-types";
 
 export function ConnectWallet({
   variant = "default",

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import BTCPrice from "./navbar/BTCPrice";
+import BTCPrice from "./CoingeckoNavbar/BTCPrice";
 import MobileDrawer from "./MobileDrawer";
 import { ConnectWallet } from "./wallet/ConnectWallet";
 import { ChevronDown } from "lucide-react";
@@ -46,31 +46,41 @@ export default function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.3 }}
               >
-                <Image src="/image/coretillaLogo.png" alt="Coretilla" width={150} height={50} className="object-contain hidden md:block" 
-                 />
+                <Image
+                  src="/image/coretillaLogo.png"
+                  alt="Coretilla"
+                  width={150}
+                  height={50}
+                  className="object-contain hidden md:block"
+                />
               </motion.div>
             </Link>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="hidden lg:flex items-center space-x-1"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             {navGroups.map((group, groupIndex) => {
-              const hasActiveItem = group.items.some(item => activeRoute === item.href);
-              
+              const hasActiveItem = group.items.some(
+                (item) => activeRoute === item.href
+              );
+
               if (group.items.length === 1) {
                 const item = group.items[0];
                 const isActive = activeRoute === item.href;
-                
+
                 return (
                   <motion.div
                     key={group.name}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.5 + groupIndex * 0.1 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: 0.5 + groupIndex * 0.1,
+                    }}
                     whileHover={{ scale: 1.02 }}
                   >
                     <Button
@@ -88,7 +98,7 @@ export default function Navbar() {
                   </motion.div>
                 );
               }
-              
+
               return (
                 <motion.div
                   key={group.name}
@@ -116,7 +126,7 @@ export default function Navbar() {
                       {group.items.map((item) => {
                         const IconComponent = item.icon;
                         const isActive = activeRoute === item.href;
-                        
+
                         return (
                           <DropdownMenuItem key={item.name} asChild>
                             <button
@@ -138,15 +148,15 @@ export default function Navbar() {
             })}
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="hidden md:flex items-center space-x-4"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
             <BTCPrice />
-            <ConnectWallet 
-              variant="ghost" 
+            <ConnectWallet
+              variant="ghost"
               className="hover:text-primary font-sans font-medium"
             />
           </motion.div>
@@ -156,8 +166,8 @@ export default function Navbar() {
             <div className="hidden sm:block">
               <BTCPrice showDropdown={false} />
             </div>
-            <MobileDrawer 
-              isOpen={mobileMenuOpen} 
+            <MobileDrawer
+              isOpen={mobileMenuOpen}
               onOpenChange={toggleMobileMenu}
             />
           </div>

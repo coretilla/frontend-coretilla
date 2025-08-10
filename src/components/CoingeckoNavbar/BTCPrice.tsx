@@ -11,11 +11,7 @@ import {
 import { TrendingUp, TrendingDown, RefreshCw, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { useBTCPrice } from "@/hooks";
-
-interface BTCPriceProps {
-  className?: string;
-  showDropdown?: boolean;
-}
+import { BTCPriceProps } from "@/app/types/btc-price-types";
 
 export default function BTCPrice({
   className = "",

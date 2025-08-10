@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import {
   Collapsible,
@@ -14,17 +10,11 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Menu, ChevronDown, ChevronRight } from "lucide-react";
-import Image from "next/image";
 import { motion } from "framer-motion";
-import BTCPrice from "./navbar/BTCPrice";
 import { ConnectWallet } from "./wallet/ConnectWallet";
 import { navGroups } from "@/lib/navItems";
 import { useNavigation, useRouteLoader } from "@/hooks";
-
-interface MobileDrawerProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+import { MobileDrawerProps } from "@/app/types/navbar-types";
 
 export default function MobileDrawer({
   isOpen,
@@ -64,7 +54,6 @@ export default function MobileDrawer({
       </SheetTrigger>
       <SheetContent side="left" className="w-65 p-0">
         <div className="flex flex-col">
-
           <Separator />
 
           {/* Navigation - Grouped Sections */}

@@ -36,11 +36,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useStaking } from "@/hooks/useStaking";
 import { useStakingHistory } from "@/hooks/useStakingHistory";
 import { useYearlyRewards } from "@/hooks/useYearlyRewards";
-
-interface StakeFormData {
-  mBtcAmount: string;
-  unstakeAmount: string;
-}
+import { StakeFormData } from "../types/staking-types";
 
 export default function StakePage() {
   const { isConnected } = useWallet();
@@ -443,7 +439,10 @@ export default function StakePage() {
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="staking" className="font-sans cursor-pointer">
+                <TabsTrigger
+                  value="staking"
+                  className="font-sans cursor-pointer"
+                >
                   Staking
                 </TabsTrigger>
                 <TabsTrigger

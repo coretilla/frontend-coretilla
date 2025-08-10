@@ -1,14 +1,10 @@
 "use client";
 
-import { ReactNode } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import PageTransition from "./PageTransition";
-
-interface MainLayoutProps {
-  children: ReactNode;
-}
+import { MainLayoutProps } from "@/app/types/main-layout-types";
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (

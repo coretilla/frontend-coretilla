@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,16 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
 import Image from "next/image";
-
-interface BTCPriceData {
-  price: number;
-  change24h: number;
-  changePercent: number;
-  high24h: number;
-  low24h: number;
-  volume: number;
-  lastUpdate: string;
-}
+import { BTCPriceData } from "@/app/types/btc-price-types";
 
 export default function BTCPriceViewer() {
   const [priceData, setPriceData] = useState<BTCPriceData>({

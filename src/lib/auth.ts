@@ -1,15 +1,5 @@
+import { NonceResponse, SignInResponse } from "@/app/types/auth-types";
 const API_BASE_URL = "https://core-backend-production-0965.up.railway.app";
-
-interface NonceResponse {
-  nonce: string;
-  expires_at?: string;
-}
-
-interface SignInResponse {
-  message: string;
-  wallet_address: string;
-  access_token: string;
-}
 
 export async function getNonce(walletAddress: string): Promise<NonceResponse> {
   try {

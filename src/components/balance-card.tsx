@@ -1,18 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-
-interface BalanceCardProps {
-  title: string;
-  amount: string;
-  symbol: string;
-  change?: {
-    value: number;
-    percentage: number;
-    period: string;
-  };
-  icon?: React.ReactNode;
-  className?: string;
-}
+import { BalanceCardProps } from "@/app/types/balance-types";
 
 export default function BalanceCard({
   title,
